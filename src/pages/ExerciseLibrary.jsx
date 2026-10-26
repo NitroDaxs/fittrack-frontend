@@ -7,6 +7,7 @@ import FilterChips from '../components/ui/FilterChips'
 import SearchInput from '../components/ui/SearchInput'
 import { EmptyState, ErrorState, SkeletonCard } from '../components/ui/States'
 import Icon from '../components/ui/Icon'
+import {Pagination} from "../components/ui/Pagination.jsx";
 
 const PER_PAGE = 8
 
@@ -162,58 +163,7 @@ export default function ExerciseLibrary() {
         )}
       </section>
 
-      {meta && meta.lastPage > 1 ? (
-        <div className="mt-xl flex justify-center gap-sm">
-          <button
-            type="button"
-            disabled={page === 1}
-            onClick={() => setPage((p) => p - 1)}
-            aria-label="Previous page"
-            className="w-10 h-10 rounded-lg flex items-center justify-center border border-surface-variant text-secondary hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Icon name="chevron_left" />
-          </button>
-          <span className="sm:hidden flex items-center px-md font-label-bold text-label-bold text-secondary">
-            Page {page} of {meta.lastPage}
-          </span>
-
-          {pageItems(page, meta.lastPage).map((item) =>
-            item.gap ? (
-              <span
-                key={item.key}
-                aria-hidden="true"
-                className="hidden sm:flex w-10 h-10 items-center justify-center text-secondary"
-              >
-                …
-              </span>
-            ) : (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => setPage(item.page)}
-                aria-label={`Page ${item.page}`}
-                aria-current={item.page === page ? 'page' : undefined}
-                className={`hidden sm:flex w-10 h-10 rounded-lg items-center justify-center font-label-bold text-label-bold transition-colors ${
-                  item.page === page
-                    ? 'bg-primary text-on-primary shadow-sm'
-                    : 'border border-surface-variant text-secondary hover:bg-surface-container'
-                }`}
-              >
-                {item.page}
-              </button>
-            )
-          )}
-          <button
-            type="button"
-            disabled={page === meta.lastPage}
-            onClick={() => setPage((p) => p + 1)}
-            aria-label="Next page"
-            className="w-10 h-10 rounded-lg flex items-center justify-center border border-surface-variant text-secondary hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            <Icon name="chevron_right" />
-          </button>
-        </div>
-      ) : null}
+      <Pagination page={page} lastPage={meta?.lastPage ?? 1} onPageChange={setPage} />
     </div>
   )
 }
