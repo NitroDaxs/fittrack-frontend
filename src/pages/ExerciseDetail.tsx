@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../i18n/index'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ErrorState, Spinner } from '../components/ui/States'
 import Icon from '../components/ui/Icon'
@@ -8,6 +10,7 @@ import { useExercise, useExercises } from '../hooks/useExercises'
 import { useFavorite } from '../hooks/useFavorite'
 
 export default function ExerciseDetail() {
+  const { t } = useTranslation()
   const { slug = '' } = useParams()
   const navigate = useNavigate()
   const { isMember } = useAuth()
@@ -18,7 +21,7 @@ export default function ExerciseDetail() {
   const { data: relatedData } = useExercises({ muscleGroup: primaryMuscle, perPage: 5 }, Boolean(primaryMuscle))
   const { isSaved, toggle: toggleSaved, pending: saving, canSave } = useFavorite('exercise', exercise?.id)
 
-  if (loading) return <Spinner label="Loading exercise" />
+  if (loading) return <Spinner label={t('exerciseDetail.loadingExercise')} />
   if (error) return <ErrorState error={error} onRetry={refetch} />
   if (!exercise) return null
 
@@ -36,7 +39,7 @@ export default function ExerciseDetail() {
         className="inline-flex items-center gap-xs font-label-bold text-label-bold text-secondary hover:text-primary transition-colors mb-lg"
       >
         <Icon name="arrow-left" size={20} />
-        Library
+        {t('common.library')}
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-xl mb-xl">
@@ -56,29 +59,29 @@ export default function ExerciseDetail() {
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-md mb-lg">
             <div className="bg-surface-container-lowest rounded-xl p-md border border-surface-variant elev-card">
               <dt className="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-xs flex items-center gap-xs">
-                <Icon name="dumbbell" size={16} /> Primary Muscle
+                <Icon name="dumbbell" size={16} />{' '}{t('exerciseDetail.primaryMuscle')}
               </dt>
-              <dd className="font-label-bold text-label-bold text-on-surface">{exercise.primaryMuscles}</dd>
+              <dd className="font-label-bold text-label-bold text-on-surface">{tLabel(exercise.primaryMuscles)}</dd>
             </div>
             <div className="bg-surface-container-lowest rounded-xl p-md border border-surface-variant elev-card">
               <dt className="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-xs flex items-center gap-xs">
-                <Icon name="dumbbell" size={16} /> Equipment
+                <Icon name="dumbbell" size={16} />{' '}{t('common.equipment')}
               </dt>
-              <dd className="font-label-bold text-label-bold text-on-surface">{exercise.equipment}</dd>
+              <dd className="font-label-bold text-label-bold text-on-surface">{tLabel(exercise.equipment)}</dd>
             </div>
           </dl>
 
           <div className="flex flex-wrap gap-sm mb-lg">
             {exercise.muscleGroups.map((group) => (
               <span
-                key={group}
+                key={tLabel(group)}
                 className="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-label-sm text-label-sm"
               >
-                {group}
+                {tLabel(group)}
               </span>
             ))}
             <span className="bg-surface-container text-secondary px-sm py-xs rounded-full font-label-sm text-label-sm">
-              {exercise.difficulty}
+              {tLabel(exercise.difficulty)}
             </span>
           </div>
 
@@ -89,14 +92,14 @@ export default function ExerciseDetail() {
               className="flex items-center gap-sm bg-primary-container text-on-primary font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-primary transition-colors active:scale-95 elev-card"
             >
               <Icon name="plus" size={20} />
-              Add to workout
+              {t('exerciseDetail.addToWorkout')}
             </button>
             <Link
               to={isMember ? '/history' : '/signup'}
               className="flex items-center gap-sm border border-outline text-on-surface font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-surface-container transition-colors"
             >
               <Icon name="list" size={20} />
-              {isMember ? 'View my log' : 'Track your lifts'}
+              {isMember ? t('exerciseDetail.viewMyLog') : t('exerciseDetail.trackYourLifts')}
             </Link>
             {canSave ? (
               <button
@@ -104,7 +107,7 @@ export default function ExerciseDetail() {
                 onClick={toggleSaved}
                 disabled={saving}
                 aria-pressed={isSaved}
-                aria-label={isSaved ? 'Remove from favorites' : 'Add to favorites'}
+                aria-label={isSaved ? t('exerciseDetail.removeFromFavorites') : t('exerciseDetail.addToFavorites')}
                 className={`flex items-center gap-sm border font-label-bold text-label-bold px-lg py-md rounded-lg transition-colors disabled:opacity-60 ${
                   isSaved
                     ? 'border-primary bg-primary-fixed text-on-primary-fixed-variant'
@@ -112,7 +115,7 @@ export default function ExerciseDetail() {
                 }`}
               >
                 <Icon name="heart" size={20} filled={isSaved} />
-                {isSaved ? 'Favorited' : 'Favorite'}
+                {isSaved ? t('exerciseDetail.favorited') : t('exerciseDetail.favorite')}
               </button>
             ) : null}
           </div>
@@ -121,7 +124,7 @@ export default function ExerciseDetail() {
 
       <div className="mb-xl">
         <section className="bg-surface-container-lowest rounded-xl p-lg border border-surface-variant elev-card">
-          <h2 className="font-headline-md text-headline-md text-on-surface mb-lg">How to perform it</h2>
+          <h2 className="font-headline-md text-headline-md text-on-surface mb-lg">{t('exerciseDetail.howToPerformIt')}</h2>
           <ol className="space-y-lg">
             {exercise.steps.map((step, index) => (
               <li key={step.title} className="flex gap-md">
@@ -142,9 +145,9 @@ export default function ExerciseDetail() {
       {related.length > 0 ? (
         <section>
           <div className="flex justify-between items-end mb-lg">
-            <h2 className="font-headline-md text-headline-md text-on-surface">Related Exercises</h2>
+            <h2 className="font-headline-md text-headline-md text-on-surface">{t('exerciseDetail.relatedExercises')}</h2>
             <Link to="/library" className="font-label-bold text-label-bold text-primary hover:text-primary-container">
-              See all
+              {t('exerciseDetail.seeAll')}
             </Link>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-md">
@@ -161,7 +164,7 @@ export default function ExerciseDetail() {
                   {item.name}
                 </h3>
                 <p className="font-label-sm text-label-sm text-secondary">
-                  {item.equipment} • {item.muscleGroups[0]}
+                  {tLabel(item.equipment)} • {tLabel(item.muscleGroups[0] ?? '')}
                 </p>
               </Link>
             ))}

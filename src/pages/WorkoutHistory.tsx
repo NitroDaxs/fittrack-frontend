@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n/index'
 import { useState } from 'react'
 import SearchInput from '../components/ui/SearchInput'
 import { EmptyState, ErrorState, Spinner } from '../components/ui/States'
@@ -13,13 +15,14 @@ function formatWhen(iso: string) {
   const date = new Date(iso)
   const today = new Date()
   const diffDays = Math.floor((today.getTime() - date.getTime()) / 86400000)
-  const time = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
-  if (diffDays === 0) return `Today, ${time}`
-  if (diffDays === 1) return `Yesterday, ${time}`
-  return `${date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}, ${time}`
+  const time = date.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' })
+  if (diffDays === 0) return i18n.t('workoutHistory.today', { time })
+  if (diffDays === 1) return i18n.t('workoutHistory.yesterday', { time })
+  return `${date.toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' })}, ${time}`
 }
 
 export default function WorkoutHistory() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [range, setRange] = useState('All Time')
   const [expandedId, setExpandedId] = useState<number | null>(null)
@@ -55,13 +58,13 @@ export default function WorkoutHistory() {
       <div className="w-full max-w-7xl mx-auto px-margin-mobile md:px-margin-desktop py-xl">
         <div className="mb-xl">
           <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-lg">
-            Workout History
+            {t('workoutHistory.workoutHistory')}
           </h1>
           <div className="flex flex-col md:flex-row gap-md">
             <SearchInput
                 value={search}
                 onChange={handleSearchChange}
-                placeholder="Search workouts..."
+                placeholder={t('workoutHistory.searchWorkouts')}
                 className="flex-1"
             />
             <div className="relative w-full md:w-56">
@@ -73,13 +76,12 @@ export default function WorkoutHistory() {
               <select
                   value={range}
                   onChange={(event) => handleRangeChange(event.target.value)}
-                  aria-label="Filter by date range"
+                  aria-label={t('workoutHistory.filterByDateRange')}
                   className="w-full bg-surface-container-low border-transparent focus:ring-2 focus:ring-primary rounded-lg pl-xl pr-xl py-sm font-body-md text-on-surface appearance-none transition-colors shadow-sm outline-none"
               >
                 {ranges.map((option) => (
                     <option key={option} value={option}>
-                      {option}
-                    </option>
+                      {t(`workoutHistory.ranges.${option}`)} </option>
                 ))}
               </select>
               <Icon
@@ -94,12 +96,12 @@ export default function WorkoutHistory() {
         {error ? (
             <ErrorState error={error} onRetry={refetch} />
         ) : loading ? (
-            <Spinner label="Loading workouts" />
+            <Spinner label={t('workoutHistory.loadingWorkouts')} />
         ) : workouts.length === 0 ? (
             <EmptyState
                 icon="history"
-                title="No workouts in this range"
-                body="Try widening the date filter or clearing your search."
+                title={t('workoutHistory.noWorkoutsInThisRange')}
+                body={t('workoutHistory.tryWideningTheDateFilterOr')}
             />
         ) : (
             <>
@@ -135,7 +137,7 @@ export default function WorkoutHistory() {
                                 aria-expanded={expanded}
                                 className="font-label-bold text-label-bold text-primary-container hover:text-primary transition-colors flex items-center gap-1 md:mt-sm"
                             >
-                              {expanded ? 'Hide details' : 'View Details'}
+                              {expanded ? t('workoutHistory.hideDetails') : t('workoutHistory.viewDetails')}
                               <Icon name={expanded ? 'chevron-up' : 'chevron-right'} size={18} />
                             </button>
                           </div>
@@ -144,7 +146,7 @@ export default function WorkoutHistory() {
                         {expanded ? (
                             <div className="border-t border-surface-variant bg-surface-container-low p-md">
                               {!detail || detail.id !== workout.id ? (
-                                  <Spinner label="Loading sets" />
+                                  <Spinner label={t('workoutHistory.loadingSets')} />
                               ) : (
                                   <ul className="space-y-sm">
                                     {detail.entries.map((entry, index) => (
@@ -161,8 +163,8 @@ export default function WorkoutHistory() {
                                         key={setIndex}
                                         className="font-label-sm text-label-sm text-secondary bg-surface-container px-sm py-xs rounded-full"
                                     >
-                                    {set.weight ? `${set.weight} lbs × ` : ''}
-                                      {set.reps} reps
+                                    {set.weight ? t('workoutHistory.lbs', { weight: set.weight }) : ''}
+                                      {set.reps}{' '}{t('common.reps2')}
                                   </span>
                                 ))}
                               </span>

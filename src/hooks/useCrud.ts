@@ -1,6 +1,8 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useState } from 'react'
-import { errorMessage, fieldErrorsOf } from '../services/http'
+import { toast } from 'sonner'
+import i18n from '../i18n'
+import { fieldErrorsOf } from '../services/http'
 import type { Page } from '../types/shared'
 import type { AdminQuery } from '../types/admin'
 import { useDebounced } from './useDebounced'
@@ -8,11 +10,6 @@ import { useDebounced } from './useDebounced'
 export interface Sort {
   key: string
   dir: 'asc' | 'desc'
-}
-
-export interface Notice {
-  message: string
-  tone: 'success' | 'error'
 }
 
 interface CrudApi<TRow, TForm> {
@@ -44,7 +41,6 @@ export function useCrud<TRow extends { id: number }, TForm>(
   const [sort, setSort] = useState<Sort | null>(defaultSort)
   const [editing, setEditing] = useState<TRow | 'new' | null>(null)
   const [deleting, setDeleting] = useState<TRow | null>(null)
-  const [notice, setNotice] = useState<Notice | null>(null)
 
   const debouncedSearch = useDebounced(search)
 
@@ -62,11 +58,6 @@ export function useCrud<TRow extends { id: number }, TForm>(
     placeholderData: keepPreviousData,
   })
 
-  const flash = useCallback((message: string, tone: Notice['tone'] = 'success') => {
-    setNotice({ message, tone })
-    setTimeout(() => setNotice(null), tone === 'error' ? 6000 : 3000)
-  }, [])
-
   // Admin writes reach public catalogs, taxonomies and stats too, so refresh it all.
   const invalidateAll = () => queryClient.invalidateQueries()
 
@@ -74,7 +65,7 @@ export function useCrud<TRow extends { id: number }, TForm>(
     mutationFn: ({ row, form }: { row: TRow | null; form: TForm }) =>
       row ? api.update(row.id, form) : api.create(form),
     onSuccess: async (_result, { row }) => {
-      flash(row ? 'Changes saved.' : 'Record created.')
+      toast.success(i18n.t(row ? 'toast.saved' : 'toast.created'))
       setEditing(null)
       await invalidateAll()
     },
@@ -83,10 +74,9 @@ export function useCrud<TRow extends { id: number }, TForm>(
   const deleteMutation = useMutation({
     mutationFn: (row: TRow) => api.remove(row.id),
     onSuccess: async () => {
-      flash('Record deleted.')
+      toast.success(i18n.t('toast.deleted'))
       await invalidateAll()
     },
-    onError: (err) => flash(errorMessage(err), 'error'),
     onSettled: () => setDeleting(null),
   })
 
@@ -123,12 +113,8 @@ export function useCrud<TRow extends { id: number }, TForm>(
     saving: saveMutation.isPending,
     save: (form: TForm) => saveMutation.mutate({ row: editingRow, form }),
     fieldErrors,
-    /** Only for failures no form field can show. */
-    saveError: saveMutation.error && Object.keys(fieldErrors).length === 0 ? errorMessage(saveMutation.error) : null,
     confirmDelete: () => {
       if (deleting) deleteMutation.mutate(deleting)
     },
-    notice,
-    flash,
   }
 }

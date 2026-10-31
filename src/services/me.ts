@@ -1,3 +1,4 @@
+import i18n from '../i18n/index'
 import { endpoints } from './endpoints'
 import { del, get, post, put } from './http'
 import type { UserDto } from '../types/auth'
@@ -14,7 +15,7 @@ export function toProfile(raw: UserDto): Profile {
     email: raw.email,
     units: raw.units,
     plan: raw.role === 'admin' ? 'Admin' : 'Member',
-    joined: new Date(raw.created_at).toLocaleDateString(undefined, { month: 'long', year: 'numeric' }),
+    joined: new Date(raw.created_at).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' }),
   }
 }
 
@@ -97,7 +98,7 @@ function toStrength(progression: ProgressionDto | null): Dashboard['strength'] {
   return {
     lift: progression.exercise.name,
     series: progression.data.map((point) => ({
-      label: new Date(`${point.date}T00:00:00`).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+      label: new Date(`${point.date}T00:00:00`).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' }),
       value: point.max_weight,
     })),
   }

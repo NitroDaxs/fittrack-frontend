@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../i18n/index'
 import { useState } from 'react'
 import { RoutineCard } from '../components/cards'
 import SearchInput from '../components/ui/SearchInput'
@@ -7,6 +9,7 @@ import { useRoutines } from '../hooks/useRoutines'
 import { useTaxonomies } from '../hooks/useTaxonomies'
 
 export default function RoutinesCatalog() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [goals, setGoals] = useState<string[]>([])
   const [levels, setLevels] = useState<string[]>([])
@@ -33,10 +36,10 @@ export default function RoutinesCatalog() {
   return (
     <div className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-xl flex flex-col md:flex-row gap-xl">
       <aside className="w-full md:w-64 flex-shrink-0 bg-surface rounded-lg elev-card border border-surface-variant p-md h-fit md:sticky md:top-28">
-        <h2 className="font-headline-md text-headline-md text-on-surface mb-md">Filters</h2>
+        <h2 className="font-headline-md text-headline-md text-on-surface mb-md">{t('routinesCatalog.filters')}</h2>
 
         <fieldset className="mb-lg">
-          <legend className="font-label-bold text-label-bold text-on-surface-variant mb-sm">Goal</legend>
+          <legend className="font-label-bold text-label-bold text-on-surface-variant mb-sm">{t('common.goal')}</legend>
           <div className="flex flex-col gap-xs">
             {(taxonomies?.goals ?? []).map((goal) => (
               <label key={goal.value} className="flex items-center gap-sm cursor-pointer group">
@@ -47,7 +50,7 @@ export default function RoutinesCatalog() {
                   className="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4"
                 />
                 <span className="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">
-                  {goal.label}
+                  {tLabel(goal.label)}
                 </span>
               </label>
             ))}
@@ -55,7 +58,7 @@ export default function RoutinesCatalog() {
         </fieldset>
 
         <fieldset className="mb-lg">
-          <legend className="font-label-bold text-label-bold text-on-surface-variant mb-sm">Experience</legend>
+          <legend className="font-label-bold text-label-bold text-on-surface-variant mb-sm">{t('routinesCatalog.experience')}</legend>
           <div className="flex flex-col gap-xs">
             {(taxonomies?.levels ?? []).map((level) => (
               <label key={level.value} className="flex items-center gap-sm cursor-pointer group">
@@ -66,7 +69,7 @@ export default function RoutinesCatalog() {
                   className="rounded border-outline-variant text-primary focus:ring-primary h-4 w-4"
                 />
                 <span className="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">
-                  {level.label}
+                  {tLabel(level.label)}
                 </span>
               </label>
             ))}
@@ -74,7 +77,7 @@ export default function RoutinesCatalog() {
         </fieldset>
 
         <fieldset className="mb-lg">
-          <legend className="font-label-bold text-label-bold text-on-surface-variant mb-sm">Days/Week</legend>
+          <legend className="font-label-bold text-label-bold text-on-surface-variant mb-sm">{t('common.daysWeek')}</legend>
           <div className="flex gap-sm">
             {[3, 4, 5].map((value) => {
               const active = daysPerWeek === value
@@ -103,7 +106,7 @@ export default function RoutinesCatalog() {
           disabled={!hasFilters}
           className="w-full bg-surface-container-high text-on-surface font-label-bold text-label-bold py-sm rounded hover:bg-surface-variant transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Clear Filters
+          {t('routinesCatalog.clearFilters')}
         </button>
       </aside>
 
@@ -112,17 +115,17 @@ export default function RoutinesCatalog() {
           <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-md mb-lg">
             <div>
               <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">
-                Explore Routines
+                {t('routinesCatalog.exploreRoutines')}
               </h1>
               <p className="font-body-md text-body-md text-on-surface-variant mt-sm">
-                Find the perfect plan for your goals.
+                {t('routinesCatalog.findThePerfectPlanForYour')}
               </p>
             </div>
             <div className="text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap">
-              {loading ? 'Searching…' : `Showing ${routines.length} ${routines.length === 1 ? 'routine' : 'routines'}`}
+              {loading ? t('common.searching') : t('routinesCatalog.showing', { count: routines.length })}
             </div>
           </div>
-          <SearchInput value={search} onChange={setSearch} placeholder="Search routines..." className="max-w-xl" />
+          <SearchInput value={search} onChange={setSearch} placeholder={t('common.searchRoutines')} className="max-w-xl" />
         </header>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
@@ -133,15 +136,15 @@ export default function RoutinesCatalog() {
           ) : routines.length === 0 ? (
             <EmptyState
               icon="calendar-x"
-              title="No routines match those filters"
-              body="Loosen the goal or experience filters to see more programmes."
+              title={t('routinesCatalog.noRoutinesMatchThoseFilters')}
+              body={t('routinesCatalog.loosenTheGoalOrExperienceFilters')}
               action={
                 <button
                   type="button"
                   onClick={clearAll}
                   className="font-label-bold text-label-bold bg-primary text-on-primary px-lg py-sm rounded-lg hover:bg-surface-tint transition-colors"
                 >
-                  Clear filters
+                  {t('common.clearFilters')}
                 </button>
               }
             />

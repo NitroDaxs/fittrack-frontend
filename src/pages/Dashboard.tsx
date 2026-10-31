@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n/index'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useUnits } from '../context/UnitContext'
@@ -13,6 +15,7 @@ const change = (from: number | null, to: number | null): number =>
   from === null || to === null ? 0 : Number((to - from).toFixed(1))
 
 export default function Dashboard() {
+  const { t } = useTranslation()
   const { user } = useAuth()
   const { weightLabel, showWeight } = useUnits()
   const navigate = useNavigate()
@@ -20,7 +23,7 @@ export default function Dashboard() {
   const { data, isPending: loading, error, refetch } = useDashboard()
   const { data: workouts } = useWorkouts({ perPage: 3 })
 
-  if (loading) return <Spinner label="Loading your dashboard" />
+  if (loading) return <Spinner label={t('dashboard.loadingYourDashboard')} />
   if (error) return <ErrorState error={error} onRetry={refetch} />
   if (!data) return null
 
@@ -38,9 +41,9 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-lg mb-xl">
         <div>
           <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background tracking-tight">
-            Welcome back{user ? `, ${user.name}` : ''}!
+            {user ? t('dashboard.welcomeBack2', { name: user.name }) : t('dashboard.welcomeBack')}
           </h1>
-          <p className="font-body-md text-body-md text-secondary mt-base">Ready to crush your goals today?</p>
+          <p className="font-body-md text-body-md text-secondary mt-base">{t('dashboard.readyToCrushYourGoalsToday')}</p>
         </div>
         <div className="flex flex-wrap gap-md">
           <button
@@ -49,21 +52,21 @@ export default function Dashboard() {
             className="flex items-center gap-sm bg-primary text-on-primary font-label-bold text-label-bold px-lg py-md rounded-lg elev-card hover:bg-surface-tint transition-colors"
           >
             <Icon name="play" size={20} filled />
-            Start a workout
+            {t('dashboard.startAWorkout')}
           </button>
           <Link
             to="/measurements"
             className="flex items-center gap-sm border border-outline text-on-surface font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-surface-container transition-colors"
           >
             <Icon name="plus" size={20} />
-            Log measurements
+            {t('dashboard.logMeasurements')}
           </Link>
           <Link
             to="/builder"
             className="flex items-center gap-sm border border-outline text-on-surface font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-surface-container transition-colors"
           >
             <Icon name="list-plus" size={20} />
-            Build a workout
+            {t('common.buildAWorkout')}
           </Link>
         </div>
       </div>
@@ -71,9 +74,9 @@ export default function Dashboard() {
       {/* Quick stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-lg mb-xl">
         {[
-          { value: stats.streak, label: 'Day Streak' },
-          { value: stats.workoutsThisWeek, label: 'Workouts this week' },
-          { value: showWeight(stats.latestWeight) ?? '—', unit: weightLabel, label: 'Latest Weight' },
+          { value: stats.streak, label: t('dashboard.dayStreak') },
+          { value: stats.workoutsThisWeek, label: t('dashboard.workoutsThisWeek') },
+          { value: showWeight(stats.latestWeight) ?? '—', unit: weightLabel, label: t('dashboard.latestWeight') },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -96,12 +99,12 @@ export default function Dashboard() {
           <div className="flex flex-wrap gap-sm justify-between items-center mb-lg">
             <div>
               <h2 className="font-headline-md text-headline-md text-on-surface">
-                Strength Progression{strength ? ` — ${strength.lift}` : ''}
+                {t('dashboard.strengthProgression')}{strength ? ` — ${strength.lift}` : ''}
               </h2>
               <p className="font-label-sm text-label-sm text-secondary mt-xs flex items-center gap-xs">
                 <Icon name={delta >= 0 ? 'trending-up' : 'trending-down'} size={16} className="text-primary" />
                 {delta >= 0 ? '+' : ''}
-                {delta} {weightLabel} since your first logged session
+                {delta} {weightLabel}{' '}{t('dashboard.sinceYourFirstLoggedSession')}
               </p>
             </div>
           </div>
@@ -112,10 +115,10 @@ export default function Dashboard() {
 
         <section className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-container flex flex-col min-h-[340px]">
           <div className="mb-lg">
-            <h2 className="font-headline-md text-headline-md text-on-surface">Body Weight</h2>
+            <h2 className="font-headline-md text-headline-md text-on-surface">{t('dashboard.bodyWeight')}</h2>
             <p className="font-label-sm text-label-sm text-secondary mt-xs flex items-center gap-xs">
               <Icon name={weightDelta <= 0 ? 'arrow-down' : 'arrow-up'} size={16} className="text-primary" />
-              {weightDelta} {weightLabel} across your recent entries
+              {weightDelta} {weightLabel}{' '}{t('dashboard.acrossYourRecentEntries')}
             </p>
           </div>
           <div className="flex-grow min-h-[220px]">
@@ -125,8 +128,8 @@ export default function Dashboard() {
 
         <section className="lg:col-span-3 bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-container">
           <div className="flex justify-between items-center mb-lg">
-            <h2 className="font-headline-md text-headline-md text-on-surface">Workout Consistency</h2>
-            <span className="font-label-sm text-label-sm text-secondary">Last 90 Days</span>
+            <h2 className="font-headline-md text-headline-md text-on-surface">{t('dashboard.workoutConsistency')}</h2>
+            <span className="font-label-sm text-label-sm text-secondary">{t('dashboard.last90Days')}</span>
           </div>
           <ConsistencyHeatmap days={consistency} />
         </section>
@@ -135,9 +138,9 @@ export default function Dashboard() {
       {/* Recent workouts */}
       <section className="mt-xl">
         <div className="flex justify-between items-end mb-lg">
-          <h2 className="font-headline-md text-headline-md text-on-surface">Recent Workouts</h2>
+          <h2 className="font-headline-md text-headline-md text-on-surface">{t('dashboard.recentWorkouts')}</h2>
           <Link to="/history" className="font-label-bold text-label-bold text-primary hover:text-primary-container">
-            View all
+            {t('dashboard.viewAll')}
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-md">
@@ -153,8 +156,8 @@ export default function Dashboard() {
               <span className="min-w-0">
                 <span className="block font-label-bold text-label-bold text-on-surface truncate">{workout.name}</span>
                 <span className="block font-label-sm text-label-sm text-secondary">
-                  {new Date(workout.performedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} •{' '}
-                  {workout.minutes ?? '—'} min
+                  {new Date(workout.performedAt).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' })} •{' '}
+                  {workout.minutes ?? '—'}{' '}{t('dashboard.min')}
                 </span>
               </span>
             </Link>

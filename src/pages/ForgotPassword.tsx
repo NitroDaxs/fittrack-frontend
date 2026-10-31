@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n/index'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { fieldErrorsOf } from '../services/http'
@@ -8,12 +10,13 @@ import Icon from '../components/ui/Icon'
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function validate(email: string): string | undefined {
-  if (!email.trim()) return 'Enter your email address.'
-  if (!EMAIL_PATTERN.test(email)) return 'That does not look like a valid email address.'
+  if (!email.trim()) return i18n.t('common.enterYourEmailAddress')
+  if (!EMAIL_PATTERN.test(email)) return i18n.t('common.thatDoesNotLookLikeA')
   return undefined
 }
 
 export default function ForgotPassword() {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string>()
   const [submitting, setSubmitting] = useState(false)
@@ -30,7 +33,7 @@ export default function ForgotPassword() {
       await authService.forgotPassword({ email: email.trim() })
       setSent(true)
     } catch (err) {
-      setError(fieldErrorsOf(err).email ?? 'Something went wrong. Please try again.')
+      setError(fieldErrorsOf(err).email ?? t('common.somethingWentWrongPleaseTryAgain'))
     } finally {
       setSubmitting(false)
     }
@@ -44,35 +47,34 @@ export default function ForgotPassword() {
         {sent ? (
           <div className="text-center" role="status">
             <Icon name="mail" size={40} className="text-primary mb-sm" />
-            <h1 className="font-headline-md text-headline-md text-on-surface mb-sm">Check your email</h1>
+            <h1 className="font-headline-md text-headline-md text-on-surface mb-sm">{t('forgotPassword.checkYourEmail')}</h1>
             <p className="font-body-md text-body-md text-on-surface-variant">
-              If an account exists for <span className="text-on-surface">{email.trim()}</span>, we&apos;ve sent a link
-              to reset your password. It expires in 60 minutes.
+              {t('forgotPassword.ifAnAccountExistsFor')}{' '}<span className="text-on-surface">{email.trim()}</span>{t('forgotPassword.weVeSentALinkTo')}
             </p>
             <p className="mt-md font-label-sm text-label-sm text-secondary">
-              Nothing there? Check your spam folder, or{' '}
+              {t('forgotPassword.nothingThereCheckYourSpamFolder')}{' '}
               <button
                 type="button"
                 onClick={() => setSent(false)}
                 className="font-label-sm text-label-sm text-primary hover:text-primary-container"
               >
-                try again
+                {t('forgotPassword.tryAgain')}
               </button>{' '}
-              in a minute.
+              {t('forgotPassword.inAMinute')}
             </p>
           </div>
         ) : (
           <>
             <div className="text-center mb-xl">
-              <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-sm">Reset your password</h1>
+              <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-sm">{t('forgotPassword.resetYourPassword')}</h1>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Enter your email and we&apos;ll send you a reset link.
+                {t('forgotPassword.enterYourEmailAndWeLl')}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} noValidate className="space-y-lg">
               <TextField
-                label="Email Address"
+                label={t('common.emailAddress')}
                 name="email"
                 type="email"
                 icon="mail"
@@ -88,7 +90,7 @@ export default function ForgotPassword() {
                 disabled={submitting}
                 className="w-full flex justify-center items-center gap-sm py-sm px-md rounded-lg shadow-sm font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-colors duration-200 active:scale-[0.98] disabled:opacity-60"
               >
-                {submitting ? 'Sending…' : 'Send reset link'}
+                {submitting ? t('forgotPassword.sending') : t('forgotPassword.sendResetLink')}
               </button>
             </form>
           </>
@@ -96,7 +98,7 @@ export default function ForgotPassword() {
 
         <p className="mt-lg text-center font-body-md text-body-md text-on-surface-variant">
           <Link to="/login" className="font-label-bold text-label-bold text-primary hover:text-primary-container">
-            Back to log in
+            {t('forgotPassword.backToLogIn')}
           </Link>
         </p>
       </div>

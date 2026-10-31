@@ -1,8 +1,11 @@
+import { useTranslation } from 'react-i18next'
+import i18n, { tLabel } from '../../i18n/index'
+import { toast } from 'sonner'
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { errorMessage } from '../../services/http'
 import { adminService } from '../../services/admin'
 import type { AdminUser, UserForm } from '../../types/admin'
-import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter, Notice } from '../../components/admin/AdminPage'
+import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter } from '../../components/admin/AdminPage'
 import DataTable, { RowActions, TableFooter, type Column } from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
 import { SelectField, TextField } from '../../components/ui/Field'
@@ -26,6 +29,7 @@ const roleTone: Record<string, string> = {
 }
 
 export default function AdminUsers() {
+  const { t } = useTranslation()
   const [role, setRole] = useState('')
   const [status, setStatus] = useState('')
 
@@ -46,8 +50,8 @@ export default function AdminUsers() {
   const submit = (event: FormEvent) => {
     event.preventDefault()
     const found: FormErrors = {}
-    if (!form.name.trim()) found.name = 'Name is required.'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) found.email = 'Enter a valid email address.'
+    if (!form.name.trim()) found.name = t('common.nameIsRequired')
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) found.email = t('admin.users.enterAValidEmailAddress')
     setErrors(found)
     if (Object.keys(found).length > 0) return
     crud.save(form)
@@ -59,15 +63,16 @@ export default function AdminUsers() {
     try {
       await adminService.users.toggleActive(row.id)
       await crud.refetch()
+      toast.success(i18n.t('toast.statusUpdated'))
     } catch (err) {
-      crud.flash(errorMessage(err), 'error')
+      toast.error(errorMessage(err))
     }
   }
 
   const columns: Column<AdminUser>[] = [
     {
       key: 'name',
-      header: 'Name',
+      header: t('common.name'),
       sortable: true,
       render: (row) => (
         <span className="flex items-center gap-md">
@@ -80,7 +85,7 @@ export default function AdminUsers() {
     },
     {
       key: 'email',
-      header: 'Email',
+      header: t('common.email'),
       sortable: true,
       className: 'hidden md:table-cell text-on-surface-variant',
       headerClassName: 'hidden md:table-cell',
@@ -88,36 +93,36 @@ export default function AdminUsers() {
     },
     {
       key: 'role',
-      header: 'Role',
+      header: t('admin.users.role'),
       sortable: true,
       render: (row) => (
         <span className={`px-sm py-xs rounded-full font-label-sm text-label-sm ${roleTone[row.role] ?? roleTone.Member}`}>
-          {row.role}
+          {tLabel(row.role)}
         </span>
       ),
     },
     {
       key: 'joined',
-      header: 'Joined Date',
+      header: t('admin.users.joinedDate'),
       sortable: true,
       className: 'hidden sm:table-cell text-on-surface-variant whitespace-nowrap',
       headerClassName: 'hidden sm:table-cell',
       render: (row) =>
-        new Date(row.joined).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' }),
+        new Date(row.joined).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: '2-digit' }),
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('common.status'),
       sortable: true,
       render: (row) => (
         <span className={`px-sm py-xs rounded-full font-label-sm text-label-sm ${statusTone[row.status]}`}>
-          {row.status}
+          {tLabel(row.status)}
         </span>
       ),
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('common.actions'),
       headerClassName: 'text-right',
       className: 'text-right',
       render: (row) => (
@@ -125,8 +130,8 @@ export default function AdminUsers() {
           <button
             type="button"
             onClick={() => toggleStatus(row)}
-            aria-label={row.status === 'Suspended' ? `Reinstate ${row.name}` : `Suspend ${row.name}`}
-            title={row.status === 'Suspended' ? 'Reinstate' : 'Suspend'}
+            aria-label={row.status === 'Suspended' ? t('admin.users.reinstate2', { name: row.name }) : t('admin.users.suspend2', { name: row.name })}
+            title={row.status === 'Suspended' ? t('admin.users.reinstate') : t('admin.users.suspend')}
             className="p-xs text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container"
           >
             <Icon name={row.status === 'Suspended' ? 'circle-check' : 'ban'} size={20} />
@@ -140,33 +145,31 @@ export default function AdminUsers() {
   return (
     <>
       <AdminHeader
-        title="User Management"
-        description="View and manage all registered accounts in the system."
-        actionLabel="Add user"
+        title={t('admin.users.userManagement')}
+        description={t('admin.users.viewAndManageAllRegisteredAccounts')}
+        actionLabel={t('admin.users.addUser')}
         onAction={() => crud.setEditing('new')}
       />
 
-      <Notice notice={crud.notice} />
-
-      <AdminToolbar search={crud.search} onSearch={crud.setSearch} placeholder="Search by name or email...">
+      <AdminToolbar search={crud.search} onSearch={crud.setSearch} placeholder={t('admin.users.searchByNameOrEmail')}>
         <AdminSelect
-          label="Role"
+          label={t('admin.users.role')}
           value={role}
           onChange={setRole}
           options={[
-            { value: '', label: 'All Roles' },
-            { value: 'admin', label: 'Admin' },
-            { value: 'member', label: 'Member' },
+            { value: '', label: t('admin.users.allRoles') },
+            { value: 'admin', label: t('common.admin') },
+            { value: 'member', label: t('common.member') },
           ]}
         />
         <AdminSelect
-          label="Status"
+          label={t('common.status')}
           value={status}
           onChange={setStatus}
           options={[
-            { value: '', label: 'All Status' },
-            { value: 'active', label: 'Active' },
-            { value: 'suspended', label: 'Suspended' },
+            { value: '', label: t('common.allStatus') },
+            { value: 'active', label: t('admin.users.active') },
+            { value: 'suspended', label: t('admin.users.suspended') },
           ]}
         />
       </AdminToolbar>
@@ -175,7 +178,7 @@ export default function AdminUsers() {
         {crud.error ? (
           <ErrorState error={crud.error} onRetry={crud.refetch} />
         ) : crud.loading ? (
-          <Spinner label="Loading users" />
+          <Spinner label={t('admin.users.loadingUsers')} />
         ) : (
           <>
             <DataTable
@@ -183,11 +186,11 @@ export default function AdminUsers() {
               rows={crud.rows}
               sort={crud.sort}
               onSortChange={crud.setSort}
-              empty="No users match those filters."
+              empty={t('admin.users.noUsersMatchThoseFilters')}
             />
             <TableFooter>
               <span className="font-label-sm text-label-sm text-on-surface-variant">
-                Showing {crud.rows.length} of {crud.meta?.total ?? crud.rows.length} entries
+                {t('admin.users.showingOfEntries', { shown: crud.rows.length, total: crud.meta?.total ?? crud.rows.length })}
               </span>
               <Pagination page={crud.page} lastPage={crud.meta?.lastPage ?? 1} onPageChange={crud.setPage} className="" />
             </TableFooter>
@@ -197,17 +200,16 @@ export default function AdminUsers() {
 
       <Modal
         open={Boolean(crud.editing)}
-        title={crud.editingRow ? 'Edit user' : 'Add user'}
-        description={crud.editingRow ? undefined : 'They can set their own password with "Forgot password?".'}
+        title={crud.editingRow ? t('admin.users.editUser') : t('admin.users.addUser')}
+        description={crud.editingRow ? undefined : t('admin.users.theyCanSetTheirOwnPassword')}
         onClose={() => crud.setEditing(null)}
         footer={<ModalFooter onCancel={() => crud.setEditing(null)} saving={crud.saving} />}
         size="sm"
       >
         <form id="crud-form" onSubmit={submit} noValidate className="space-y-md">
-          {crud.saveError ? <Notice notice={{ message: crud.saveError, tone: 'error' }} /> : null}
-          <TextField label="Name" name="name" value={form.name} onChange={setField('name')} error={errors.name ?? crud.fieldErrors.name} />
+          <TextField label={t('common.name')} name="name" value={form.name} onChange={setField('name')} error={errors.name ?? crud.fieldErrors.name} />
           <TextField
-            label="Email"
+            label={t('common.email')}
             name="email"
             type="email"
             value={form.email}
@@ -215,13 +217,13 @@ export default function AdminUsers() {
             error={errors.email ?? crud.fieldErrors.email}
           />
           <div className="grid grid-cols-2 gap-md">
-            <SelectField label="Role" name="role" value={form.role} onChange={setField('role')}>
-              <option>Member</option>
-              <option>Admin</option>
+            <SelectField label={t('admin.users.role')} name="role" value={form.role} onChange={setField('role')}>
+              <option value="Member">{t('common.member')}</option>
+              <option value="Admin">{t('common.admin')}</option>
             </SelectField>
-            <SelectField label="Status" name="status" value={form.status} onChange={setField('status')}>
-              <option>Active</option>
-              <option>Suspended</option>
+            <SelectField label={t('common.status')} name="status" value={form.status} onChange={setField('status')}>
+              <option value="Active">{t('admin.users.active')}</option>
+              <option value="Suspended">{t('admin.users.suspended')}</option>
             </SelectField>
           </div>
         </form>

@@ -1,23 +1,26 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Icon from '../components/ui/Icon'
+import LanguageSwitcher from '../components/ui/LanguageSwitcher'
 import ProfileMenu from './ProfileMenu'
 
 const publicLinks = [
-  { to: '/library', label: 'Library' },
-  { to: '/routines', label: 'Routines' },
-  { to: '/calculators', label: 'Calculators' },
-  { to: '/articles', label: 'Articles' },
+  { to: '/library', label: 'common.library' },
+  { to: '/routines', label: 'nav.routines' },
+  { to: '/calculators', label: 'common.calculators' },
+  { to: '/articles', label: 'nav.articles' },
 ]
 
 const memberLinks = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/history', label: 'History' },
-  { to: '/measurements', label: 'Measurements' },
+  { to: '/dashboard', label: 'nav.dashboard' },
+  { to: '/history', label: 'nav.history' },
+  { to: '/measurements', label: 'nav.measurements' },
 ]
 
 export default function TopNav() {
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -43,7 +46,7 @@ export default function TopNav() {
           <div className="hidden lg:flex items-center gap-lg">
             {links.map((link) => (
               <NavLink key={link.to} to={link.to} className={linkClass}>
-                {link.label}
+                {t(link.label)}
               </NavLink>
             ))}
           </div>
@@ -56,8 +59,9 @@ export default function TopNav() {
                 to="/builder"
                 className="hidden md:block font-label-bold text-label-bold border border-outline text-on-surface px-md py-sm rounded-lg hover:bg-surface-container transition-colors"
               >
-                Build a workout
+                {t('common.buildAWorkout')}
               </Link>
+              <LanguageSwitcher />
               <ProfileMenu />
             </>
           ) : (
@@ -66,20 +70,22 @@ export default function TopNav() {
                 to="/login"
                 className="font-label-bold text-label-bold text-secondary hover:text-primary-container px-sm py-xs transition-colors"
               >
-                Login
+                {t('nav.login')}
               </Link>
               <Link
                 to="/signup"
                 className="font-label-bold text-label-bold bg-primary-container text-on-primary px-lg py-sm rounded-lg hover:bg-primary transition-colors active:scale-95 elev-card border border-surface-variant"
               >
-                Sign up free
+                {t('nav.signUpFree')}
               </Link>
             </div>
           )}
 
+          {isAuthenticated ? null : <LanguageSwitcher />}
+
           <button
             type="button"
-            aria-label="Toggle menu"
+            aria-label={t('nav.toggleMenu')}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((open) => !open)}
             className="lg:hidden text-primary p-xs active:scale-95 transition-transform"
@@ -102,7 +108,7 @@ export default function TopNav() {
                 }`
               }
             >
-              {link.label}
+              {t(link.label)}
             </NavLink>
           ))}
           {!isAuthenticated ? (
@@ -112,14 +118,14 @@ export default function TopNav() {
                   onClick={() => setMenuOpen(false)}
                   className="font-label-bold text-label-bold py-sm px-sm rounded-lg border border-outline text-center text-on-surface"
                 >
-                  Login
+                  {t('nav.login')}
                 </Link>
                 <Link
                   to="/signup"
                   onClick={() => setMenuOpen(false)}
                   className="font-label-bold text-label-bold py-sm px-sm rounded-lg bg-primary-container text-on-primary text-center"
                 >
-                  Sign up free
+                  {t('nav.signUpFree')}
                 </Link>
             </div>
           ) : null}

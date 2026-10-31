@@ -2,32 +2,32 @@
 export const calculators = [
   {
     slug: '1rm',
-    name: '1RM Calculator',
-    description: 'Estimate your one-rep max to optimize your training zones.',
+    name: 'common.x1rmCalculator',
+    description: 'common.estimateYourOneRepMaxTo',
     icon: 'dumbbell' as const,
   },
   {
     slug: 'tdee',
-    name: 'TDEE Calculator',
-    description: 'Work out how many calories you burn on an average day.',
+    name: 'common.tdeeCalculator',
+    description: 'calculators.hub.workOutHowManyCaloriesYou',
     icon: 'flame' as const,
   },
   {
     slug: 'bmi',
-    name: 'BMI Calculator',
-    description: 'A rough population-level screen for body composition.',
+    name: 'common.bmiCalculator',
+    description: 'calculators.hub.aRoughPopulationLevelScreenFor',
     icon: 'scale' as const,
   },
   {
     slug: 'macros',
-    name: 'Macro Split Calculator',
-    description: 'Divide your calorie target into protein, carbs, and fat.',
+    name: 'common.macroSplitCalculator',
+    description: 'calculators.hub.divideYourCalorieTargetIntoProtein',
     icon: 'chart-pie' as const,
   },
   {
     slug: 'bodyfat',
-    name: 'Body Fat % Estimator',
-    description: 'Estimate body fat from tape measurements.',
+    name: 'common.bodyFatEstimator',
+    description: 'calculators.hub.estimateBodyFatFromTapeMeasurements',
     icon: 'person-standing' as const,
   },
 ]

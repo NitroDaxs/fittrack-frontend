@@ -1,4 +1,5 @@
 import axios, { type AxiosRequestConfig } from 'axios'
+import i18n from '../i18n'
 
 const TOKEN_KEY = 'token'
 
@@ -28,22 +29,22 @@ interface ErrorBody {
 
 function toApiError(error: unknown): ApiError {
   if (!axios.isAxiosError<ErrorBody>(error)) {
-    return new ApiError(error instanceof Error ? error.message : 'Request failed', undefined)
+    return new ApiError(error instanceof Error ? error.message : i18n.t('errors.requestFailed'), undefined)
   }
   if (!error.response) {
-    return new ApiError('Could not reach the server. Check your connection and try again.', undefined)
+    return new ApiError(i18n.t('errors.unreachable'), undefined)
   }
 
   const { status, data } = error.response
   const fieldErrors = Object.fromEntries(
-    Object.entries(data?.errors ?? {}).map(([field, messages]) => [field, messages[0] ?? 'This value is invalid.']),
+    Object.entries(data?.errors ?? {}).map(([field, messages]) => [field, messages[0] ?? i18n.t('errors.invalidValue')]),
   )
-  return new ApiError(data?.message || 'Request failed', status, fieldErrors)
+  return new ApiError(data?.message || i18n.t('errors.requestFailed'), status, fieldErrors)
 }
 
 /** The message to show for anything a request can throw. */
 export const errorMessage = (error: unknown): string =>
-  error instanceof Error ? error.message : 'Something went wrong. Please try again.'
+  error instanceof Error ? error.message : i18n.t('errors.generic')
 
 export const fieldErrorsOf = (error: unknown): Record<string, string> =>
   error instanceof ApiError ? error.fieldErrors : {}

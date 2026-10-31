@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n/index'
 import type { IconName } from '../components/ui/Icon'
 import { useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -11,12 +13,12 @@ type Errors = Partial<Record<keyof Values, string>>
 
 function validate(values: Values): Errors {
   const errors: Errors = {}
-  if (!values.password) errors.password = 'Choose a new password.'
-  else if (values.password.length < 8) errors.password = 'Must be at least 8 characters.'
-  else if (!/[0-9]/.test(values.password)) errors.password = 'Include at least one number.'
+  if (!values.password) errors.password = i18n.t('resetPassword.chooseANewPassword2')
+  else if (values.password.length < 8) errors.password = i18n.t('common.mustBeAtLeast8Characters')
+  else if (!/[0-9]/.test(values.password)) errors.password = i18n.t('common.includeAtLeastOneNumber')
 
-  if (!values.confirm) errors.confirm = 'Confirm your new password.'
-  else if (values.confirm !== values.password) errors.confirm = 'Passwords do not match.'
+  if (!values.confirm) errors.confirm = i18n.t('resetPassword.confirmYourNewPassword')
+  else if (values.confirm !== values.password) errors.confirm = i18n.t('common.passwordsDoNotMatch')
 
   return errors
 }
@@ -38,6 +40,7 @@ function Notice({ icon, title, children, action, to }: { icon: IconName; title: 
 }
 
 export default function ResetPassword() {
+  const { t } = useTranslation()
   const [params] = useSearchParams()
   const token = params.get('token')
 
@@ -82,7 +85,7 @@ export default function ResetPassword() {
       } else if (fields.password || fields.password_confirmation) {
         setErrors({ password: fields.password, confirm: fields.password_confirmation })
       } else {
-        setFormError('Something went wrong. Please try again.')
+        setFormError(t('common.somethingWentWrongPleaseTryAgain'))
       }
     } finally {
       setSubmitting(false)
@@ -95,25 +98,25 @@ export default function ResetPassword() {
 
       <div className="w-full max-w-md bg-surface-container-lowest elev-card rounded-xl p-lg md:p-xl relative z-10 border border-surface-variant/50">
         {stage === 'done' ? (
-          <Notice icon="circle-check" title="Password updated" action="Log in" to="/login">
-            You can now log in with your new password.
+          <Notice icon="circle-check" title={t('resetPassword.passwordUpdated')} action={t('common.logIn')} to="/login">
+            {t('resetPassword.youCanNowLogInWith')}
           </Notice>
         ) : stage === 'invalid' ? (
-          <Notice icon="unlink" title="This link doesn't work" action="Request a new link" to="/forgot-password">
-            Reset links work once and expire after 60 minutes. Request a new one to continue.
+          <Notice icon="unlink" title={t('resetPassword.thisLinkDoesnTWork')} action={t('resetPassword.requestANewLink')} to="/forgot-password">
+            {t('resetPassword.resetLinksWorkOnceAndExpire')}
           </Notice>
         ) : (
           <>
             <div className="text-center mb-xl">
-              <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-sm">Choose a new password</h1>
+              <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-sm">{t('resetPassword.chooseANewPassword')}</h1>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Use at least 8 characters, including a number.
+                {t('resetPassword.useAtLeast8CharactersIncluding')}
               </p>
             </div>
 
             <form onSubmit={handleSubmit} noValidate className="space-y-lg">
               <TextField
-                label="New Password"
+                label={t('resetPassword.newPassword')}
                 name="password"
                 type="password"
                 icon="lock"
@@ -125,7 +128,7 @@ export default function ResetPassword() {
                 error={touched.password ? errors.password : undefined}
               />
               <TextField
-                label="Confirm New Password"
+                label={t('resetPassword.confirmNewPassword')}
                 name="confirm"
                 type="password"
                 icon="lock"
@@ -148,7 +151,7 @@ export default function ResetPassword() {
                 disabled={submitting}
                 className="w-full flex justify-center items-center gap-sm py-sm px-md rounded-lg shadow-sm font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-colors duration-200 active:scale-[0.98] disabled:opacity-60"
               >
-                {submitting ? 'Updating…' : 'Update password'}
+                {submitting ? t('resetPassword.updating') : t('resetPassword.updatePassword')}
               </button>
             </form>
           </>

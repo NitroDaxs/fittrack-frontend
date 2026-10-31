@@ -19,6 +19,8 @@ Core.
 - [Authentication and roles](#authentication-and-roles)
 - [Calculators](#calculators)
 - [Units](#units)
+- [Languages](#languages)
+- [Notifications](#notifications)
 - [Styling and components](#styling-and-components)
 - [Deployment](#deployment)
 - [Known limitations](#known-limitations)
@@ -34,6 +36,8 @@ Core.
 | Styling | Tailwind CSS 3 |
 | Charts | Recharts |
 | Icons | Lucide |
+| Languages | i18next, react-i18next |
+| Notifications | Sonner |
 | Hosting config | Vercel |
 
 ## Features
@@ -206,6 +210,25 @@ display, so switching between metric and imperial never changes saved data.
 `UnitContext` holds the current choice, saved to the profile and mirrored in
 `localStorage` so the first paint uses the right units. `utils/units.ts` does the
 display conversion.
+
+## Languages
+
+The app is available in English and Bulgarian. Text lives in `src/i18n/locales/en.json`
+and `bg.json`, and the first visit follows the browser's language. The language dropdown in
+the header remembers the choice in this browser.
+
+Use `t('key')` from `useTranslation()` in components, and add every new key to both
+files. `tLabel()` translates fixed values the API sends in English, such as muscle
+groups and difficulty levels.
+
+Exercise, routine and article content comes from the database, and API messages come
+from the backend, so both stay in English.
+
+## Notifications
+
+Toasts use Sonner. `services/queryClient.ts` shows a toast for every failed write,
+except field errors, which the form shows. Hooks show the success toasts, such as
+`toast.success(i18n.t('toast.deleted'))`.
 
 ## Styling and components
 

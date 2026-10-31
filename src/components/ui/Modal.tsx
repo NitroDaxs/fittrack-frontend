@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useEffect, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import Icon from './Icon'
@@ -13,6 +14,7 @@ interface ModalProps {
 }
 
 export default function Modal({ open, title, description, onClose, children, footer, size = 'md' }: ModalProps) {
+  const { t } = useTranslation()
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Kept in a ref so the effect below doesn't need `onClose` as a dependency.
@@ -66,7 +68,7 @@ export default function Modal({ open, title, description, onClose, children, foo
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close dialog"
+            aria-label={t('ui.closeDialog')}
             className="text-secondary hover:text-on-surface hover:bg-surface-container rounded-full p-xs transition-colors shrink-0"
           >
             <Icon name="x" size={20} />

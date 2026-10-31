@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { InputHTMLAttributes } from 'react'
 import Icon from './Icon'
 
@@ -6,7 +7,8 @@ interface SearchInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, '
   onChange: (value: string) => void
 }
 
-export default function SearchInput({ value, onChange, placeholder = 'Search...', className = '', ...rest }: SearchInputProps) {
+export default function SearchInput({ value, onChange, placeholder, className = '', ...rest }: SearchInputProps) {
+  const { t } = useTranslation()
   return (
     <div className={`relative ${className}`}>
       <Icon
@@ -18,7 +20,7 @@ export default function SearchInput({ value, onChange, placeholder = 'Search...'
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('ui.search')}
         aria-label={placeholder}
         className="w-full bg-surface-container-low border-none rounded-lg pl-xl pr-md py-sm focus:ring-2 focus:ring-primary focus:bg-surface transition-all text-on-background font-body-md shadow-sm outline-none"
         {...rest}
@@ -27,7 +29,7 @@ export default function SearchInput({ value, onChange, placeholder = 'Search...'
         <button
           type="button"
           onClick={() => onChange('')}
-          aria-label="Clear search"
+          aria-label={t('ui.clearSearch')}
           className="absolute right-sm top-1/2 -translate-y-1/2 text-secondary hover:text-on-surface"
         >
           <Icon name="x" size={18} />

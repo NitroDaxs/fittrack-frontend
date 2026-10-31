@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { IconName } from './Icon'
 import { useState } from 'react'
 import Icon from './Icon'
@@ -20,6 +21,7 @@ interface VideoEmbedProps {
 }
 
 export default function VideoEmbed({ videoId, poster, title = '', icon = 'dumbbell', className = '' }: VideoEmbedProps) {
+  const { t } = useTranslation()
   const [playing, setPlaying] = useState(false)
 
   // 16:9 matches both the player and YouTube's thumbnails. hqdefault is 4:3
@@ -32,7 +34,7 @@ export default function VideoEmbed({ videoId, poster, title = '', icon = 'dumbbe
       <div className={frame}>
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`}
-          title={title ? `${title} demonstration` : 'Exercise demonstration'}
+          title={title ? t('ui.demonstration', { title }) : t('ui.exerciseDemonstration')}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           allowFullScreen
           className="absolute inset-0 w-full h-full border-0"
@@ -48,7 +50,7 @@ export default function VideoEmbed({ videoId, poster, title = '', icon = 'dumbbe
         <button
           type="button"
           onClick={() => setPlaying(true)}
-          aria-label={title ? `Play ${title} demonstration` : 'Play demonstration video'}
+          aria-label={title ? t('ui.playDemonstration', { title }) : t('ui.playDemonstrationVideo')}
           className="absolute inset-0 flex items-center justify-center group focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
         >
           <span className="w-16 h-16 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center text-primary elev-overlay transition-transform duration-200 group-hover:scale-110 group-active:scale-95">

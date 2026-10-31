@@ -1,3 +1,6 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../i18n/index'
+import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useUnits } from '../context/UnitContext'
@@ -7,6 +10,7 @@ import Img from '../components/ui/Img'
 import { useProfile, useSaved } from '../hooks/useMe'
 
 export default function ProfileSettings() {
+  const { t } = useTranslation()
   const { logout } = useAuth()
   const { unit, setUnit } = useUnits()
   const navigate = useNavigate()
@@ -14,7 +18,7 @@ export default function ProfileSettings() {
   const { data: profile, isPending: loading, error, refetch } = useProfile()
   const { data: saved } = useSaved()
 
-  if (loading) return <Spinner label="Loading profile" />
+  if (loading) return <Spinner label={t('profileSettings.loadingProfile')} />
   if (error) return <ErrorState error={error} onRetry={refetch} />
   if (!profile) return null
 
@@ -28,8 +32,7 @@ export default function ProfileSettings() {
         <div className="text-center sm:text-left flex-1">
           <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">{profile.name}</h1>
           <p className="font-body-md text-body-md text-secondary">
-            {profile.plan}
-            {` • Joined ${profile.joined}`}
+            {t('profileSettings.joined', { plan: profile.plan === 'Admin' ? t('common.admin') : t('common.member'), date: profile.joined })}
           </p>
         </div>
       </header>
@@ -37,9 +40,9 @@ export default function ProfileSettings() {
       {/* Saved routines */}
       <section className="mb-xl">
         <div className="flex justify-between items-end mb-md">
-          <h2 className="font-headline-md text-headline-md text-on-surface">Saved Routines</h2>
+          <h2 className="font-headline-md text-headline-md text-on-surface">{t('profileSettings.savedRoutines')}</h2>
           <Link to="/routines" className="font-label-bold text-label-bold text-primary hover:text-primary-container">
-            View All
+            {t('common.viewAll')}
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
@@ -55,7 +58,7 @@ export default function ProfileSettings() {
               <span className="min-w-0">
                 <span className="block font-label-bold text-label-bold text-on-surface truncate">{routine.title}</span>
                 <span className="block font-label-sm text-label-sm text-secondary">
-                  {routine.daysPerWeek} Days/Wk • {routine.level}
+                  {t('common.daysWk', { count: routine.daysPerWeek })} • {tLabel(routine.level)}
                 </span>
               </span>
             </Link>
@@ -65,7 +68,7 @@ export default function ProfileSettings() {
 
       {/* Favourite exercises */}
       <section className="mb-xl">
-        <h2 className="font-headline-md text-headline-md text-on-surface mb-md">Favorited Exercises</h2>
+        <h2 className="font-headline-md text-headline-md text-on-surface mb-md">{t('profileSettings.favoritedExercises')}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-md">
           {(saved?.exercises ?? []).map((exercise) => (
             <Link
@@ -85,13 +88,13 @@ export default function ProfileSettings() {
 
       {/* Account settings */}
       <section>
-        <h2 className="font-headline-md text-headline-md text-on-surface mb-md">Account Settings</h2>
+        <h2 className="font-headline-md text-headline-md text-on-surface mb-md">{t('profileSettings.accountSettings')}</h2>
         <div className="bg-surface-container-lowest rounded-xl elev-card border border-surface-variant divide-y divide-surface-variant overflow-hidden">
           <div className="p-md flex items-center justify-between gap-md">
             <div className="flex items-center gap-md min-w-0">
               <Icon name="mail" className="text-secondary shrink-0" />
               <div className="min-w-0">
-                <span className="block font-label-bold text-label-bold text-on-surface">Email</span>
+                <span className="block font-label-bold text-label-bold text-on-surface">{t('common.email')}</span>
                 <span className="block font-body-md text-body-md text-secondary truncate">{profile.email}</span>
               </div>
             </div>
@@ -101,9 +104,9 @@ export default function ProfileSettings() {
             <div className="flex items-center gap-md">
               <Icon name="ruler" className="text-secondary shrink-0" />
               <div>
-                <span className="block font-label-bold text-label-bold text-on-surface">Units</span>
+                <span className="block font-label-bold text-label-bold text-on-surface">{t('common.units')}</span>
                 <span className="block font-body-md text-body-md text-secondary">
-                  {unit === 'metric' ? 'Metric (kg, cm)' : 'Imperial (lbs, in)'}
+                  {unit === 'metric' ? t('profileSettings.metricKgCm') : t('profileSettings.imperialLbsIn')}
                 </span>
               </div>
             </div>
@@ -114,15 +117,17 @@ export default function ProfileSettings() {
                 <button
                   key={option}
                   type="button"
-                  onClick={() => setUnit(option)}
+                  onClick={() => {
+                    setUnit(option)
+                    toast.success(t('toast.preferencesSaved'))
+                  }}
                   className={`px-md py-xs font-label-bold text-label-bold capitalize transition-colors ${
                     unit === option
                       ? 'bg-primary-container text-on-primary'
                       : 'bg-surface text-secondary hover:bg-surface-container'
                   }`}
                 >
-                  {option}
-                </button>
+                  {t(`common.unitSystem.${option}`)} </button>
               ))}
             </div>
           </div>
@@ -138,7 +143,7 @@ export default function ProfileSettings() {
           className="mt-lg w-full flex items-center justify-center gap-sm border border-outline text-error font-label-bold text-label-bold py-md rounded-lg hover:bg-error-container transition-colors"
         >
           <Icon name="log-out" size={20} />
-          Log out
+          {t('common.logOut')}
         </button>
       </section>
     </div>

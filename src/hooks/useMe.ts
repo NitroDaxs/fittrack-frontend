@@ -1,4 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import i18n from '../i18n'
 import { meService, toProfile } from '../services/me'
 import type { WorkoutQuery } from '../types/me'
 
@@ -33,7 +35,10 @@ export function useLogWorkout() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: meService.logWorkout,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['me'] }),
+    onSuccess: () => {
+      toast.success(i18n.t('toast.workoutSaved'))
+      return queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
   })
 }
 
@@ -42,7 +47,10 @@ export function useLogMeasurement() {
   return useMutation({
     mutationFn: meService.logMeasurement,
     // The dashboard's latest weight and trend come from the same data.
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['me'] }),
+    onSuccess: () => {
+      toast.success(i18n.t('toast.measurementSaved'))
+      return queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
   })
 }
 

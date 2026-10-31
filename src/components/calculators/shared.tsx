@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { errorMessage, fieldErrorsOf } from '../../services/http'
@@ -85,15 +86,16 @@ export function HeightInput({
   onChange: (value: HeightValues) => void
   errors: Record<string, string>
 }) {
+  const { t } = useTranslation()
   const { unit } = useUnits()
   return (
     <div>
-      <span className="font-label-bold text-label-bold text-on-surface-variant mb-xs block">Height</span>
+      <span className="font-label-bold text-label-bold text-on-surface-variant mb-xs block">{t('calculators.shared.height')}</span>
       {unit === 'imperial' ? (
         <div className="grid grid-cols-2 gap-md">
           <NumberInput
             id="height-feet"
-            ariaLabel="Height in feet"
+            ariaLabel={t('calculators.shared.heightInFeet')}
             suffix="ft"
             value={value.feet}
             onChange={(feet) => onChange({ ...value, feet })}
@@ -101,7 +103,7 @@ export function HeightInput({
           />
           <NumberInput
             id="height-inches"
-            ariaLabel="Height in inches"
+            ariaLabel={t('calculators.shared.heightInInches')}
             suffix="in"
             value={value.inches}
             onChange={(inches) => onChange({ ...value, inches })}
@@ -111,7 +113,7 @@ export function HeightInput({
       ) : (
         <NumberInput
           id="height-cm"
-          ariaLabel="Height in centimeters"
+          ariaLabel={t('calculators.shared.heightInCentimeters')}
           suffix="cm"
           value={value.cm}
           onChange={(cm) => onChange({ ...value, cm })}
@@ -123,9 +125,10 @@ export function HeightInput({
 }
 
 export function SexToggle({ value, onChange }: { value: Sex; onChange: (value: Sex) => void }) {
+  const { t } = useTranslation()
   return (
     <div>
-      <span className="font-label-bold text-label-bold text-on-surface-variant mb-xs block">Sex</span>
+      <span className="font-label-bold text-label-bold text-on-surface-variant mb-xs block">{t('calculators.shared.sex')}</span>
       <div className="flex rounded-lg border border-surface-variant overflow-hidden">
         {(['male', 'female'] as const).map((option) => (
           <button
@@ -137,8 +140,7 @@ export function SexToggle({ value, onChange }: { value: Sex; onChange: (value: S
               value === option ? 'bg-primary-container text-on-primary' : 'bg-surface text-secondary hover:bg-surface-container'
             }`}
           >
-            {option}
-          </button>
+            {t(`common.sex.${option}`)} </button>
         ))}
       </div>
     </div>
@@ -146,6 +148,7 @@ export function SexToggle({ value, onChange }: { value: Sex; onChange: (value: S
 }
 
 export function CalculateButton({ pending }: { pending: boolean }) {
+  const { t } = useTranslation()
   return (
     <button
       type="submit"
@@ -153,7 +156,7 @@ export function CalculateButton({ pending }: { pending: boolean }) {
       className="w-full flex justify-center items-center gap-sm py-sm px-md rounded-lg shadow-sm font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-colors active:scale-[0.98] disabled:opacity-60"
     >
       <Icon name="calculator" size={20} />
-      {pending ? 'Calculating…' : 'Calculate'}
+      {pending ? t('calculators.shared.calculating') : t('calculators.shared.calculate')}
     </button>
   )
 }
@@ -169,6 +172,7 @@ export function FormError({ error }: { error: Error | null }) {
 }
 
 export function CalculatorHeader({ title, description, action }: { title: string; description: string; action?: ReactNode }) {
+  const { t } = useTranslation()
   return (
     <>
       <Link
@@ -176,7 +180,7 @@ export function CalculatorHeader({ title, description, action }: { title: string
         className="inline-flex items-center gap-xs font-label-bold text-label-bold text-secondary hover:text-primary transition-colors mb-lg"
       >
         <Icon name="arrow-left" size={20} />
-        Calculators
+        {t('common.calculators')}
       </Link>
       <header className="mb-xl flex flex-wrap items-start justify-between gap-md">
         <div>

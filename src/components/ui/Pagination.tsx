@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import Icon from './Icon'
 
 type PageItem = { key: number; page: number } | { key: string; gap: true }
@@ -50,6 +51,7 @@ interface PaginationProps {
  * only one page. `onPageChange` always receives the new page number.
  */
 export function Pagination({ page, lastPage, onPageChange, className = 'mt-xl' }: PaginationProps) {
+  const { t } = useTranslation()
     if (lastPage <= 1) return null
 
     return (
@@ -58,14 +60,14 @@ export function Pagination({ page, lastPage, onPageChange, className = 'mt-xl' }
                 type="button"
                 disabled={page === 1}
                 onClick={() => onPageChange(page - 1)}
-                aria-label="Previous page"
+                aria-label={t('ui.previousPage')}
                 className="w-10 h-10 rounded-lg flex items-center justify-center border border-surface-variant text-secondary hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
                 <Icon name="chevron-left" />
             </button>
 
             <span className="sm:hidden flex items-center px-md font-label-bold text-label-bold text-secondary">
-        Page {page} of {lastPage}
+        {t('ui.pageOf', { page, last: lastPage })}
       </span>
 
             {pageItems(page, lastPage).map((item) =>
@@ -82,7 +84,7 @@ export function Pagination({ page, lastPage, onPageChange, className = 'mt-xl' }
                             key={item.key}
                             type="button"
                             onClick={() => onPageChange(item.page)}
-                            aria-label={`Page ${item.page}`}
+                            aria-label={t('ui.page', { page: item.page })}
                             aria-current={item.page === page ? 'page' : undefined}
                             className={`hidden sm:flex w-10 h-10 rounded-lg items-center justify-center font-label-bold text-label-bold transition-colors ${
                                 item.page === page
@@ -99,7 +101,7 @@ export function Pagination({ page, lastPage, onPageChange, className = 'mt-xl' }
                 type="button"
                 disabled={page === lastPage}
                 onClick={() => onPageChange(page + 1)}
-                aria-label="Next page"
+                aria-label={t('ui.nextPage')}
                 className="w-10 h-10 rounded-lg flex items-center justify-center border border-surface-variant text-secondary hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
                 <Icon name="chevron-right" />

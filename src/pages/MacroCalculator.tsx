@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n/index'
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { CalculateButton, CalculatorHeader, FieldError, FormError, NumberInput, toNumber } from '../components/calculators/shared'
@@ -6,19 +8,20 @@ import type { MacroResult, MacroSplit } from '../types/calculators'
 import { fieldErrorsOf } from '../services/http'
 
 const splits: { value: MacroSplit; label: string }[] = [
-  { value: 'balanced', label: 'Balanced' },
-  { value: 'high_protein', label: 'High Protein' },
-  { value: 'low_carb', label: 'Low Carb' },
-  { value: 'keto', label: 'Keto' },
+  { value: 'balanced', label: 'calculators.macro.balanced' },
+  { value: 'high_protein', label: 'calculators.macro.highProtein' },
+  { value: 'low_carb', label: 'calculators.macro.lowCarb' },
+  { value: 'keto', label: 'calculators.macro.keto' },
 ]
 
 const macroStyle: Record<MacroResult['targets'][number]['macro'], { label: string; tone: string; text: string }> = {
-  protein: { label: 'Protein', tone: 'bg-primary', text: 'text-primary' },
-  carbs: { label: 'Carbs', tone: 'bg-secondary', text: 'text-secondary' },
-  fat: { label: 'Fat', tone: 'bg-tertiary', text: 'text-tertiary' },
+  protein: { label: 'calculators.macro.protein', tone: 'bg-primary', text: 'text-primary' },
+  carbs: { label: 'calculators.macro.carbs', tone: 'bg-secondary', text: 'text-secondary' },
+  fat: { label: 'calculators.macro.fat', tone: 'bg-tertiary', text: 'text-tertiary' },
 }
 
 export default function MacroCalculator() {
+  const { t } = useTranslation()
   const [calories, setCalories] = useState('')
   const [split, setSplit] = useState<MacroSplit | null>(null)
   const calculation = useMacros()
@@ -33,22 +36,22 @@ export default function MacroCalculator() {
 
   return (
     <div className="max-w-[800px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
-      <CalculatorHeader title="Macro Split Calculator" description="Divide a daily calorie target into protein, carbs, and fat." />
+      <CalculatorHeader title={t('common.macroSplitCalculator')} description={t('calculators.macro.divideADailyCalorieTargetInto')} />
 
       <form onSubmit={submit} noValidate className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant mb-xl space-y-md">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
           <div>
-            <NumberInput id="calories" label="Daily Calories" value={calories} onChange={setCalories} error={errors.calories} />
+            <NumberInput id="calories" label={t('calculators.macro.dailyCalories')} value={calories} onChange={setCalories} error={errors.calories} />
             <p className="font-label-sm text-label-sm text-secondary mt-sm">
-              Not sure? Use the{' '}
+              {t('calculators.macro.notSureUseThe')}{' '}
               <Link to="/calculators/tdee" className="text-primary hover:text-primary-container">
-                TDEE calculator
+                {t('calculators.macro.tdeeCalculator')}
               </Link>{' '}
-              first.
+              {t('calculators.macro.first')}
             </p>
           </div>
           <div>
-            <span className="font-label-bold text-label-bold text-on-surface-variant mb-xs block">Split</span>
+            <span className="font-label-bold text-label-bold text-on-surface-variant mb-xs block">{t('calculators.macro.split')}</span>
             <div className="grid grid-cols-2 gap-sm">
               {splits.map((option) => (
                 <button
@@ -62,7 +65,7 @@ export default function MacroCalculator() {
                       : 'border-surface-variant bg-surface text-secondary hover:border-primary/50'
                   }`}
                 >
-                  {option.label}
+                  {t(option.label)}
                 </button>
               ))}
             </div>
@@ -76,8 +79,8 @@ export default function MacroCalculator() {
       {result ? (
         <section className="bg-surface-container-lowest rounded-xl elev-card border border-surface-variant overflow-hidden">
           <div className="p-lg pb-md flex items-center justify-between">
-            <h2 className="font-headline-md text-headline-md text-on-surface">Daily targets</h2>
-            <span className="font-label-sm text-label-sm text-secondary">{result.calories.toLocaleString()} kcal</span>
+            <h2 className="font-headline-md text-headline-md text-on-surface">{t('calculators.macro.dailyTargets')}</h2>
+            <span className="font-label-sm text-label-sm text-secondary">{t('calculators.macro.kcal', { calories: result.calories.toLocaleString(i18n.language) })}</span>
           </div>
 
           <div className="flex h-3 mx-lg rounded-full overflow-hidden bg-surface-container">
@@ -86,7 +89,7 @@ export default function MacroCalculator() {
                 key={target.macro}
                 className={macroStyle[target.macro].tone}
                 style={{ width: `${target.percent}%` }}
-                title={macroStyle[target.macro].label}
+                title={t(macroStyle[target.macro].label)}
               />
             ))}
           </div>
@@ -96,7 +99,7 @@ export default function MacroCalculator() {
               <div key={target.macro} className="flex items-center justify-between p-lg">
                 <span className={`font-label-bold text-label-bold flex items-center gap-sm ${macroStyle[target.macro].text}`}>
                   <span className={`w-2.5 h-2.5 rounded-full ${macroStyle[target.macro].tone}`} />
-                  {macroStyle[target.macro].label}
+                  {t(macroStyle[target.macro].label)}
                 </span>
                 <span className="font-body-md text-body-md text-secondary">{target.percent}%</span>
                 <span className="font-headline-md text-headline-md text-on-surface">{target.grams}g</span>

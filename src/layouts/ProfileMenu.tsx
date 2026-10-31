@@ -1,13 +1,16 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useCallback, useId, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Icon from '../components/ui/Icon'
 import { useAuth } from '../context/AuthContext'
+import { useDismiss } from '../hooks/useDismiss'
 import { useProfile } from '../hooks/useMe'
 
 const itemClass =
   'flex w-full items-center gap-sm rounded-lg px-sm py-sm text-left font-label-bold text-label-bold transition-colors'
 
 export default function ProfileMenu() {
+  const { t } = useTranslation()
   const { user, isAdmin, logout } = useAuth()
   // Fresher than the login session, which doesn't change when the profile is edited.
   const { data: profile } = useProfile()
@@ -17,26 +20,8 @@ export default function ProfileMenu() {
   const panelId = useId()
   const navigate = useNavigate()
 
-  useEffect(() => {
-    if (!open) return
-    const onPointerDown = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) setOpen(false)
-    }
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setOpen(false)
-        button.current?.focus()
-      }
-    }
-    document.addEventListener('pointerdown', onPointerDown)
-    document.addEventListener('keydown', onKeyDown)
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown)
-      document.removeEventListener('keydown', onKeyDown)
-    }
-  }, [open])
-
-  const close = () => setOpen(false)
+  const close = useCallback(() => setOpen(false), [])
+  useDismiss(open, close, root, button)
 
   const handleLogout = () => {
     close()
@@ -44,14 +29,14 @@ export default function ProfileMenu() {
     navigate('/')
   }
 
-  const role = isAdmin ? 'Admin' : 'Member'
+  const role = isAdmin ? t('common.admin') : t('common.member')
 
   return (
     <div ref={root} className="relative">
       <button
         ref={button}
         type="button"
-        aria-label="Account menu"
+        aria-label={t('nav.accountMenu')}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
@@ -84,19 +69,18 @@ export default function ProfileMenu() {
           </div>
 
           <p className="px-sm pb-sm font-label-sm text-label-sm text-on-surface-variant">
-            {role}
-            {profile?.joined ? ` · Joined ${profile.joined}` : ''}
+            {profile?.joined ? t('nav.joined', { role, date: profile.joined }) : role}
           </p>
 
           <div className="flex flex-col gap-xs border-t border-surface-variant pt-xs">
             <Link to="/profile" onClick={close} className={`${itemClass} text-on-surface hover:bg-surface-container`}>
               <Icon name="settings" size={18} />
-              Profile settings
+              {t('nav.profileSettings')}
             </Link>
             {isAdmin ? (
               <Link to="/admin" onClick={close} className={`${itemClass} text-on-surface hover:bg-surface-container`}>
                 <Icon name="shield-user" size={18} />
-                Admin console
+                {t('nav.adminConsole')}
               </Link>
             ) : null}
           </div>
@@ -104,7 +88,7 @@ export default function ProfileMenu() {
           <div className="mt-xs border-t border-surface-variant pt-xs">
             <button type="button" onClick={handleLogout} className={`${itemClass} text-error hover:bg-error-container`}>
               <Icon name="log-out" size={18} />
-              Log out
+              {t('common.logOut')}
             </button>
           </div>
         </div>

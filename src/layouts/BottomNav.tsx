@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Icon, { type IconName } from '../components/ui/Icon'
@@ -9,20 +10,21 @@ interface NavItem {
 }
 
 const guestItems: NavItem[] = [
-  { to: '/library', label: 'Library', icon: 'book-open' },
-  { to: '/routines', label: 'Routines', icon: 'list' },
-  { to: '/calculators', label: 'Calculators', icon: 'calculator' },
-  { to: '/articles', label: 'Articles', icon: 'file-text' },
+  { to: '/library', label: 'common.library', icon: 'book-open' },
+  { to: '/routines', label: 'nav.routines', icon: 'list' },
+  { to: '/calculators', label: 'common.calculators', icon: 'calculator' },
+  { to: '/articles', label: 'nav.articles', icon: 'file-text' },
 ]
 
 const memberItems: NavItem[] = [
-  { to: '/dashboard', label: 'Workout', icon: 'dumbbell' },
-  { to: '/history', label: 'History', icon: 'history' },
-  { to: '/measurements', label: 'Stats', icon: 'chart-line' },
-  { to: '/profile', label: 'Settings', icon: 'settings' },
+  { to: '/dashboard', label: 'nav.workout', icon: 'dumbbell' },
+  { to: '/history', label: 'nav.history', icon: 'history' },
+  { to: '/measurements', label: 'nav.stats', icon: 'chart-line' },
+  { to: '/profile', label: 'nav.settings', icon: 'settings' },
 ]
 
 export default function BottomNav() {
+  const { t } = useTranslation()
   const { isAuthenticated } = useAuth()
   const items = isAuthenticated ? memberItems : guestItems
 
@@ -41,7 +43,7 @@ export default function BottomNav() {
           {({ isActive }) => (
             <>
               <Icon name={item.icon} size={24} filled={isActive} />
-              <span className="text-[10px] font-label-bold">{item.label}</span>
+              <span className="text-[10px] font-label-bold">{t(item.label)}</span>
               {isActive ? <span className="w-1 h-1 bg-primary rounded-full" /> : null}
             </>
           )}

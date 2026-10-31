@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../../i18n/index'
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { adminService } from '../../services/admin'
 import { toExerciseForm } from '../../services/exercises'
 import type { Exercise, ExerciseForm } from '../../types/exercises'
-import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter, Notice } from '../../components/admin/AdminPage'
+import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter } from '../../components/admin/AdminPage'
 import DataTable, { RowActions, TableFooter, type Column } from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
 import { SelectField, TextAreaField, TextField } from '../../components/ui/Field'
@@ -30,6 +32,7 @@ const blankExercise: ExerciseForm = {
 }
 
 export default function AdminExercises() {
+  const { t } = useTranslation()
   const [category, setCategory] = useState('')
   const taxonomies = useTaxonomies()
 
@@ -58,9 +61,9 @@ export default function AdminExercises() {
   const submit = (event: FormEvent) => {
     event.preventDefault()
     const found: FormErrors = {}
-    if (!form.name.trim()) found.name = 'Name is required.'
-    if (!form.description.trim()) found.description = 'Give it a one-line description.'
-    if (form.muscleGroups.length === 0) found.muscleGroups = 'Pick at least one muscle group.'
+    if (!form.name.trim()) found.name = t('common.nameIsRequired')
+    if (!form.description.trim()) found.description = t('admin.exercises.giveItAOneLineDescription')
+    if (form.muscleGroups.length === 0) found.muscleGroups = t('admin.exercises.pickAtLeastOneMuscleGroup')
     setErrors(found)
     if (Object.keys(found).length > 0) return
     crud.save(form)
@@ -69,7 +72,7 @@ export default function AdminExercises() {
   const columns: Column<Exercise>[] = [
     {
       key: 'name',
-      header: 'Name',
+      header: t('common.name'),
       sortable: true,
       render: (row) => (
         <span className="flex items-center gap-md font-medium">
@@ -82,7 +85,7 @@ export default function AdminExercises() {
     },
     {
       key: 'muscleGroups',
-      header: 'Muscle Groups',
+      header: t('admin.exercises.muscleGroups'),
       className: 'hidden sm:table-cell',
       headerClassName: 'hidden sm:table-cell',
       render: (row) => (
@@ -96,7 +99,7 @@ export default function AdminExercises() {
                   : 'bg-surface-container text-on-surface-variant'
               }`}
             >
-              {group}
+              {tLabel(group)}
             </span>
           ))}
         </span>
@@ -104,18 +107,18 @@ export default function AdminExercises() {
     },
     {
       key: 'equipment',
-      header: 'Equipment',
+      header: t('common.equipment'),
       sortable: true,
       className: 'hidden md:table-cell text-on-surface-variant',
       headerClassName: 'hidden md:table-cell',
-      render: (row) => row.equipment,
+      render: (row) => tLabel(row.equipment),
     },
     {
       key: 'difficulty',
-      header: 'Difficulty',
+      header: t('common.difficulty'),
       sortable: true,
       render: (row) => (
-        <span className="inline-flex items-center gap-1 text-primary" title={row.difficulty}>
+        <span className="inline-flex items-center gap-1 text-primary" title={tLabel(row.difficulty)}>
           {[1, 2, 3].map((n) => (
             <Icon key={n} name="star" size={16} filled={n <= (difficultyStars[row.difficulty] ?? 0)} />
           ))}
@@ -124,7 +127,7 @@ export default function AdminExercises() {
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('common.actions'),
       headerClassName: 'text-right',
       className: 'text-right',
       render: (row) => <RowActions onEdit={() => crud.setEditing(row)} onDelete={() => crud.setDeleting(row)} />,
@@ -134,20 +137,18 @@ export default function AdminExercises() {
   return (
     <>
       <AdminHeader
-        title="Manage Exercises"
-        description="View, edit, and create exercise data for the global library."
-        actionLabel="Add new exercise"
+        title={t('admin.exercises.manageExercises')}
+        description={t('admin.exercises.viewEditAndCreateExerciseData')}
+        actionLabel={t('admin.exercises.addNewExercise')}
         onAction={() => crud.setEditing('new')}
       />
 
-      <Notice notice={crud.notice} />
-
-      <AdminToolbar search={crud.search} onSearch={crud.setSearch} placeholder="Search exercises...">
+      <AdminToolbar search={crud.search} onSearch={crud.setSearch} placeholder={t('common.searchExercises')}>
         <AdminSelect
-          label="Category"
+          label={t('common.category')}
           value={category}
           onChange={setCategory}
-          options={[{ value: '', label: 'All' }, ...(taxonomies?.categories ?? [])]}
+          options={[{ value: '', label: t('common.all') }, ...(taxonomies?.categories ?? [])]}
         />
       </AdminToolbar>
 
@@ -155,7 +156,7 @@ export default function AdminExercises() {
         {crud.error ? (
           <ErrorState error={crud.error} onRetry={crud.refetch} />
         ) : crud.loading ? (
-          <Spinner label="Loading exercises" />
+          <Spinner label={t('admin.exercises.loadingExercises')} />
         ) : (
           <>
             <DataTable
@@ -163,11 +164,11 @@ export default function AdminExercises() {
               rows={crud.rows}
               sort={crud.sort}
               onSortChange={crud.setSort}
-              empty="No exercises match your search."
+              empty={t('admin.exercises.noExercisesMatchYourSearch')}
             />
             <TableFooter>
               <span className="font-label-sm text-label-sm text-on-surface-variant">
-                Showing {crud.rows.length} of {crud.meta?.total ?? crud.rows.length} exercises
+                {t('admin.exercises.showingOfExercises', { shown: crud.rows.length, total: crud.meta?.total ?? crud.rows.length })}
               </span>
               <Pagination page={crud.page} lastPage={crud.meta?.lastPage ?? 1} onPageChange={crud.setPage} className="" />
             </TableFooter>
@@ -177,15 +178,14 @@ export default function AdminExercises() {
 
       <Modal
         open={Boolean(crud.editing)}
-        title={crud.editingRow ? 'Edit exercise' : 'Add new exercise'}
+        title={crud.editingRow ? t('admin.exercises.editExercise') : t('admin.exercises.addNewExercise')}
         onClose={() => crud.setEditing(null)}
         footer={<ModalFooter onCancel={() => crud.setEditing(null)} saving={crud.saving} />}
       >
         <form id="crud-form" onSubmit={submit} noValidate className="space-y-md">
-          {crud.saveError ? <Notice notice={{ message: crud.saveError, tone: 'error' }} /> : null}
-          <TextField label="Name" name="name" value={form.name} onChange={setField('name')} error={errors.name ?? crud.fieldErrors.name} />
+          <TextField label={t('common.name')} name="name" value={form.name} onChange={setField('name')} error={errors.name ?? crud.fieldErrors.name} />
           <TextAreaField
-            label="Description"
+            label={t('common.description')}
             name="description"
             value={form.description}
             onChange={setField('description')}
@@ -193,7 +193,7 @@ export default function AdminExercises() {
           />
 
           <div>
-            <span className="block font-label-bold text-label-bold text-on-surface mb-xs">Muscle groups</span>
+            <span className="block font-label-bold text-label-bold text-on-surface mb-xs">{t('admin.exercises.muscleGroups2')}</span>
             <div className="flex flex-wrap gap-sm">
               {(taxonomies?.muscleGroups ?? []).map((group) => {
                 const active = form.muscleGroups.includes(group.label)
@@ -209,8 +209,7 @@ export default function AdminExercises() {
                         : 'border-surface-variant bg-surface text-secondary hover:border-primary/50'
                     }`}
                   >
-                    {group.label}
-                  </button>
+                    {tLabel(group.label)}</button>
                 )
               })}
             </div>
@@ -220,7 +219,7 @@ export default function AdminExercises() {
           </div>
 
           <div>
-            <span className="block font-label-bold text-label-bold text-on-surface mb-xs">Equipment</span>
+            <span className="block font-label-bold text-label-bold text-on-surface mb-xs">{t('common.equipment')}</span>
             <div className="flex flex-wrap gap-sm">
               {(taxonomies?.equipment ?? []).map((option) => {
                 const active = form.equipmentList.includes(option.label)
@@ -236,50 +235,47 @@ export default function AdminExercises() {
                         : 'border-surface-variant bg-surface text-secondary hover:border-primary/50'
                     }`}
                   >
-                    {option.label}
-                  </button>
+                    {tLabel(option.label)}</button>
                 )
               })}
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-            <SelectField label="Difficulty" name="difficulty" value={form.difficulty} onChange={setField('difficulty')}>
+            <SelectField label={t('common.difficulty')} name="difficulty" value={form.difficulty} onChange={setField('difficulty')}>
               {(taxonomies?.difficulties ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
-                  {option.label}
-                </option>
+                  {tLabel(option.label)}</option>
               ))}
             </SelectField>
-            <SelectField label="Category" name="category" value={form.category} onChange={setField('category')}>
+            <SelectField label={t('common.category')} name="category" value={form.category} onChange={setField('category')}>
               {(taxonomies?.categories ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
-                  {option.label}
-                </option>
+                  {tLabel(option.label)}</option>
               ))}
             </SelectField>
           </div>
 
           <TextField
-            label="Primary muscles"
+            label={t('admin.exercises.primaryMuscles')}
             name="primaryMuscles"
             value={form.primaryMuscles}
             onChange={setField('primaryMuscles')}
-            placeholder="Chest, Triceps — must be among the groups selected above"
+            placeholder={t('admin.exercises.chestTricepsMustBeAmongThe')}
           />
 
           <TextAreaField
-            label="Instructions — one step per line"
+            label={t('admin.exercises.instructionsOneStepPerLine')}
             name="instructions"
             value={form.instructions}
             onChange={setField('instructions')}
             rows={5}
-            placeholder={'Lie flat with your eyes under the bar.\nGrip slightly wider than shoulder-width.'}
+            placeholder={t('admin.exercises.instructionsPlaceholder')}
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
             <TextField
-              label="Video URL"
+              label={t('admin.exercises.videoUrl')}
               name="videoUrl"
               type="url"
               value={form.videoUrl}
@@ -288,7 +284,7 @@ export default function AdminExercises() {
               placeholder="https://www.youtube.com/watch?v=..."
             />
             <TextField
-              label="Thumbnail URL"
+              label={t('admin.exercises.thumbnailUrl')}
               name="thumbnailUrl"
               type="url"
               value={form.thumbnailUrl}

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../i18n/index'
 import { Link } from 'react-router-dom'
 import Icon, { type IconName } from './ui/Icon'
 import Img from './ui/Img'
@@ -32,17 +34,17 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
         <div className="flex flex-wrap gap-xs mt-auto">
           {exercise.muscleGroups.map((group) => (
             <span
-              key={group}
+              key={tLabel(group)}
               className="bg-secondary-container text-on-secondary-container px-2 py-1 rounded font-label-sm text-label-sm"
             >
-              {group}
+              {tLabel(group)}
             </span>
           ))}
           <span className="bg-surface-container text-secondary px-2 py-1 rounded font-label-sm text-label-sm">
-            {exercise.equipment}
+            {tLabel(exercise.equipment)}
           </span>
           <span className="bg-surface-container text-secondary px-2 py-1 rounded font-label-sm text-label-sm">
-            {exercise.difficulty}
+            {tLabel(exercise.difficulty)}
           </span>
         </div>
       </div>
@@ -67,6 +69,7 @@ const goalIcon: Record<string, IconName> = {
 }
 
 export function RoutineCard({ routine }: { routine: Routine }) {
+  const { t } = useTranslation()
   return (
     <Link
       to={`/routines/${routine.slug}`}
@@ -79,7 +82,7 @@ export function RoutineCard({ routine }: { routine: Routine }) {
           imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-sm right-sm bg-surface/90 backdrop-blur px-sm py-xs rounded font-label-sm text-label-sm text-on-surface font-bold">
-          {routine.daysPerWeek} Days/Wk
+          {t('common.daysWk', { count: routine.daysPerWeek })}
         </div>
       </div>
       <div className="p-md flex flex-col flex-grow">
@@ -94,11 +97,11 @@ export function RoutineCard({ routine }: { routine: Routine }) {
             className={`${goalTone[routine.goal] ?? 'bg-surface-container text-secondary'} px-sm py-xs rounded-full font-label-sm text-label-sm flex items-center gap-xs`}
           >
             <Icon name={goalIcon[routine.goal] ?? 'flag'} size={16} />
-            {routine.goal}
+            {tLabel(routine.goal)}
           </span>
           <span className="bg-surface-variant text-on-surface-variant px-sm py-xs rounded-full font-label-sm text-label-sm flex items-center gap-xs">
             <Icon name="trending-up" size={16} />
-            {routine.level}
+            {tLabel(routine.level)}
           </span>
         </div>
       </div>
@@ -107,6 +110,7 @@ export function RoutineCard({ routine }: { routine: Routine }) {
 }
 
 export function ArticleCard({ article, featured = false }: { article: Article; featured?: boolean }) {
+  const { t } = useTranslation()
   return (
     <Link
       to={`/articles/${article.slug}`}
@@ -122,7 +126,7 @@ export function ArticleCard({ article, featured = false }: { article: Article; f
       </div>
       <div className="p-md flex flex-col flex-grow">
         <span className="font-label-sm text-label-sm text-primary uppercase tracking-widest mb-xs">
-          {article.category}
+          {tLabel(article.category)}
         </span>
         <h3
           className={`${featured ? 'font-headline-lg-mobile text-headline-lg-mobile' : 'font-headline-md text-headline-md'} text-on-surface mb-xs group-hover:text-primary transition-colors`}
@@ -137,7 +141,7 @@ export function ArticleCard({ article, featured = false }: { article: Article; f
           </span>
           <span className="flex items-center gap-xs">
             <Icon name="clock" size={16} />
-            {article.readMinutes} min read
+            {t('common.minRead', { count: article.readMinutes })}
           </span>
         </div>
       </div>

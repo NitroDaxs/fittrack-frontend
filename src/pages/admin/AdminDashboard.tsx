@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ErrorState, Spinner } from '../../components/ui/States'
 import Icon, { type IconName } from '../../components/ui/Icon'
@@ -19,25 +20,26 @@ const toneClasses = {
 }
 
 export default function AdminDashboard() {
+  const { t } = useTranslation()
   const { data: stats, isPending, error, refetch } = useAdminStats()
   const { data: activity } = useAdminActivity()
 
-  if (isPending) return <Spinner label="Loading admin overview" />
+  if (isPending) return <Spinner label={t('admin.dashboard.loadingAdminOverview')} />
   if (error) return <ErrorState error={error} onRetry={refetch} />
   if (!stats) return null
 
   const cards = [
-    { label: 'Total Exercises', value: stats.totalExercises, delta: stats.exerciseDelta, icon: 'dumbbell' as const, to: '/admin/exercises', ring: 'bg-primary-fixed' },
-    { label: 'Total Routines', value: stats.totalRoutines, delta: stats.routineDelta, icon: 'calendar-days' as const, to: '/admin/routines', ring: 'bg-secondary-fixed' },
-    { label: 'Published Articles', value: stats.publishedArticles, delta: stats.articleDelta, icon: 'file-text' as const, to: '/admin/articles', ring: 'bg-tertiary-fixed' },
-    { label: 'Total Users', value: stats.totalUsers, delta: stats.userDelta, icon: 'users' as const, to: '/admin/users', ring: 'bg-error-container' },
+    { label: t('admin.dashboard.totalExercises'), value: stats.totalExercises, delta: stats.exerciseDelta, icon: 'dumbbell' as const, to: '/admin/exercises', ring: 'bg-primary-fixed' },
+    { label: t('admin.dashboard.totalRoutines'), value: stats.totalRoutines, delta: stats.routineDelta, icon: 'calendar-days' as const, to: '/admin/routines', ring: 'bg-secondary-fixed' },
+    { label: t('admin.dashboard.publishedArticles'), value: stats.publishedArticles, delta: stats.articleDelta, icon: 'file-text' as const, to: '/admin/articles', ring: 'bg-tertiary-fixed' },
+    { label: t('admin.dashboard.totalUsers'), value: stats.totalUsers, delta: stats.userDelta, icon: 'users' as const, to: '/admin/users', ring: 'bg-error-container' },
   ]
 
   return (
     <>
       <header className="mb-xl">
-        <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Overview</h1>
-        <p className="font-body-md text-body-md text-on-surface-variant">System performance and daily metrics.</p>
+        <h1 className="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">{t('admin.dashboard.overview')}</h1>
+        <p className="font-body-md text-body-md text-on-surface-variant">{t('admin.dashboard.systemPerformanceAndDailyMetrics')}</p>
       </header>
 
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter mb-xl">
@@ -74,7 +76,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
         <section className="lg:col-span-2 glass-card rounded-xl p-lg">
           <div className="flex items-center justify-between mb-lg border-b border-surface-variant pb-md">
-            <h2 className="font-headline-md text-headline-md text-on-surface">Recent Activity</h2>
+            <h2 className="font-headline-md text-headline-md text-on-surface">{t('admin.dashboard.recentActivity')}</h2>
           </div>
           <ul className="flex flex-col gap-md">
             {(activity ?? []).map((item) => (
@@ -98,11 +100,11 @@ export default function AdminDashboard() {
 
         <section className="flex flex-col gap-gutter">
           <div className="glass-card rounded-xl p-lg">
-            <h2 className="font-headline-md text-headline-md text-on-surface mb-md">System Health</h2>
+            <h2 className="font-headline-md text-headline-md text-on-surface mb-md">{t('admin.dashboard.systemHealth')}</h2>
             <div className="space-y-md">
               <div>
                 <div className="flex justify-between font-label-sm text-label-sm mb-1">
-                  <span className="text-on-surface-variant">Storage Capacity</span>
+                  <span className="text-on-surface-variant">{t('admin.dashboard.storageCapacity')}</span>
                   <span className="text-primary-container font-bold">{stats.storageCapacity}%</span>
                 </div>
                 <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
@@ -113,12 +115,12 @@ export default function AdminDashboard() {
           </div>
 
           <div className="glass-card rounded-xl p-lg">
-            <h2 className="font-headline-md text-headline-md text-on-surface mb-md">Quick actions</h2>
+            <h2 className="font-headline-md text-headline-md text-on-surface mb-md">{t('admin.dashboard.quickActions')}</h2>
             <div className="flex flex-col gap-sm">
               {[
-                { to: '/admin/exercises', label: 'Add an exercise', icon: 'dumbbell' as const },
-                { to: '/admin/routines', label: 'Create a routine', icon: 'calendar-days' as const },
-                { to: '/admin/articles', label: 'Draft an article', icon: 'file-text' as const },
+                { to: '/admin/exercises', label: t('common.addAnExercise'), icon: 'dumbbell' as const },
+                { to: '/admin/routines', label: t('admin.dashboard.createARoutine'), icon: 'calendar-days' as const },
+                { to: '/admin/articles', label: t('admin.dashboard.draftAnArticle'), icon: 'file-text' as const },
               ].map((action) => (
                 <Link
                   key={action.to}

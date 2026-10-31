@@ -2,6 +2,8 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { Toaster } from 'sonner'
+import './i18n'
 import App from './router/index'
 import { AuthProvider } from './context/AuthContext'
 import { WorkoutProvider } from './context/WorkoutContext'
@@ -17,6 +19,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <WorkoutProvider>
             <UnitProvider>
               <App />
+              <Toaster position="top-right" richColors closeButton />
             </UnitProvider>
           </WorkoutProvider>
         </AuthProvider>

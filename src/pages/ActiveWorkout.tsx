@@ -1,7 +1,8 @@
+import { useTranslation } from 'react-i18next'
 import { useCallback, useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useWorkoutDraft } from '../context/WorkoutContext'
-import { errorMessage, ApiError } from '../services/http'
+import { ApiError } from '../services/http'
 import Icon from '../components/ui/Icon'
 import Img from '../components/ui/Img'
 import { useLogWorkout } from '../hooks/useMe'
@@ -17,6 +18,7 @@ interface StepperProps {
 }
 
 function Stepper({ label, value, step, onAdjust, onSet }: StepperProps) {
+  const { t } = useTranslation()
   const [pulse, setPulse] = useState(false)
 
   const adjust = (delta: number) => {
@@ -32,7 +34,7 @@ function Stepper({ label, value, step, onAdjust, onSet }: StepperProps) {
         <button
           type="button"
           onClick={() => adjust(-step)}
-          aria-label={`Decrease ${label} by ${step}`}
+          aria-label={t('activeWorkout.decreaseBy', { label, step })}
           className="w-16 h-16 rounded-full bg-surface-container-low text-secondary flex items-center justify-center active:bg-surface-container-high active:scale-95 transition-all shadow-sm border border-surface-variant"
         >
           <Icon name="minus" size={32} />
@@ -52,7 +54,7 @@ function Stepper({ label, value, step, onAdjust, onSet }: StepperProps) {
         <button
           type="button"
           onClick={() => adjust(step)}
-          aria-label={`Increase ${label} by ${step}`}
+          aria-label={t('activeWorkout.increaseBy', { label, step })}
           className="w-16 h-16 rounded-full bg-surface-container-low text-secondary flex items-center justify-center active:bg-surface-container-high active:scale-95 transition-all shadow-sm border border-surface-variant"
         >
           <Icon name="plus" size={32} />
@@ -63,6 +65,7 @@ function Stepper({ label, value, step, onAdjust, onSet }: StepperProps) {
 }
 
 export default function ActiveWorkout() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { session, adjustCurrent, setCurrentValue, completeSet, goToExercise, endSession } = useWorkoutDraft()
 
@@ -140,23 +143,23 @@ export default function ActiveWorkout() {
         <div className="w-20 h-20 rounded-full bg-primary-fixed text-primary flex items-center justify-center mx-auto mb-lg">
           <Icon name="circle-check" size={40} filled />
         </div>
-        <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-sm">Workout complete</h1>
+        <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-sm">{t('activeWorkout.workoutComplete')}</h1>
         <p className="font-body-md text-body-md text-secondary mb-xl">{session.name}</p>
 
         <div className="grid grid-cols-3 gap-md mb-xl">
           <div className="bg-surface-container-lowest rounded-xl p-md border border-surface-variant elev-card">
             <span className="block font-headline-lg text-headline-lg text-on-surface">{doneSets}</span>
-            <span className="font-label-sm text-label-sm text-secondary uppercase">Sets</span>
+            <span className="font-label-sm text-label-sm text-secondary uppercase">{t('common.sets')}</span>
           </div>
           <div className="bg-surface-container-lowest rounded-xl p-md border border-surface-variant elev-card">
             <span className="block font-headline-lg text-headline-lg text-on-surface">{session.exercises.length}</span>
-            <span className="font-label-sm text-label-sm text-secondary uppercase">Exercises</span>
+            <span className="font-label-sm text-label-sm text-secondary uppercase">{t('common.exercises')}</span>
           </div>
           <div className="bg-surface-container-lowest rounded-xl p-md border border-surface-variant elev-card">
             <span className="block font-headline-lg text-headline-lg text-on-surface">
               {volume >= 1000 ? `${(volume / 1000).toFixed(1)}k` : volume}
             </span>
-            <span className="font-label-sm text-label-sm text-secondary uppercase">Volume</span>
+            <span className="font-label-sm text-label-sm text-secondary uppercase">{t('activeWorkout.volume')}</span>
           </div>
         </div>
 
@@ -180,13 +183,11 @@ export default function ActiveWorkout() {
           disabled={logWorkout.isPending}
           className="disabled:opacity-60 w-full bg-primary-container text-on-primary font-label-bold text-label-bold py-md rounded-xl hover:bg-primary transition-colors active:scale-[0.98]"
         >
-          {logWorkout.isPending ? 'Saving…' : 'Save to history'}
+          {logWorkout.isPending ? t('common.saving') : t('activeWorkout.saveToHistory')}
         </button>
-        {logWorkout.isError ? (
+        {logWorkout.error instanceof ApiError && logWorkout.error.status === 401 ? (
           <p role="alert" className="font-label-sm text-label-sm text-error mt-sm">
-            {logWorkout.error instanceof ApiError && logWorkout.error.status === 401
-              ? 'Log in to save this workout to your history.'
-              : errorMessage(logWorkout.error)}
+            {t('activeWorkout.logInToSaveThisWorkout')}
           </p>
         ) : null}
       </div>
@@ -201,16 +202,16 @@ export default function ActiveWorkout() {
           <button
             type="button"
             onClick={quit}
-            aria-label="Quit workout"
+            aria-label={t('activeWorkout.quitWorkout')}
             className="text-secondary hover:bg-surface-container-high transition-colors p-sm rounded-full active:scale-95"
           >
             <Icon name="x" />
           </button>
           <span className="font-label-bold text-label-bold text-primary">
-            Exercise {session.exerciseIndex + 1} of {session.exercises.length}
+            {t('activeWorkout.exerciseOf', { current: session.exerciseIndex + 1, total: session.exercises.length })}
           </span>
           <span className="font-label-sm text-label-sm text-secondary">
-            Set {Math.min(setNumber, current.targetSets)}/{current.targetSets}
+            {t('activeWorkout.set', { current: Math.min(setNumber, current.targetSets), total: current.targetSets })}
           </span>
         </div>
         <div className="w-full bg-surface-container-high h-2">
@@ -238,14 +239,14 @@ export default function ActiveWorkout() {
 
         <div className="w-full space-y-lg mb-lg">
           <Stepper
-            label="Weight (lbs)"
+            label={t('activeWorkout.weightLbs')}
             value={current.weight}
             step={5}
             onAdjust={(delta) => adjustCurrent('weight', delta)}
             onSet={(value) => setCurrentValue('weight', value)}
           />
           <Stepper
-            label="Reps"
+            label={t('common.reps')}
             value={current.reps}
             step={1}
             onAdjust={(delta) => adjustCurrent('reps', delta)}
@@ -254,9 +255,9 @@ export default function ActiveWorkout() {
         </div>
 
         <div className="w-full bg-surface-container-low p-sm rounded-lg flex justify-between items-center mb-lg">
-          <span className="font-label-sm text-label-sm text-secondary">Previous Set:</span>
+          <span className="font-label-sm text-label-sm text-secondary">{t('activeWorkout.previousSet')}</span>
           <span className="font-body-md text-body-md text-on-surface-variant font-medium">
-            {previousSet ? `${previousSet.weight} lbs x ${previousSet.reps} reps` : 'First set of this exercise'}
+            {previousSet ? `${previousSet.weight} lbs x ${previousSet.reps} reps` : t('activeWorkout.firstSetOfThisExercise')}
           </span>
         </div>
 
@@ -265,7 +266,7 @@ export default function ActiveWorkout() {
           {Array.from({ length: current.targetSets }, (_, i) => (
             <span
               key={i}
-              title={`Set ${i + 1}`}
+              title={t('activeWorkout.set2', { n: i + 1 })}
               className={`flex-1 h-2 rounded-full ${
                 i < current.logged.length ? 'bg-primary' : i === current.logged.length ? 'bg-primary-fixed-dim' : 'bg-surface-variant'
               }`}
@@ -317,7 +318,7 @@ export default function ActiveWorkout() {
                 onClick={() => setRestRunning(false)}
                 className="font-label-bold text-label-bold text-secondary hover:text-on-surface px-sm py-xs rounded-full transition-colors"
               >
-                Pause
+                {t('activeWorkout.pause')}
               </button>
               <button
                 type="button"
@@ -327,7 +328,7 @@ export default function ActiveWorkout() {
                 }}
                 className="font-label-bold text-label-bold text-primary hover:text-primary-container px-sm py-xs rounded-full transition-colors"
               >
-                Skip
+                {t('activeWorkout.skip')}
               </button>
             </>
           ) : (
@@ -336,7 +337,7 @@ export default function ActiveWorkout() {
               onClick={() => startRest(restRemaining || REST_SECONDS)}
               className="font-label-bold text-label-bold text-primary hover:text-primary-container px-sm py-xs rounded-full transition-colors"
             >
-              {restRemaining ? 'Resume' : 'Start rest'}
+              {restRemaining ? t('activeWorkout.resume') : t('activeWorkout.startRest')}
             </button>
           )}
         </div>
@@ -347,7 +348,7 @@ export default function ActiveWorkout() {
           className="w-full max-w-md bg-primary-container text-on-primary font-headline-md text-headline-md py-md rounded-xl shadow-lg active:scale-[0.98] transition-transform duration-150 flex items-center justify-center gap-sm hover:bg-primary"
         >
           <Icon name="circle-check" filled />
-          Complete Set
+          {t('activeWorkout.completeSet')}
         </button>
       </div>
     </div>

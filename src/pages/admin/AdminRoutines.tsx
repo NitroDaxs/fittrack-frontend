@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../../i18n/index'
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { adminService } from '../../services/admin'
 import type { Routine, RoutineForm } from '../../types/routines'
-import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter, Notice } from '../../components/admin/AdminPage'
+import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter } from '../../components/admin/AdminPage'
 import DataTable, { RowActions, TableFooter, type Column } from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
 import { SelectField, TextAreaField, TextField } from '../../components/ui/Field'
@@ -33,6 +35,7 @@ const goalTone: Record<string, string> = {
 }
 
 export default function AdminRoutines() {
+  const { t } = useTranslation()
   const [goal, setGoal] = useState('')
   const taxonomies = useTaxonomies()
 
@@ -89,13 +92,13 @@ export default function AdminRoutines() {
   const submit = (event: FormEvent) => {
     event.preventDefault()
     const found: FormErrors = {}
-    if (!form.title.trim()) found.title = 'Title is required.'
-    if (!form.description.trim()) found.description = 'Describe the programme in a sentence.'
-    if (Number(form.daysPerWeek) < 1 || Number(form.daysPerWeek) > 7) found.daysPerWeek = 'Between 1 and 7.'
+    if (!form.title.trim()) found.title = t('common.titleIsRequired')
+    if (!form.description.trim()) found.description = t('admin.routines.describeTheProgrammeInASentence')
+    if (Number(form.daysPerWeek) < 1 || Number(form.daysPerWeek) > 7) found.daysPerWeek = t('admin.routines.between1And7')
     // A day with no exercises would publish as an empty block on the routine page.
     const emptyDay = form.days.findIndex((day) => day.exercises.length === 0)
     if (emptyDay !== -1) {
-      found.days = `"${form.days[emptyDay].name || `Day ${emptyDay + 1}`}" has no exercises.`
+      found.days = t('admin.routines.hasNoExercises', { name: form.days[emptyDay].name || t('common.day', { n: emptyDay + 1 }) })
     }
     setErrors(found)
     if (Object.keys(found).length > 0) return
@@ -106,7 +109,7 @@ export default function AdminRoutines() {
   const columns: Column<Routine>[] = [
     {
       key: 'title',
-      header: 'Routine Title',
+      header: t('admin.routines.routineTitle'),
       sortable: true,
       render: (row) => (
         <span className="flex items-center gap-md">
@@ -116,7 +119,7 @@ export default function AdminRoutines() {
           <span className="min-w-0">
             <span className="block font-medium text-on-surface truncate">{row.title}</span>
             <span className="block font-label-sm text-label-sm text-on-surface-variant">
-              {row.goal} • {row.level} • {row.daysPerWeek} Days
+              {t('admin.routines.days', { goal: tLabel(row.goal), level: tLabel(row.level), days: row.daysPerWeek })}
             </span>
           </span>
         </span>
@@ -124,27 +127,27 @@ export default function AdminRoutines() {
     },
     {
       key: 'goal',
-      header: 'Goal',
+      header: t('common.goal'),
       sortable: true,
       className: 'hidden sm:table-cell',
       headerClassName: 'hidden sm:table-cell',
       render: (row) => (
         <span className={`px-sm py-xs rounded-full font-label-sm text-label-sm ${goalTone[row.goal] ?? 'bg-surface-container text-secondary'}`}>
-          {row.goal}
+          {tLabel(row.goal)}
         </span>
       ),
     },
     {
       key: 'level',
-      header: 'Difficulty',
+      header: t('common.difficulty'),
       sortable: true,
       className: 'hidden md:table-cell text-on-surface-variant',
       headerClassName: 'hidden md:table-cell',
-      render: (row) => row.level,
+      render: (row) => tLabel(row.level),
     },
     {
       key: 'daysPerWeek',
-      header: 'Days/Week',
+      header: t('common.daysWeek'),
       sortable: true,
       className: 'hidden md:table-cell text-on-surface-variant',
       headerClassName: 'hidden md:table-cell',
@@ -152,7 +155,7 @@ export default function AdminRoutines() {
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('common.actions'),
       headerClassName: 'text-right',
       className: 'text-right',
       render: (row) => <RowActions onEdit={() => crud.setEditing(row)} onDelete={() => crud.setDeleting(row)} />,
@@ -162,20 +165,18 @@ export default function AdminRoutines() {
   return (
     <>
       <AdminHeader
-        title="Manage Routines"
-        description="Create, edit, and organize workout templates for users."
-        actionLabel="Add new routine"
+        title={t('admin.routines.manageRoutines')}
+        description={t('admin.routines.createEditAndOrganizeWorkoutTemplates')}
+        actionLabel={t('admin.routines.addNewRoutine')}
         onAction={() => crud.setEditing('new')}
       />
 
-      <Notice notice={crud.notice} />
-
-      <AdminToolbar search={crud.search} onSearch={crud.setSearch} placeholder="Search routines...">
+      <AdminToolbar search={crud.search} onSearch={crud.setSearch} placeholder={t('common.searchRoutines')}>
         <AdminSelect
-          label="Goal"
+          label={t('common.goal')}
           value={goal}
           onChange={setGoal}
-          options={[{ value: '', label: 'All Goals' }, ...(taxonomies?.goals ?? [])]}
+          options={[{ value: '', label: t('admin.routines.allGoals') }, ...(taxonomies?.goals ?? [])]}
         />
       </AdminToolbar>
 
@@ -183,7 +184,7 @@ export default function AdminRoutines() {
         {crud.error ? (
           <ErrorState error={crud.error} onRetry={crud.refetch} />
         ) : crud.loading ? (
-          <Spinner label="Loading routines" />
+          <Spinner label={t('admin.routines.loadingRoutines')} />
         ) : (
           <>
             <DataTable
@@ -191,11 +192,11 @@ export default function AdminRoutines() {
               rows={crud.rows}
               sort={crud.sort}
               onSortChange={crud.setSort}
-              empty="No routines match your search."
+              empty={t('admin.routines.noRoutinesMatchYourSearch')}
             />
             <TableFooter>
               <span className="font-label-sm text-label-sm text-on-surface-variant">
-                Showing {crud.rows.length} of {crud.meta?.total ?? crud.rows.length} routines
+                {t('admin.routines.showingOfRoutines', { shown: crud.rows.length, total: crud.meta?.total ?? crud.rows.length })}
               </span>
               <Pagination page={crud.page} lastPage={crud.meta?.lastPage ?? 1} onPageChange={crud.setPage} className="" />
             </TableFooter>
@@ -205,39 +206,36 @@ export default function AdminRoutines() {
 
       <Modal
         open={Boolean(crud.editing)}
-        title={crud.editingRow ? 'Edit routine' : 'Add new routine'}
-        description="Metadata plus the day-by-day programme. Everything saves together."
+        title={crud.editingRow ? t('admin.routines.editRoutine') : t('admin.routines.addNewRoutine')}
+        description={t('admin.routines.metadataPlusTheDayByDay')}
         onClose={() => crud.setEditing(null)}
         size="lg"
         footer={<ModalFooter onCancel={() => crud.setEditing(null)} saving={crud.saving} />}
       >
         <form id="crud-form" onSubmit={submit} noValidate className="space-y-md">
-          {crud.saveError ? <Notice notice={{ message: crud.saveError, tone: 'error' }} /> : null}
-          <TextField label="Title" name="title" value={form.title} onChange={setField('title')} error={errors.title ?? crud.fieldErrors.title} />
+          <TextField label={t('common.title')} name="title" value={form.title} onChange={setField('title')} error={errors.title ?? crud.fieldErrors.title} />
           <TextAreaField
-            label="Description"
+            label={t('common.description')}
             name="description"
             value={form.description}
             onChange={setField('description')}
             error={errors.description}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-            <SelectField label="Goal" name="goal" value={form.goal} onChange={setField('goal')}>
+            <SelectField label={t('common.goal')} name="goal" value={form.goal} onChange={setField('goal')}>
               {(taxonomies?.goals ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
-                  {option.label}
-                </option>
+                  {tLabel(option.label)}</option>
               ))}
             </SelectField>
-            <SelectField label="Level" name="level" value={form.level} onChange={setField('level')}>
+            <SelectField label={t('admin.routines.level')} name="level" value={form.level} onChange={setField('level')}>
               {(taxonomies?.levels ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
-                  {option.label}
-                </option>
+                  {tLabel(option.label)}</option>
               ))}
             </SelectField>
             <TextField
-              label="Days per week"
+              label={t('admin.routines.daysPerWeek')}
               name="daysPerWeek"
               type="number"
               min="1"

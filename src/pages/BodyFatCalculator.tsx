@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState, type FormEvent } from 'react'
 import {
   CalculateButton,
@@ -17,14 +18,15 @@ import type { BodyFatCategory, Sex } from '../types/calculators'
 import { fieldErrorsOf } from '../services/http'
 
 const categoryLabels: Record<BodyFatCategory, string> = {
-  essential_fat: 'Essential fat',
-  athletic: 'Athletic',
-  fitness: 'Fitness',
-  average: 'Average',
-  above_average: 'Above average',
+  essential_fat: 'calculators.bodyFat.essentialFat',
+  athletic: 'calculators.bodyFat.athletic',
+  fitness: 'calculators.bodyFat.fitness',
+  average: 'calculators.bodyFat.average',
+  above_average: 'calculators.bodyFat.aboveAverage',
 }
 
 export default function BodyFatCalculator() {
+  const { t } = useTranslation()
   const [sex, setSex] = useState<Sex>('male')
   const [height, setHeight] = useState(emptyHeight)
   const [neck, setNeck] = useState('')
@@ -62,8 +64,8 @@ export default function BodyFatCalculator() {
   return (
     <div className="max-w-[800px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
       <CalculatorHeader
-        title="Body Fat % Estimator"
-        description="Estimate body fat with the US Navy tape-measurement method."
+        title={t('common.bodyFatEstimator')}
+        description={t('calculators.bodyFat.estimateBodyFatWithTheUs')}
         action={<UnitToggle unit={unit} onChange={setUnit} imperialLabel="ft-in" metricLabel="cm" />}
       />
 
@@ -71,10 +73,10 @@ export default function BodyFatCalculator() {
         <SexToggle value={sex} onChange={changeSex} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
           <HeightInput value={height} onChange={setHeight} errors={errors} />
-          <NumberInput id="neck" label={`Neck (${lengthLabel})`} value={neck} onChange={setNeck} error={errors.neck} />
-          <NumberInput id="waist" label={`Waist (${lengthLabel}), at the navel`} value={waist} onChange={setWaist} error={errors.waist} />
+          <NumberInput id="neck" label={t('calculators.bodyFat.neck', { unit: lengthLabel })} value={neck} onChange={setNeck} error={errors.neck} />
+          <NumberInput id="waist" label={t('calculators.bodyFat.waistAtTheNavel', { unit: lengthLabel })} value={waist} onChange={setWaist} error={errors.waist} />
           {sex === 'female' ? (
-            <NumberInput id="hip" label={`Hip (${lengthLabel}), at the widest point`} value={hip} onChange={setHip} error={errors.hip} />
+            <NumberInput id="hip" label={t('calculators.bodyFat.hipAtTheWidestPoint', { unit: lengthLabel })} value={hip} onChange={setHip} error={errors.hip} />
           ) : null}
         </div>
         <CalculateButton pending={calculation.isPending} />
@@ -84,16 +86,15 @@ export default function BodyFatCalculator() {
       {result ? (
         <section className="bg-primary-fixed rounded-xl p-xl text-center border border-outline-variant">
           <span className="font-label-bold text-label-bold text-on-primary-fixed-variant uppercase tracking-widest">
-            Estimated Body Fat
+            {t('calculators.bodyFat.estimatedBodyFat')}
           </span>
           <p className="font-display-stat text-display-stat text-primary mt-sm">{result.body_fat.toFixed(1)}%</p>
-          <p className="font-label-bold text-label-bold text-on-primary-fixed-variant mt-sm">{categoryLabels[result.category]}</p>
+          <p className="font-label-bold text-label-bold text-on-primary-fixed-variant mt-sm">{t(categoryLabels[result.category])}</p>
         </section>
       ) : null}
 
       <p className="font-label-sm text-label-sm text-secondary mt-lg text-center max-w-xl mx-auto">
-        Tape measurements are a rough estimate — accuracy depends on consistent, taut (not tight) placement. For a
-        precise reading, use DEXA or hydrostatic weighing.
+        {t('calculators.bodyFat.tapeMeasurementsAreARoughEstimate')}
       </p>
     </div>
   )

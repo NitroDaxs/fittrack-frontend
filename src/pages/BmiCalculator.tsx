@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState, type FormEvent } from 'react'
 import {
   CalculateButton,
@@ -16,13 +17,14 @@ import type { BmiCategory } from '../types/calculators'
 import { fieldErrorsOf } from '../services/http'
 
 const categories: Record<BmiCategory, { label: string; tone: string }> = {
-  underweight: { label: 'Underweight', tone: 'text-secondary' },
-  normal_weight: { label: 'Normal weight', tone: 'text-primary' },
-  overweight: { label: 'Overweight', tone: 'text-tertiary' },
-  obese: { label: 'Obese', tone: 'text-error' },
+  underweight: { label: 'calculators.bmi.underweight', tone: 'text-secondary' },
+  normal_weight: { label: 'calculators.bmi.normalWeight', tone: 'text-primary' },
+  overweight: { label: 'calculators.bmi.overweight', tone: 'text-tertiary' },
+  obese: { label: 'calculators.bmi.obese', tone: 'text-error' },
 }
 
 export default function BmiCalculator() {
+  const { t } = useTranslation()
   const [height, setHeight] = useState(emptyHeight)
   const [weight, setWeight] = useState('')
   const calculation = useBmi()
@@ -43,15 +45,15 @@ export default function BmiCalculator() {
   return (
     <div className="max-w-[800px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
       <CalculatorHeader
-        title="BMI Calculator"
-        description="A rough population-level screen for body composition based on height and weight."
+        title={t('common.bmiCalculator')}
+        description={t('calculators.bmi.aRoughPopulationLevelScreenFor')}
         action={<UnitToggle unit={unit} onChange={setUnit} />}
       />
 
       <form onSubmit={submit} noValidate className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant mb-xl space-y-md">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
           <HeightInput value={height} onChange={setHeight} errors={errors} />
-          <NumberInput id="weight" label={`Weight (${weightLabel})`} value={weight} onChange={setWeight} error={errors.weight} />
+          <NumberInput id="weight" label={t('common.weight', { unit: weightLabel })} value={weight} onChange={setWeight} error={errors.weight} />
         </div>
         <CalculateButton pending={calculation.isPending} />
         <FormError error={calculation.error} />
@@ -59,17 +61,16 @@ export default function BmiCalculator() {
 
       {result ? (
         <section className="bg-primary-fixed rounded-xl p-xl text-center border border-outline-variant">
-          <span className="font-label-bold text-label-bold text-on-primary-fixed-variant uppercase tracking-widest">Your BMI</span>
+          <span className="font-label-bold text-label-bold text-on-primary-fixed-variant uppercase tracking-widest">{t('calculators.bmi.yourBmi')}</span>
           <p className="font-display-stat text-display-stat text-primary mt-sm">{result.bmi.toFixed(1)}</p>
           <p className={`font-label-bold text-label-bold mt-sm ${categories[result.category].tone}`}>
-            {categories[result.category].label}
+            {t(categories[result.category].label)}
           </p>
         </section>
       ) : null}
 
       <p className="font-label-sm text-label-sm text-secondary mt-lg text-center max-w-xl mx-auto">
-        BMI doesn't distinguish muscle from fat, so it can misclassify muscular or very lean people. Treat it as a
-        starting point, not a diagnosis.
+        {t('calculators.bmi.bmiDoesnTDistinguishMuscleFrom')}
       </p>
     </div>
   )

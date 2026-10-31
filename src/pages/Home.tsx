@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { RoutineCard } from '../components/cards'
 import { SkeletonCard } from '../components/ui/States'
@@ -9,13 +10,14 @@ const heroImage =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuA2r1u89fi_WJDaENJkStZCajqT8QBjZ6jAsDJwxmlOFbNth1K6tXp_agWld0hazUAdWENSDwZH2UV1M3s1rIi3bzRGAH6tLMxOobPh_85W371_vwqHN-pfabSCjJuyCPjoxbfEq4DlsnKq1xayO_McgICgN9TSyzBI7lfhS8Q3XdX_IcGpxjiopo3bvnUS_WuQBbCMMhM1HYBqz0HBwTS9JY-jj0AehNadzcN6MnLDJ7wgFsrmhFv06dRzYSLAF4AaRkKCPfIKdYkP'
 
 const features = [
-  { icon: 'library' as const, title: 'Exercise Library', body: 'Hundreds of movements with step-by-step instructions, videos, and difficulty ratings.', to: '/library' },
-  { icon: 'calendar-days' as const, title: 'Proven Routines', body: 'Structured programmes for muscle gain, fat loss, strength, and endurance.', to: '/routines' },
-  { icon: 'chart-line' as const, title: 'Progress Tracking', body: 'Strength curves, body measurements, and a consistency heatmap that keeps you honest.', to: '/dashboard' },
-  { icon: 'calculator' as const, title: 'Training Calculators', body: 'Estimate your one-rep max and daily calorie needs in seconds.', to: '/calculators' },
+  { icon: 'library' as const, title: 'common.exerciseLibrary', body: 'home.hundredsOfMovementsWithStepBy', to: '/library' },
+  { icon: 'calendar-days' as const, title: 'home.provenRoutines', body: 'home.structuredProgrammesForMuscleGainFat', to: '/routines' },
+  { icon: 'chart-line' as const, title: 'home.progressTracking', body: 'home.strengthCurvesBodyMeasurementsAndA', to: '/dashboard' },
+  { icon: 'calculator' as const, title: 'home.trainingCalculators', body: 'home.estimateYourOneRepMaxAnd', to: '/calculators' },
 ]
 
 export default function Home() {
+  const { t } = useTranslation()
   const { data, isPending: loading } = useRoutines({ perPage: 3 })
   const routines = data?.data ?? []
 
@@ -26,30 +28,29 @@ export default function Home() {
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none bg-gradient-to-bl from-primary-container via-surface to-background blur-3xl" />
         <div className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-xl items-center relative z-10">
           <div className="flex flex-col gap-lg order-2 md:order-1">
-            <span className="font-label-bold text-label-bold text-primary uppercase tracking-widest">Achieve More</span>
+            <span className="font-label-bold text-label-bold text-primary uppercase tracking-widest">{t('home.achieveMore')}</span>
             <h1 className="font-display-stat text-headline-lg md:text-display-stat text-on-surface">
-              Your Ultimate <br className="hidden md:block" />
+              {t('home.yourUltimate')}{' '}<br className="hidden md:block" />
               <span className="bg-gradient-to-r from-primary-container to-primary bg-clip-text text-transparent">
-                Performance Partner
+                {t('home.performancePartner')}
               </span>
             </h1>
             <p className="font-body-lg text-body-lg text-on-surface-variant max-w-md">
-              Data-driven insights meets high-octane motivation. Track workouts, build routines, and hit new PRs with
-              precision tracking built for athletes.
+              {t('home.dataDrivenInsightsMeetsHighOctane')}
             </p>
             <div className="flex flex-col sm:flex-row gap-md pt-sm">
               <Link
                 to="/signup"
                 className="font-label-bold text-label-bold bg-primary-container text-on-primary px-xl py-md rounded-lg hover:bg-primary transition-all active:scale-95 elev-card text-center flex items-center justify-center gap-xs"
               >
-                Start Tracking Now
+                {t('home.startTrackingNow')}
                 <Icon name="arrow-right" size={18} />
               </Link>
               <a
                 href="#features"
                 className="font-label-bold text-label-bold border border-outline bg-surface text-on-surface px-xl py-md rounded-lg hover:bg-surface-variant transition-colors active:scale-95 text-center elev-card"
               >
-                Explore Features
+                {t('home.exploreFeatures')}
               </a>
             </div>
           </div>
@@ -58,7 +59,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-primary-container/5 rounded-xl md:rounded-[40px] rotate-3" />
             <Img
               src={heroImage}
-              alt="Athlete mid-workout in a modern gym"
+              alt={t('home.athleteMidWorkoutInAModern')}
               icon="dumbbell"
               className="absolute inset-0 rounded-xl md:rounded-[32px] overflow-hidden"
               imgClassName="absolute inset-0 w-full h-full object-cover rounded-xl md:rounded-[32px] elev-overlay z-10"
@@ -70,7 +71,7 @@ export default function Home() {
       {/* Features */}
       <section id="features" className="py-xl max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop mt-xl scroll-mt-24">
         <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-lg">
-          Everything in one place
+          {t('home.everythingInOnePlace')}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-lg">
           {features.map((feature) => (
@@ -83,9 +84,9 @@ export default function Home() {
                 <Icon name={feature.icon} size={24} />
               </div>
               <h3 className="font-headline-md text-headline-md text-on-surface mb-xs group-hover:text-primary transition-colors">
-                {feature.title}
+                {t(feature.title)}
               </h3>
-              <p className="font-body-md text-body-md text-secondary text-sm">{feature.body}</p>
+              <p className="font-body-md text-body-md text-secondary text-sm">{t(feature.body)}</p>
             </Link>
           ))}
         </div>
@@ -96,17 +97,17 @@ export default function Home() {
         <div className="flex justify-between items-end mb-lg">
           <div>
             <h2 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">
-              Trending Routines
+              {t('home.trendingRoutines')}
             </h2>
             <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
-              Curated programs to accelerate your progress.
+              {t('home.curatedProgramsToAccelerateYourProgress')}
             </p>
           </div>
           <Link
             to="/routines"
             className="hidden md:flex font-label-bold text-label-bold text-primary items-center gap-xs hover:text-primary-container transition-colors"
           >
-            View All <Icon name="arrow-right" size={16} />
+            {t('common.viewAll')}{' '}<Icon name="arrow-right" size={16} />
           </Link>
         </div>
 
@@ -121,7 +122,7 @@ export default function Home() {
             to="/routines"
             className="font-label-bold text-label-bold border border-outline bg-surface text-on-surface px-xl py-sm rounded-lg hover:bg-surface-variant transition-colors active:scale-95 inline-block w-full"
           >
-            View All Routines
+            {t('home.viewAllRoutines')}
           </Link>
         </div>
       </section>

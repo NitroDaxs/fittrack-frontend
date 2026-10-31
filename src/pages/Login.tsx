@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n/index'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -11,14 +13,15 @@ type Errors = Partial<Record<keyof Values, string>>
 
 function validate(values: Values): Errors {
   const errors: Errors = {}
-  if (!values.email.trim()) errors.email = 'Enter your email address.'
-  else if (!EMAIL_PATTERN.test(values.email)) errors.email = 'That does not look like a valid email address.'
-  if (!values.password) errors.password = 'Enter your password.'
-  else if (values.password.length < 8) errors.password = 'Password must be at least 8 characters.'
+  if (!values.email.trim()) errors.email = i18n.t('common.enterYourEmailAddress')
+  else if (!EMAIL_PATTERN.test(values.email)) errors.email = i18n.t('common.thatDoesNotLookLikeA')
+  if (!values.password) errors.password = i18n.t('login.enterYourPassword')
+  else if (values.password.length < 8) errors.password = i18n.t('login.passwordMustBeAtLeast8')
   return errors
 }
 
 export default function Login() {
+  const { t } = useTranslation()
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
@@ -69,12 +72,12 @@ export default function Login() {
       <div className="w-full max-w-md bg-surface-container-lowest elev-card rounded-xl p-lg md:p-xl relative z-10 border border-surface-variant/50">
         <div className="text-center mb-xl">
           <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-sm">FitTrack</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">Log in to track your progress.</p>
+          <p className="font-body-md text-body-md text-on-surface-variant">{t('login.logInToTrackYourProgress')}</p>
         </div>
 
         <form onSubmit={handleSubmit} noValidate className="space-y-lg">
           <TextField
-            label="Email Address"
+            label={t('common.emailAddress')}
             name="email"
             type="email"
             icon="mail"
@@ -89,10 +92,10 @@ export default function Login() {
           <div>
             <div className="flex items-center justify-between mb-xs">
               <label className="block font-label-bold text-label-bold text-on-surface" htmlFor="password">
-                Password
+                {t('common.password')}
               </label>
               <Link to="/forgot-password" className="font-label-sm text-label-sm text-primary hover:text-primary-container">
-                Forgot password?
+                {t('login.forgotPassword')}
               </Link>
             </div>
             <TextField
@@ -120,14 +123,14 @@ export default function Login() {
             disabled={submitting}
             className="w-full flex justify-center items-center gap-sm py-sm px-md rounded-lg shadow-sm font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-colors duration-200 active:scale-[0.98] disabled:opacity-60"
           >
-            {submitting ? 'Logging in…' : 'Log in'}
+            {submitting ? t('login.loggingIn') : t('common.logIn')}
           </button>
         </form>
 
         <p className="mt-lg text-center font-body-md text-body-md text-on-surface-variant">
-          Don&apos;t have an account?{' '}
+          {t('login.donTHaveAnAccount')}{' '}
           <Link to="/signup" className="font-label-bold text-label-bold text-primary hover:text-primary-container">
-            Sign up
+            {t('login.signUp')}
           </Link>
         </p>
 

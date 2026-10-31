@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useMemo, useState } from 'react'
 import type { Exercise } from '../../types/exercises'
 import type { ProgrammeDay, ProgrammeExercise } from '../../types/routines'
@@ -21,6 +22,7 @@ interface RoutineDayBuilderProps {
  * draft and only hands the finished array back on submit.
  */
 export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: RoutineDayBuilderProps) {
+  const { t } = useTranslation()
   const [activeDay, setActiveDay] = useState(0)
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounced(search)
@@ -37,7 +39,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
     update(days.map((day, i) => (i === index ? { ...day, ...patch } : day)))
 
   const addDay = () =>
-    update([...days, { name: `Day ${days.length + 1}`, exercises: [] }])
+    update([...days, { name: t('common.day', { n: days.length + 1 }), exercises: [] }])
 
   const removeDay = (index: number) => {
     update(days.filter((_, i) => i !== index))
@@ -49,7 +51,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
     const target = Number(daysPerWeek) || 0
     if (target <= days.length) return
     const extra = Array.from({ length: target - days.length }, (_, i) => ({
-      name: `Day ${days.length + i + 1}`,
+      name: t('common.day', { n: days.length + i + 1 }),
       exercises: [],
     }))
     update([...days, ...extra])
@@ -104,9 +106,9 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
     <section className="border border-surface-variant rounded-xl overflow-hidden">
       <header className="px-md py-sm bg-surface-container-low border-b border-surface-variant flex flex-wrap items-center justify-between gap-sm">
         <div>
-          <span className="block font-label-bold text-label-bold text-on-surface">Programme</span>
+          <span className="block font-label-bold text-label-bold text-on-surface">{t('admin.shared.programme')}</span>
           <span className="block font-label-sm text-label-sm text-secondary">
-            {days.length} {days.length === 1 ? 'day' : 'days'} · {totalExercises}{' '}
+            {days.length} {days.length === 1 ? t('common.day2') : 'days'} · {totalExercises}{' '}
             {totalExercises === 1 ? 'exercise' : 'exercises'}
           </span>
         </div>
@@ -117,7 +119,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
               onClick={fillToTarget}
               className="font-label-sm text-label-sm text-primary hover:underline px-sm py-xs"
             >
-              Add {shortfall} to match {daysPerWeek}/wk
+              {t('admin.shared.addToMatchWk', { count: shortfall, target: daysPerWeek })}
             </button>
           ) : null}
           <button
@@ -126,7 +128,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
             className="flex items-center gap-xs font-label-bold text-label-sm border border-outline text-on-surface px-sm py-xs rounded-lg hover:bg-surface-container transition-colors"
           >
             <Icon name="plus" size={16} />
-            Add day
+            {t('admin.shared.addDay')}
           </button>
         </div>
       </header>
@@ -134,14 +136,14 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
       {days.length === 0 ? (
         <div className="p-lg text-center">
           <p className="font-body-md text-sm text-secondary mb-sm">
-            This routine has no days yet, so it would show as an empty programme.
+            {t('admin.shared.thisRoutineHasNoDaysYet')}
           </p>
           <button
             type="button"
             onClick={daysPerWeek ? fillToTarget : addDay}
             className="font-label-bold text-label-sm bg-primary-container text-on-primary px-md py-sm rounded-lg hover:bg-primary transition-colors"
           >
-            {daysPerWeek ? `Create ${daysPerWeek} days` : 'Add the first day'}
+            {daysPerWeek ? t('admin.shared.createDays', { n: daysPerWeek }) : t('admin.shared.addTheFirstDay')}
           </button>
         </div>
       ) : (
@@ -160,7 +162,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                     : 'border-transparent text-secondary hover:text-on-surface'
                 }`}
               >
-                {day.name || `Day ${index + 1}`}
+                {day.name || t('common.day', { n: index + 1 })}
                 <span className="ml-xs text-[10px] opacity-70">{day.exercises.length}</span>
               </button>
             ))}
@@ -171,18 +173,18 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
               <div className="flex items-end gap-sm">
                 <div className="flex-1">
                   <TextField
-                    label="Day name"
+                    label={t('admin.shared.dayName')}
                     name={`day-name-${activeDay}`}
                     value={current.name}
                     onChange={(event) => mutateDay(activeDay, { name: event.target.value })}
-                    placeholder="Push Day A"
+                    placeholder={t('admin.shared.pushDayA')}
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => removeDay(activeDay)}
                   className="text-secondary hover:text-error p-sm rounded-lg hover:bg-error-container/40 transition-colors"
-                  aria-label={`Remove ${current.name || 'day'}`}
+                  aria-label={t('common.remove', { name: current.name || t('common.day2') })}
                 >
                   <Icon name="trash-2" size={20} />
                 </button>
@@ -191,7 +193,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
               {/* Exercises in this day */}
               {current.exercises.length === 0 ? (
                 <p className="font-body-md text-sm text-secondary text-center py-md">
-                  No exercises in this day yet — search the library below.
+                  {t('admin.shared.noExercisesInThisDayYet')}
                 </p>
               ) : (
                 <ul className="flex flex-col gap-sm">
@@ -211,7 +213,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                           type="button"
                           onClick={() => moveExercise(index, -1)}
                           disabled={index === 0}
-                          aria-label="Move up"
+                          aria-label={t('admin.shared.moveUp')}
                           className="text-secondary hover:text-primary p-xs rounded disabled:opacity-30 disabled:pointer-events-none"
                         >
                           <Icon name="arrow-up" size={16} />
@@ -220,7 +222,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                           type="button"
                           onClick={() => moveExercise(index, 1)}
                           disabled={index === current.exercises.length - 1}
-                          aria-label="Move down"
+                          aria-label={t('admin.shared.moveDown')}
                           className="text-secondary hover:text-primary p-xs rounded disabled:opacity-30 disabled:pointer-events-none"
                         >
                           <Icon name="arrow-down" size={16} />
@@ -228,7 +230,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                         <button
                           type="button"
                           onClick={() => removeExercise(index)}
-                          aria-label={`Remove ${entry.name}`}
+                          aria-label={t('common.remove', { name: entry.name })}
                           className="text-secondary hover:text-error p-xs rounded"
                         >
                           <Icon name="x" size={16} />
@@ -238,7 +240,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                       <div className="grid grid-cols-3 gap-sm">
                         <label className="flex flex-col gap-[2px]">
                           <span className="font-label-sm text-[10px] text-secondary uppercase tracking-widest">
-                            Sets
+                            {t('common.sets')}
                           </span>
                           <input
                             type="number"
@@ -255,7 +257,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                         </label>
                         <label className="flex flex-col gap-[2px]">
                           <span className="font-label-sm text-[10px] text-secondary uppercase tracking-widest">
-                            Reps
+                            {t('common.reps')}
                           </span>
                           <input
                             type="text"
@@ -267,7 +269,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                         </label>
                         <label className="flex flex-col gap-[2px]">
                           <span className="font-label-sm text-[10px] text-secondary uppercase tracking-widest">
-                            Rest (s)
+                            {t('admin.shared.restS')}
                           </span>
                           <input
                             type="number"
@@ -292,19 +294,19 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
               {/* Library search */}
               <div className="border-t border-surface-variant pt-md">
                 <TextField
-                  label="Add an exercise"
+                  label={t('common.addAnExercise')}
                   name="exercise-search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search the library — type at least 2 letters"
+                  placeholder={t('admin.shared.searchTheLibraryTypeAtLeast')}
                 />
                 {debouncedSearch.trim().length >= 2 ? (
                   <div className="mt-sm flex flex-col gap-xs max-h-48 overflow-y-auto custom-scrollbar">
                     {loading ? (
-                      <span className="font-label-sm text-label-sm text-secondary px-sm py-xs">Searching…</span>
+                      <span className="font-label-sm text-label-sm text-secondary px-sm py-xs">{t('common.searching')}</span>
                     ) : (results?.data ?? []).length === 0 ? (
                       <span className="font-label-sm text-label-sm text-secondary px-sm py-xs">
-                        Nothing matches “{debouncedSearch}”.
+                        {t('admin.shared.nothingMatches', { query: debouncedSearch })}
                       </span>
                     ) : (
                       (results?.data ?? []).map((exercise) => {

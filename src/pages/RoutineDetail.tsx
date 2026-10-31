@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../i18n/index'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ErrorState, Spinner } from '../components/ui/States'
@@ -9,6 +11,7 @@ import { useFavorite } from '../hooks/useFavorite'
 import { useRoutine } from '../hooks/useRoutines'
 
 export default function RoutineDetail() {
+  const { t } = useTranslation()
   const { slug = '' } = useParams()
   const navigate = useNavigate()
   const [activeDay, setActiveDay] = useState(0)
@@ -17,7 +20,7 @@ export default function RoutineDetail() {
   const { data: routine, isPending: loading, error, refetch } = useRoutine(slug)
   const { isSaved, toggle: toggleSaved, pending: saving, canSave } = useFavorite('routine', routine?.id)
 
-  if (loading) return <Spinner label="Loading routine" />
+  if (loading) return <Spinner label={t('routineDetail.loadingRoutine')} />
   if (error) return <ErrorState error={error} onRetry={refetch} />
   if (!routine) return null
 
@@ -36,7 +39,7 @@ export default function RoutineDetail() {
         className="inline-flex items-center gap-xs font-label-bold text-label-bold text-secondary hover:text-primary transition-colors mb-lg"
       >
         <Icon name="arrow-left" size={20} />
-        Back to Routines
+        {t('routineDetail.backToRoutines')}
       </Link>
 
       <header className="relative rounded-xl overflow-hidden mb-xl elev-card">
@@ -50,13 +53,13 @@ export default function RoutineDetail() {
           </h1>
           <div className="flex flex-wrap gap-sm">
             <span className="bg-primary-container text-on-primary px-sm py-xs rounded-full font-label-sm text-label-sm">
-              {routine.goal}
+              {tLabel(routine.goal)}
             </span>
             <span className="bg-white/15 backdrop-blur text-white px-sm py-xs rounded-full font-label-sm text-label-sm">
-              {routine.daysPerWeek} Days/Week
+              {t('routineDetail.daysWeek', { count: routine.daysPerWeek })}
             </span>
             <span className="bg-white/15 backdrop-blur text-white px-sm py-xs rounded-full font-label-sm text-label-sm">
-              {routine.level}
+              {tLabel(routine.level)}
             </span>
           </div>
         </div>
@@ -64,8 +67,8 @@ export default function RoutineDetail() {
 
       <div className="grid grid-cols-2 gap-md mb-xl">
         {[
-          { value: routine.daysPerWeek, label: 'Days/Wk' },
-          { value: routine.days.reduce((sum, d) => sum + d.exercises.length, 0), label: 'Exercises' },
+          { value: routine.daysPerWeek, label: t('routineDetail.daysWk') },
+          { value: routine.days.reduce((sum, d) => sum + d.exercises.length, 0), label: t('common.exercises') },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -82,7 +85,7 @@ export default function RoutineDetail() {
       <p className="font-body-lg text-body-lg text-on-surface-variant max-w-3xl mb-xl">{routine.description}</p>
 
       <section className="mb-xl">
-        <h2 className="font-headline-md text-headline-md text-on-surface mb-md">Weekly Split Overview</h2>
+        <h2 className="font-headline-md text-headline-md text-on-surface mb-md">{t('routineDetail.weeklySplitOverview')}</h2>
         <div className="flex gap-sm overflow-x-auto pb-sm no-scrollbar">
           {routine.days.map((item, index) => (
             <button
@@ -116,7 +119,7 @@ export default function RoutineDetail() {
             className="hidden sm:flex items-center gap-sm bg-primary-container text-on-primary font-label-bold text-label-bold px-lg py-sm rounded-lg hover:bg-primary transition-colors active:scale-95"
           >
             <Icon name="play" size={20} filled />
-            Load this day
+            {t('routineDetail.loadThisDay')}
           </button>
         </header>
 
@@ -145,11 +148,11 @@ export default function RoutineDetail() {
               <div className="flex gap-lg shrink-0">
                 <div className="text-center">
                   <span className="block font-headline-md text-headline-md text-primary">{entry.sets}</span>
-                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Sets</span>
+                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-widest">{t('common.sets')}</span>
                 </div>
                 <div className="text-center">
                   <span className="block font-headline-md text-headline-md text-primary">{entry.reps}</span>
-                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-widest">Reps</span>
+                  <span className="font-label-sm text-label-sm text-secondary uppercase tracking-widest">{t('common.reps')}</span>
                 </div>
               </div>
             </li>
@@ -157,7 +160,7 @@ export default function RoutineDetail() {
         </ul>
       </section>
       ) : (
-        <p className="font-body-md text-body-md text-secondary mb-xl">This routine has no programme yet.</p>
+        <p className="font-body-md text-body-md text-secondary mb-xl">{t('routineDetail.thisRoutineHasNoProgrammeYet')}</p>
       )}
 
       <div className="flex flex-col sm:flex-row gap-md">
@@ -168,7 +171,7 @@ export default function RoutineDetail() {
           className="disabled:opacity-40 disabled:cursor-not-allowed flex-1 flex items-center justify-center gap-sm bg-primary-container text-on-primary font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-primary transition-colors active:scale-95 elev-card"
         >
           <Icon name="play" size={20} filled />
-          Load {day?.name ?? 'day'} into builder
+          {t('routineDetail.loadIntoBuilder', { name: day?.name ?? t('common.day2') })}
         </button>
         {canSave ? (
           <button
@@ -183,7 +186,7 @@ export default function RoutineDetail() {
             }`}
           >
             <Icon name="bookmark" size={20} filled={isSaved} />
-            {isSaved ? 'Saved to your routines' : 'Save routine'}
+            {isSaved ? t('routineDetail.savedToYourRoutines') : t('routineDetail.saveRoutine')}
           </button>
         ) : (
           <Link
@@ -191,7 +194,7 @@ export default function RoutineDetail() {
             className="flex items-center justify-center gap-sm border border-outline text-on-surface font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-surface-container transition-colors"
           >
             <Icon name="bookmark" size={20} />
-            Sign up to save
+            {t('routineDetail.signUpToSave')}
           </Link>
         )}
       </div>

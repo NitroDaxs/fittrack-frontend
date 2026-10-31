@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../../i18n/index'
 import type { SelectOption } from '../../types/shared'
 
 interface FilterChipsProps {
@@ -12,7 +14,8 @@ interface FilterChipsProps {
  * Pill-shaped single-select filter row. `value` of null means "no filter";
  * clicking the active chip clears it.
  */
-export default function FilterChips({ label, options, value, onChange, allLabel = 'All' }: FilterChipsProps) {
+export default function FilterChips({ label, options, value, onChange, allLabel }: FilterChipsProps) {
+  const { t } = useTranslation()
   return (
     <div>
       <span className="font-label-bold text-label-bold text-on-surface-variant block mb-sm">{label}</span>
@@ -27,7 +30,7 @@ export default function FilterChips({ label, options, value, onChange, allLabel 
               : 'border-surface-variant bg-surface text-secondary hover:border-primary/50'
           }`}
         >
-          {allLabel}
+          {allLabel ?? t('common.all')}
         </button>
         {options.map((option) => {
           const active = value === option.value
@@ -43,7 +46,7 @@ export default function FilterChips({ label, options, value, onChange, allLabel 
                   : 'border-surface-variant bg-surface text-secondary hover:border-primary/50'
               }`}
             >
-              {option.label}
+              {tLabel(option.label)}
             </button>
           )
         })}

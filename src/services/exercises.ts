@@ -1,4 +1,5 @@
 import type { IconName } from '../components/ui/Icon'
+import i18n from '../i18n'
 import { endpoints } from './endpoints'
 import { get } from './http'
 import type { Exercise, ExerciseCategoryValue, ExerciseDto, ExerciseForm, ExerciseQuery, ExerciseRequest, ExerciseStep } from '../types/exercises'
@@ -51,7 +52,7 @@ function parseSteps(instructions: string | null): ExerciseStep[] {
     .split('\n')
     .map((line) => line.replace(/^\d+\.\s*/, '').trim())
     .filter(Boolean)
-    .map((body, index) => ({ title: `Step ${index + 1}`, body }))
+    .map((body, index) => ({ title: i18n.t('exerciseDetail.step', { n: index + 1 }), body }))
 }
 
 export function toExercise(raw: ExerciseDto): Exercise {

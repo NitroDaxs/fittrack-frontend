@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
+import { toast } from 'sonner'
+import i18n from '../i18n'
 import { useAuth } from '../context/AuthContext'
 import { favoriteService } from '../services/me'
 import { useSaved } from './useMe'
@@ -24,7 +26,10 @@ export function useFavorite(type: 'routine' | 'exercise', id: number | undefined
     },
     onMutate: ({ next }) => setOverride(next),
     onError: (_error, { next }) => setOverride(!next),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['me', 'saved'] }),
+    onSuccess: (_result, { next }) => {
+      toast.success(i18n.t(next ? 'toast.favoriteAdded' : 'toast.favoriteRemoved'))
+      return queryClient.invalidateQueries({ queryKey: ['me', 'saved'] })
+    },
   })
 
   const toggle = () => {

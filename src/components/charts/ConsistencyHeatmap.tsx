@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '../../i18n/index'
 import { useMemo, useState } from 'react'
 import type { ConsistencyDay } from '../../types/me'
 
@@ -7,9 +9,10 @@ const localDate = (day: string) => new Date(`${day}T00:00:00`)
 // Intensity ramp uses the primary scale, matching the legend in the design.
 const intensities = ['bg-surface-variant', 'bg-primary-fixed-dim', 'bg-primary-container', 'bg-primary']
 
-const weekdayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', '']
+const weekdayLabels = ['', 'charts.mon', '', 'charts.wed', '', 'charts.fri', '']
 
 export default function ConsistencyHeatmap({ days }: { days: ConsistencyDay[] }) {
+  const { t } = useTranslation()
   const [hovered, setHovered] = useState<ConsistencyDay | null>(null)
 
   // Bucket the flat day list into columns of seven, aligned so each column is a
@@ -32,7 +35,7 @@ export default function ConsistencyHeatmap({ days }: { days: ConsistencyDay[] })
       if (!firstReal) return
       const month = localDate(firstReal.date).getMonth()
       if (month !== lastMonth) {
-        markers.push({ index, label: localDate(firstReal.date).toLocaleDateString(undefined, { month: 'short' }) })
+        markers.push({ index, label: localDate(firstReal.date).toLocaleDateString(i18n.language, { month: 'short' }) })
         lastMonth = month
       }
     })
@@ -49,8 +52,7 @@ export default function ConsistencyHeatmap({ days }: { days: ConsistencyDay[] })
         <div className="flex flex-col gap-xs pt-[18px] shrink-0">
           {weekdayLabels.map((label, i) => (
             <span key={i} className="h-4 font-label-sm text-[10px] text-secondary leading-4 w-8">
-              {label}
-            </span>
+              {label ? t(label) : ''} </span>
           ))}
         </div>
 
@@ -95,15 +97,15 @@ export default function ConsistencyHeatmap({ days }: { days: ConsistencyDay[] })
       <div className="flex flex-wrap justify-between items-center gap-sm mt-md">
         <p className="font-label-sm text-label-sm text-secondary" aria-live="polite">
           {hovered
-            ? `${localDate(hovered.date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })} — ${hovered.count} ${hovered.count === 1 ? 'session' : 'sessions'}`
-            : `${total} sessions across ${activeDays} active days`}
+            ? `${localDate(hovered.date).toLocaleDateString(i18n.language, { weekday: 'short', month: 'short', day: 'numeric' })} — ${hovered.count} ${hovered.count === 1 ? 'session' : 'sessions'}`
+            : t('charts.sessionsAcrossActiveDays', { total, days: activeDays })}
         </p>
         <div className="flex items-center gap-xs text-secondary font-label-sm text-label-sm">
-          <span>Less</span>
+          <span>{t('charts.less')}</span>
           {intensities.map((tone) => (
             <span key={tone} className={`w-3 h-3 rounded-sm ${tone}`} />
           ))}
-          <span>More</span>
+          <span>{t('charts.more')}</span>
         </div>
       </div>
     </div>

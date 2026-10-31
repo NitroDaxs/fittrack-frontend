@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { Units } from '../../types/shared'
 
 interface UnitToggleProps {
@@ -13,10 +14,11 @@ const options = (imperialLabel: string, metricLabel: string): { value: Units; la
 ]
 
 /** Segmented Imperial/Metric switch shared by the calculators. */
-export default function UnitToggle({ unit, onChange, imperialLabel = 'lbs / ft-in', metricLabel = 'kg / cm' }: UnitToggleProps) {
+export default function UnitToggle({ unit, onChange, imperialLabel, metricLabel }: UnitToggleProps) {
+  const { t } = useTranslation()
   return (
-    <div className="inline-flex rounded-lg border border-surface-variant overflow-hidden" role="group" aria-label="Units">
-      {options(imperialLabel, metricLabel).map((option) => (
+    <div className="inline-flex rounded-lg border border-surface-variant overflow-hidden" role="group" aria-label={t('common.units')}>
+      {options(imperialLabel ?? t('ui.lbsFtIn'), metricLabel ?? t('common.kgCm')).map((option) => (
         <button
           key={option.value}
           type="button"

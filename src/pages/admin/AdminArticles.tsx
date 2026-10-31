@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next'
+import i18n, { tLabel } from '../../i18n/index'
 import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import { adminService } from '../../services/admin'
 import type { Article, ArticleForm } from '../../types/articles'
-import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter, Notice } from '../../components/admin/AdminPage'
+import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter } from '../../components/admin/AdminPage'
 import DataTable, { RowActions, TableFooter, type Column } from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
 import { SelectField, TextAreaField, TextField } from '../../components/ui/Field'
@@ -21,6 +23,7 @@ const blankArticle: ArticleForm = {
 type FormErrors = Partial<Record<keyof ArticleForm, string>>
 
 export default function AdminArticles() {
+  const { t } = useTranslation()
   const [status, setStatus] = useState('')
   const [author, setAuthor] = useState('')
   const taxonomies = useTaxonomies()
@@ -49,8 +52,8 @@ export default function AdminArticles() {
   const submit = (event: FormEvent) => {
     event.preventDefault()
     const found: FormErrors = {}
-    if (!form.title.trim()) found.title = 'Title is required.'
-    if (isNew && !form.body.trim()) found.body = 'Write the article body.'
+    if (!form.title.trim()) found.title = t('common.titleIsRequired')
+    if (isNew && !form.body.trim()) found.body = t('admin.articles.writeTheArticleBody')
     setErrors(found)
     if (Object.keys(found).length > 0) return
     crud.save(form)
@@ -59,7 +62,7 @@ export default function AdminArticles() {
   const columns: Column<Article>[] = [
     {
       key: 'title',
-      header: 'Title',
+      header: t('common.title'),
       sortable: true,
       render: (row) => (
         <span className="flex items-center gap-md">
@@ -77,7 +80,7 @@ export default function AdminArticles() {
     },
     {
       key: 'author',
-      header: 'Author',
+      header: t('admin.articles.author'),
       sortable: true,
       className: 'hidden md:table-cell text-on-surface-variant',
       headerClassName: 'hidden md:table-cell',
@@ -85,7 +88,7 @@ export default function AdminArticles() {
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('common.status'),
       sortable: true,
       render: (row) => (
         <span
@@ -96,22 +99,22 @@ export default function AdminArticles() {
           }`}
         >
           <Icon name={row.status === 'Published' ? 'circle-check' : 'file-pen'} size={14} />
-          {row.status}
+          {tLabel(row.status)}
         </span>
       ),
     },
     {
       key: 'date',
-      header: 'Date',
+      header: t('admin.articles.date'),
       sortable: true,
       className: 'hidden sm:table-cell text-on-surface-variant whitespace-nowrap',
       headerClassName: 'hidden sm:table-cell',
       render: (row) =>
-        new Date(row.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: '2-digit' }),
+        new Date(row.date).toLocaleDateString(i18n.language, { year: 'numeric', month: 'short', day: '2-digit' }),
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: t('common.actions'),
       headerClassName: 'text-right',
       className: 'text-right',
       render: (row) => <RowActions onEdit={() => crud.setEditing(row)} onDelete={() => crud.setDeleting(row)} />,
@@ -121,31 +124,29 @@ export default function AdminArticles() {
   return (
     <>
       <AdminHeader
-        title="Manage Articles"
-        description="Manage content creation, editing, and publishing status."
-        actionLabel="New article"
+        title={t('admin.articles.manageArticles')}
+        description={t('admin.articles.manageContentCreationEditingAndPublishing')}
+        actionLabel={t('admin.articles.newArticle')}
         onAction={() => crud.setEditing('new')}
       />
 
-      <Notice notice={crud.notice} />
-
-      <AdminToolbar search={crud.search} onSearch={crud.setSearch} placeholder="Search articles...">
+      <AdminToolbar search={crud.search} onSearch={crud.setSearch} placeholder={t('common.searchArticles')}>
         <AdminSelect
-          label="Status"
+          label={t('common.status')}
           value={status}
           onChange={setStatus}
           options={[
-            { value: '', label: 'All Status' },
-            { value: 'published', label: 'Published' },
-            { value: 'draft', label: 'Draft' },
+            { value: '', label: t('common.allStatus') },
+            { value: 'published', label: t('admin.articles.published') },
+            { value: 'draft', label: t('admin.articles.draft') },
           ]}
         />
         <AdminSelect
-          label="Author"
+          label={t('admin.articles.author')}
           value={author}
           onChange={setAuthor}
           options={[
-            { value: '', label: 'All Authors' },
+            { value: '', label: t('admin.articles.allAuthors') },
             ...(taxonomies?.authors ?? []).map((name) => ({ value: name, label: name })),
           ]}
         />
@@ -155,7 +156,7 @@ export default function AdminArticles() {
         {crud.error ? (
           <ErrorState error={crud.error} onRetry={crud.refetch} />
         ) : crud.loading ? (
-          <Spinner label="Loading articles" />
+          <Spinner label={t('admin.articles.loadingArticles')} />
         ) : (
           <>
             <DataTable
@@ -163,11 +164,11 @@ export default function AdminArticles() {
               rows={crud.rows}
               sort={crud.sort}
               onSortChange={crud.setSort}
-              empty="No articles match those filters."
+              empty={t('admin.articles.noArticlesMatchThoseFilters')}
             />
             <TableFooter>
               <span className="font-label-sm text-label-sm text-on-surface-variant">
-                Showing {crud.rows.length} of {crud.meta?.total ?? crud.rows.length} articles
+                {t('admin.articles.showingOfArticles', { shown: crud.rows.length, total: crud.meta?.total ?? crud.rows.length })}
               </span>
               <Pagination page={crud.page} lastPage={crud.meta?.lastPage ?? 1} onPageChange={crud.setPage} className="" />
             </TableFooter>
@@ -177,15 +178,14 @@ export default function AdminArticles() {
 
       <Modal
         open={Boolean(crud.editing)}
-        title={isNew ? 'New article' : 'Edit article'}
-        description={isNew ? undefined : 'Leave the body empty to keep the current content.'}
+        title={isNew ? t('admin.articles.newArticle') : t('admin.articles.editArticle')}
+        description={isNew ? undefined : t('admin.articles.leaveTheBodyEmptyToKeep')}
         onClose={() => crud.setEditing(null)}
-        footer={<ModalFooter onCancel={() => crud.setEditing(null)} saving={crud.saving} submitLabel="Save article" />}
+        footer={<ModalFooter onCancel={() => crud.setEditing(null)} saving={crud.saving} submitLabel={t('admin.articles.saveArticle')} />}
       >
         <form id="crud-form" onSubmit={submit} noValidate className="space-y-md">
-          {crud.saveError ? <Notice notice={{ message: crud.saveError, tone: 'error' }} /> : null}
           <TextField
-            label="Title"
+            label={t('common.title')}
             name="title"
             value={form.title}
             onChange={setField('title')}
@@ -194,7 +194,7 @@ export default function AdminArticles() {
           {/* The API splits this into blocks: blank lines separate paragraphs,
               and a short line ending in a colon becomes a heading. */}
           <TextAreaField
-            label="Body — blank line between paragraphs, end a line with ':' for a heading"
+            label={t('admin.articles.bodyBlankLineBetweenParagraphsEnd')}
             name="body"
             value={form.body}
             onChange={setField('body')}
@@ -202,16 +202,15 @@ export default function AdminArticles() {
             rows={8}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-            <SelectField label="Category" name="category" value={form.category} onChange={setField('category')}>
+            <SelectField label={t('common.category')} name="category" value={form.category} onChange={setField('category')}>
               {(taxonomies?.articleCategories ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
-                  {option.label}
-                </option>
+                  {tLabel(option.label)}</option>
               ))}
             </SelectField>
-            <SelectField label="Status" name="status" value={form.status} onChange={setField('status')}>
-              <option>Draft</option>
-              <option>Published</option>
+            <SelectField label={t('common.status')} name="status" value={form.status} onChange={setField('status')}>
+              <option value="Draft">{t('admin.articles.draft')}</option>
+              <option value="Published">{t('admin.articles.published')}</option>
             </SelectField>
           </div>
         </form>

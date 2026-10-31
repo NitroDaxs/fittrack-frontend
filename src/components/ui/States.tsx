@@ -1,12 +1,14 @@
+import { useTranslation } from 'react-i18next'
 import type { IconName } from './Icon'
 import type { ReactNode } from 'react'
 import Icon from './Icon'
 
-export function Spinner({ label = 'Loading' }: { label?: string }) {
+export function Spinner({ label }: { label?: string }) {
+  const { t } = useTranslation()
   return (
     <div className="flex items-center justify-center gap-sm py-xl text-secondary" role="status">
       <span className="w-5 h-5 rounded-full border-2 border-surface-variant border-t-primary-container animate-spin" />
-      <span className="font-label-sm text-label-sm">{label}</span>
+      <span className="font-label-sm text-label-sm">{label ?? t('ui.loading')}</span>
     </div>
   )
 }
@@ -32,14 +34,15 @@ export function EmptyState({ icon = 'search-x', title, body, action }: EmptyStat
 }
 
 export function ErrorState({ error, onRetry }: { error?: Error | null; onRetry?: () => void }) {
+  const { t } = useTranslation()
   return (
     <div className="col-span-full flex flex-col items-center justify-center text-center py-xl px-md">
       <div className="w-16 h-16 rounded-full bg-error-container flex items-center justify-center text-on-error-container mb-md">
         <Icon name="circle-alert" size={32} />
       </div>
-      <h3 className="font-headline-md text-headline-md text-on-surface mb-xs">Something went wrong</h3>
+      <h3 className="font-headline-md text-headline-md text-on-surface mb-xs">{t('ui.somethingWentWrong')}</h3>
       <p className="font-body-md text-body-md text-secondary max-w-md">
-        {error?.message ?? 'The request could not be completed.'}
+        {error?.message ?? t('ui.theRequestCouldNotBeCompleted')}
       </p>
       {onRetry ? (
         <button
@@ -47,7 +50,7 @@ export function ErrorState({ error, onRetry }: { error?: Error | null; onRetry?:
           onClick={() => onRetry()}
           className="mt-md font-label-bold text-label-bold bg-primary text-on-primary px-lg py-sm rounded-lg hover:bg-surface-tint transition-colors"
         >
-          Try again
+          {t('ui.tryAgain')}
         </button>
       ) : null}
     </div>

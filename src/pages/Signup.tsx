@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import i18n from '../i18n/index'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
@@ -12,18 +14,18 @@ type Errors = Partial<Record<keyof Values, string>>
 
 function validate(values: Values): Errors {
   const errors: Errors = {}
-  if (!values.name.trim()) errors.name = 'Enter your full name.'
-  else if (values.name.trim().length < 2) errors.name = 'That name looks too short.'
+  if (!values.name.trim()) errors.name = i18n.t('signup.enterYourFullName')
+  else if (values.name.trim().length < 2) errors.name = i18n.t('signup.thatNameLooksTooShort')
 
-  if (!values.email.trim()) errors.email = 'Enter your email address.'
-  else if (!EMAIL_PATTERN.test(values.email)) errors.email = 'That does not look like a valid email address.'
+  if (!values.email.trim()) errors.email = i18n.t('common.enterYourEmailAddress')
+  else if (!EMAIL_PATTERN.test(values.email)) errors.email = i18n.t('common.thatDoesNotLookLikeA')
 
-  if (!values.password) errors.password = 'Choose a password.'
-  else if (values.password.length < 8) errors.password = 'Must be at least 8 characters.'
-  else if (!/[0-9]/.test(values.password)) errors.password = 'Include at least one number.'
+  if (!values.password) errors.password = i18n.t('signup.chooseAPassword')
+  else if (values.password.length < 8) errors.password = i18n.t('common.mustBeAtLeast8Characters')
+  else if (!/[0-9]/.test(values.password)) errors.password = i18n.t('common.includeAtLeastOneNumber')
 
-  if (!values.confirm) errors.confirm = 'Confirm your password.'
-  else if (values.confirm !== values.password) errors.confirm = 'Passwords do not match.'
+  if (!values.confirm) errors.confirm = i18n.t('signup.confirmYourPassword')
+  else if (values.confirm !== values.password) errors.confirm = i18n.t('common.passwordsDoNotMatch')
 
   return errors
 }
@@ -37,9 +39,10 @@ function strengthOf(password: string) {
   return score
 }
 
-const strengthLabels = ['Too short', 'Weak', 'Fair', 'Good', 'Strong']
+const strengthLabels = ['signup.tooShort', 'signup.weak', 'signup.fair', 'signup.good', 'signup.strong']
 
 export default function Signup() {
+  const { t } = useTranslation()
   const { register } = useAuth()
   const navigate = useNavigate()
 
@@ -90,15 +93,15 @@ export default function Signup() {
       <div className="w-full max-w-md bg-surface-container-lowest elev-card rounded-xl p-lg md:p-xl relative z-10 border border-surface-variant/50">
         <div className="text-center mb-xl">
           <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight mb-sm">FitTrack</h1>
-          <h2 className="font-headline-md text-headline-md text-on-surface">Create your account</h2>
+          <h2 className="font-headline-md text-headline-md text-on-surface">{t('signup.createYourAccount')}</h2>
           <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
-            Start your high-performance journey today.
+            {t('signup.startYourHighPerformanceJourneyToday')}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} noValidate className="space-y-lg">
           <TextField
-            label="Full Name"
+            label={t('signup.fullName')}
             name="name"
             icon="user"
             placeholder="Alex Alexson"
@@ -109,7 +112,7 @@ export default function Signup() {
             error={touched.name ? errors.name : undefined}
           />
           <TextField
-            label="Email Address"
+            label={t('common.emailAddress')}
             name="email"
             type="email"
             icon="mail"
@@ -122,7 +125,7 @@ export default function Signup() {
           />
           <div>
             <TextField
-              label="Password"
+              label={t('common.password')}
               name="password"
               type="password"
               icon="lock"
@@ -132,7 +135,7 @@ export default function Signup() {
               onChange={setField('password')}
               onBlur={blur('password')}
               error={touched.password ? errors.password : undefined}
-              hint={!values.password ? 'Must be at least 8 characters and include a number.' : undefined}
+              hint={!values.password ? t('signup.mustBeAtLeast8Characters') : undefined}
             />
             {values.password ? (
               <div className="mt-sm">
@@ -147,13 +150,13 @@ export default function Signup() {
                   ))}
                 </div>
                 <p className="font-label-sm text-label-sm text-secondary mt-xs">
-                  Password strength: {strengthLabels[score]}
+                  {t('signup.passwordStrength', { value: t(strengthLabels[score]) })}
                 </p>
               </div>
             ) : null}
           </div>
           <TextField
-            label="Confirm Password"
+            label={t('signup.confirmPassword')}
             name="confirm"
             type="password"
             icon="key-round"
@@ -176,15 +179,15 @@ export default function Signup() {
             disabled={submitting}
             className="w-full flex justify-center items-center gap-xs py-sm px-md rounded-lg shadow-sm font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-colors duration-200 active:scale-[0.98] disabled:opacity-60"
           >
-            {submitting ? 'Creating account…' : 'Create account'}
+            {submitting ? t('signup.creatingAccount') : t('signup.createAccount')}
             {!submitting ? <Icon name="arrow-right" size={18} /> : null}
           </button>
         </form>
 
         <p className="mt-lg text-center font-body-md text-body-md text-on-surface-variant">
-          Already have an account?{' '}
+          {t('signup.alreadyHaveAnAccount')}{' '}
           <Link to="/login" className="font-label-bold text-label-bold text-primary hover:text-primary-container">
-            Log in
+            {t('common.logIn')}
           </Link>
         </p>
 

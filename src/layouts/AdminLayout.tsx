@@ -1,18 +1,21 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Icon, { type IconName } from '../components/ui/Icon'
+import LanguageSwitcher from '../components/ui/LanguageSwitcher'
 import ProfileMenu from './ProfileMenu'
 
 const navItems: { to: string; label: string; icon: IconName; end?: boolean }[] = [
-  { to: '/admin', label: 'Dashboard', icon: 'layout-dashboard', end: true },
-  { to: '/admin/exercises', label: 'Exercises', icon: 'dumbbell' },
-  { to: '/admin/routines', label: 'Routines', icon: 'calendar-days' },
-  { to: '/admin/articles', label: 'Articles', icon: 'file-text' },
-  { to: '/admin/users', label: 'Users', icon: 'users' },
+  { to: '/admin', label: 'nav.dashboard', icon: 'layout-dashboard', end: true },
+  { to: '/admin/exercises', label: 'common.exercises', icon: 'dumbbell' },
+  { to: '/admin/routines', label: 'nav.routines', icon: 'calendar-days' },
+  { to: '/admin/articles', label: 'nav.articles', icon: 'file-text' },
+  { to: '/admin/users', label: 'nav.users', icon: 'users' },
 ]
 
 export default function AdminLayout() {
+  const { t } = useTranslation()
   const { logout } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
@@ -31,8 +34,8 @@ export default function AdminLayout() {
           FA
         </div>
         <div>
-          <h1 className="font-headline-md text-headline-md font-bold text-primary">FitTrack Admin</h1>
-          <p className="font-label-sm text-label-sm text-on-surface-variant">System Management</p>
+          <h1 className="font-headline-md text-headline-md font-bold text-primary">{t('nav.fittrackAdmin')}</h1>
+          <p className="font-label-sm text-label-sm text-on-surface-variant">{t('nav.systemManagement')}</p>
         </div>
       </div>
 
@@ -42,7 +45,7 @@ export default function AdminLayout() {
             {({ isActive }) => (
               <>
                 <Icon name={item.icon} size={24} filled={isActive} />
-                <span>{item.label}</span>
+                <span>{t(item.label)}</span>
               </>
             )}
           </NavLink>
@@ -52,7 +55,7 @@ export default function AdminLayout() {
       <div className="mt-auto border-t border-outline-variant pt-md flex flex-col gap-xs">
         <NavLink to="/" className="flex items-center gap-3 px-md py-xs text-on-surface-variant hover:text-primary transition-colors rounded-lg">
           <Icon name="globe" size={20} />
-          <span className="font-label-bold text-label-bold">View site</span>
+          <span className="font-label-bold text-label-bold">{t('nav.viewSite')}</span>
         </NavLink>
         <button
           type="button"
@@ -63,7 +66,7 @@ export default function AdminLayout() {
           className="flex items-center gap-3 px-md py-xs text-on-surface-variant hover:text-error transition-colors rounded-lg text-left"
         >
           <Icon name="log-out" size={20} />
-          <span className="font-label-bold text-label-bold">Logout</span>
+          <span className="font-label-bold text-label-bold">{t('nav.logout')}</span>
         </button>
       </div>
     </>
@@ -91,18 +94,21 @@ export default function AdminLayout() {
           <div className="flex items-center md:hidden">
             <button
               type="button"
-              aria-label="Open navigation"
+              aria-label={t('nav.openNavigation')}
               onClick={() => setSidebarOpen(true)}
               className="text-on-surface-variant p-xs hover:bg-surface-container rounded-full transition-all"
             >
               <Icon name="menu" />
             </button>
-            <span className="font-headline-md text-headline-md font-extrabold text-on-surface ml-sm">FitTrack Admin</span>
+            <span className="font-headline-md text-headline-md font-extrabold text-on-surface ml-sm">{t('nav.fittrackAdmin')}</span>
           </div>
 
           <div className="hidden md:block" />
 
-          <ProfileMenu />
+          <div className="flex items-center gap-sm">
+            <LanguageSwitcher />
+            <ProfileMenu />
+          </div>
         </header>
 
         <div className="flex-1 p-margin-mobile md:p-margin-desktop overflow-auto">

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../i18n/index'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWorkoutDraft } from '../context/WorkoutContext'
@@ -35,6 +37,7 @@ function NumberField({ label, value, onChange, width = 'w-16', accent = false }:
 }
 
 export default function WorkoutBuilder() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { draft, setDraftName, addExercise, removeItem, updateItem, moveItem, resetDraft, startSession } =
     useWorkoutDraft()
@@ -73,12 +76,12 @@ export default function WorkoutBuilder() {
           type="text"
           value={draft.name}
           onChange={(event) => setDraftName(event.target.value)}
-          placeholder="Name your workout"
-          aria-label="Workout name"
+          placeholder={t('workoutBuilder.nameYourWorkout')}
+          aria-label={t('workoutBuilder.workoutName')}
           className="w-full bg-transparent border-0 border-b-2 border-transparent focus:border-primary-container p-0 pb-2 text-headline-lg-mobile md:text-headline-lg font-headline-lg text-on-surface placeholder-secondary-fixed-dim outline-none transition-colors"
         />
         <p className="font-body-md text-body-md text-secondary mt-2">
-          Build your routine. Drag the handle to reorder exercises.
+          {t('workoutBuilder.buildYourRoutineDragTheHandle')}
         </p>
       </header>
 
@@ -92,8 +95,8 @@ export default function WorkoutBuilder() {
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           onFocus={() => setPickerOpen(true)}
-          placeholder="Search library to add exercise..."
-          aria-label="Search library to add exercise"
+          placeholder={t('workoutBuilder.searchLibraryToAddExercise2')}
+          aria-label={t('workoutBuilder.searchLibraryToAddExercise')}
           className="w-full bg-surface-container-low text-on-surface font-body-md text-body-md rounded-xl pl-12 pr-4 py-4 border-2 border-transparent focus:border-primary-container focus:bg-surface-container-lowest outline-none transition-all shadow-sm"
         />
 
@@ -102,10 +105,10 @@ export default function WorkoutBuilder() {
             <div className="fixed inset-0 z-10" onClick={() => setPickerOpen(false)} aria-hidden="true" />
             <div className="absolute z-20 left-0 right-0 mt-sm bg-surface-container-lowest border border-surface-variant rounded-xl elev-overlay overflow-hidden max-h-80 overflow-y-auto custom-scrollbar">
               {loading ? (
-                <p className="p-md font-body-md text-body-md text-secondary">Searching library…</p>
+                <p className="p-md font-body-md text-body-md text-secondary">{t('workoutBuilder.searchingLibrary')}</p>
               ) : results.length === 0 ? (
                 <p className="p-md font-body-md text-body-md text-secondary">
-                  No exercises match “{search}”.
+                  {t('workoutBuilder.noExercisesMatch', { query: search })}
                 </p>
               ) : (
                 <ul>
@@ -129,7 +132,7 @@ export default function WorkoutBuilder() {
                             {exercise.name}
                           </span>
                           <span className="block font-label-sm text-label-sm text-secondary">
-                            {exercise.muscleGroups.join(', ')} • {exercise.equipment}
+                            {exercise.muscleGroups.join(', ')} • {tLabel(exercise.equipment)}
                           </span>
                         </span>
                         <Icon name="circle-plus" size={22} className="text-primary shrink-0" />
@@ -148,8 +151,8 @@ export default function WorkoutBuilder() {
         <div className="bg-surface-container-lowest rounded-xl border border-dashed border-outline-variant">
           <EmptyState
             icon="list-plus"
-            title="No exercises yet"
-            body="Search the library above and pick a few movements. You can set targets and reorder them afterwards."
+            title={t('workoutBuilder.noExercisesYet')}
+            body={t('workoutBuilder.searchTheLibraryAboveAndPick')}
           />
         </div>
       ) : (
@@ -182,7 +185,7 @@ export default function WorkoutBuilder() {
               <div className="flex items-center gap-sm w-full md:w-auto md:flex-1 min-w-0">
                 <span
                   className="text-secondary cursor-grab active:cursor-grabbing p-1 touch-none shrink-0"
-                  title="Drag to reorder"
+                  title={t('workoutBuilder.dragToReorder')}
                   aria-hidden="true"
                 >
                   <Icon name="grip-vertical" />
@@ -194,7 +197,7 @@ export default function WorkoutBuilder() {
                     type="button"
                     onClick={() => moveItem(index, index - 1)}
                     disabled={index === 0}
-                    aria-label={`Move ${item.name} up`}
+                    aria-label={t('workoutBuilder.moveUp', { name: item.name })}
                     className="text-secondary hover:text-primary disabled:opacity-30 disabled:hover:text-secondary transition-colors leading-none"
                   >
                     <Icon name="chevron-up" size={18} />
@@ -203,7 +206,7 @@ export default function WorkoutBuilder() {
                     type="button"
                     onClick={() => moveItem(index, index + 1)}
                     disabled={index === draft.items.length - 1}
-                    aria-label={`Move ${item.name} down`}
+                    aria-label={t('workoutBuilder.moveDown', { name: item.name })}
                     className="text-secondary hover:text-primary disabled:opacity-30 disabled:hover:text-secondary transition-colors leading-none"
                   >
                     <Icon name="chevron-down" size={18} />
@@ -236,7 +239,7 @@ export default function WorkoutBuilder() {
                 <button
                   type="button"
                   onClick={() => removeItem(item.uid)}
-                  aria-label={`Remove ${item.name}`}
+                  aria-label={t('common.remove', { name: item.name })}
                   className="md:hidden text-outline hover:text-error transition-colors p-2 shrink-0"
                 >
                   <Icon name="x" />
@@ -244,12 +247,12 @@ export default function WorkoutBuilder() {
               </div>
 
               <div className="flex items-center gap-sm w-full md:w-auto justify-between md:justify-end border-t border-surface-variant md:border-none pt-4 md:pt-0 mt-2 md:mt-0">
-                <NumberField label="Sets" value={item.sets} onChange={(v) => updateItem(item.uid, { sets: v })} />
+                <NumberField label={t('common.sets')} value={item.sets} onChange={(v) => updateItem(item.uid, { sets: v })} />
                 <span className="text-secondary font-label-bold mt-5">×</span>
-                <NumberField label="Reps" value={item.reps} onChange={(v) => updateItem(item.uid, { reps: v })} />
+                <NumberField label={t('common.reps')} value={item.reps} onChange={(v) => updateItem(item.uid, { reps: v })} />
                 <span className="text-secondary font-label-bold mt-5">@</span>
                 <NumberField
-                  label="Lbs"
+                  label={t('workoutBuilder.lbs')}
                   value={item.weight}
                   onChange={(v) => updateItem(item.uid, { weight: v })}
                   width="w-20"
@@ -258,7 +261,7 @@ export default function WorkoutBuilder() {
                 <button
                   type="button"
                   onClick={() => removeItem(item.uid)}
-                  aria-label={`Remove ${item.name}`}
+                  aria-label={t('common.remove', { name: item.name })}
                   className="hidden md:flex text-outline hover:text-error transition-colors p-2 ml-2"
                 >
                   <Icon name="x" />
@@ -271,8 +274,7 @@ export default function WorkoutBuilder() {
 
       {draft.items.length > 0 ? (
         <p className="font-label-sm text-label-sm text-secondary mt-lg text-center">
-          {draft.items.length} exercises •{' '}
-          {draft.items.reduce((sum, item) => sum + (Number(item.sets) || 0), 0)} total sets
+          {t('workoutBuilder.summary', { count: draft.items.length, sets: draft.items.reduce((sum, item) => sum + (Number(item.sets) || 0), 0) })}
         </p>
       ) : null}
 
@@ -285,7 +287,7 @@ export default function WorkoutBuilder() {
             disabled={draft.items.length === 0}
             className="px-lg py-md rounded-xl border border-outline text-on-surface font-label-bold text-label-bold hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            Clear
+            {t('workoutBuilder.clear')}
           </button>
           <button
             type="button"
@@ -294,7 +296,7 @@ export default function WorkoutBuilder() {
             className="flex-1 bg-primary-container text-on-primary py-md rounded-xl font-label-bold text-label-bold active:scale-[0.98] transition-transform shadow-md hover:bg-primary disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-sm"
           >
             <Icon name="play" size={20} filled />
-            Start workout
+            {t('workoutBuilder.startWorkout')}
           </button>
         </div>
       </div>

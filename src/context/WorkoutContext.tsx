@@ -1,3 +1,4 @@
+import i18n from '../i18n'
 import type { IconName } from '../components/ui/Icon'
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import type { Exercise } from '../types/exercises'
@@ -85,7 +86,7 @@ const toDraftItem = (exercise: Exercise, overrides: Partial<DraftItem> = {}): Dr
   ...overrides,
 })
 
-const emptyDraft: Draft = { name: 'New Workout', items: [] }
+const emptyDraft: Draft = { name: i18n.t('workoutBuilder.newWorkout'), items: [] }
 
 export function WorkoutProvider({ children }: { children: ReactNode }) {
   const [draft, setDraft] = useState<Draft>(emptyDraft)

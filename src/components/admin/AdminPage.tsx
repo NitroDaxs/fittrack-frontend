@@ -1,6 +1,7 @@
+import { useTranslation } from 'react-i18next'
+import { tLabel } from '../../i18n/index'
 import type { ReactNode } from 'react'
 import type { SelectOption } from '../../types/shared'
-import type { Notice as NoticeValue } from '../../hooks/useCrud'
 import Icon from '../ui/Icon'
 import SearchInput from '../ui/SearchInput'
 import Modal from '../ui/Modal'
@@ -70,7 +71,7 @@ export function AdminSelect({ label, value, onChange, options }: AdminSelectProp
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {tLabel(option.label)}
           </option>
         ))}
       </select>
@@ -83,22 +84,6 @@ export function AdminSelect({ label, value, onChange, options }: AdminSelectProp
   )
 }
 
-export function Notice({ notice }: { notice: NoticeValue | null }) {
-  if (!notice) return null
-  const isError = notice.tone === 'error'
-  return (
-    <p
-      role={isError ? 'alert' : 'status'}
-      className={`mb-lg rounded-lg px-md py-sm font-label-bold text-label-bold flex items-center gap-xs ${
-        isError ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-on-primary-fixed-variant'
-      }`}
-    >
-      <Icon name={isError ? 'circle-alert' : 'circle-check'} size={18} filled />
-      {notice.message}
-    </p>
-  )
-}
-
 interface DeleteDialogProps {
   row: unknown
   label?: string
@@ -107,11 +92,12 @@ interface DeleteDialogProps {
 }
 
 export function DeleteDialog({ row, label, onCancel, onConfirm }: DeleteDialogProps) {
+  const { t } = useTranslation()
   return (
     <Modal
       open={Boolean(row)}
-      title="Delete this record?"
-      description="This permanently deletes it. It cannot be undone."
+      title={t('admin.shared.deleteThisRecord')}
+      description={t('admin.shared.thisPermanentlyDeletesItItCannot')}
       onClose={onCancel}
       size="sm"
       footer={
@@ -121,26 +107,27 @@ export function DeleteDialog({ row, label, onCancel, onConfirm }: DeleteDialogPr
             onClick={onCancel}
             className="px-lg py-sm rounded-lg border border-outline text-on-surface font-label-bold text-label-bold hover:bg-surface-container transition-colors"
           >
-            Cancel
+            {t('admin.shared.cancel')}
           </button>
           <button
             type="button"
             onClick={onConfirm}
             className="px-lg py-sm rounded-lg bg-error text-on-error font-label-bold text-label-bold hover:opacity-90 transition-opacity"
           >
-            Delete
+            {t('common.delete')}
           </button>
         </>
       }
     >
       <p className="font-body-md text-body-md text-on-surface">
-        <span className="font-semibold">{label}</span> will be deleted.
+        <span className="font-semibold">{label}</span>{' '}{t('admin.shared.willBeDeleted')}
       </p>
     </Modal>
   )
 }
 
-export function ModalFooter({ onCancel, saving, submitLabel = 'Save' }: { onCancel: () => void; saving: boolean; submitLabel?: string }) {
+export function ModalFooter({ onCancel, saving, submitLabel }: { onCancel: () => void; saving: boolean; submitLabel?: string }) {
+  const { t } = useTranslation()
   return (
     <>
       <button
@@ -148,7 +135,7 @@ export function ModalFooter({ onCancel, saving, submitLabel = 'Save' }: { onCanc
         onClick={onCancel}
         className="px-lg py-sm rounded-lg border border-outline text-on-surface font-label-bold text-label-bold hover:bg-surface-container transition-colors"
       >
-        Cancel
+        {t('admin.shared.cancel')}
       </button>
       <button
         type="submit"
@@ -156,7 +143,7 @@ export function ModalFooter({ onCancel, saving, submitLabel = 'Save' }: { onCanc
         disabled={saving}
         className="px-lg py-sm rounded-lg bg-primary-container text-on-primary font-label-bold text-label-bold hover:bg-primary transition-colors disabled:opacity-60"
       >
-        {saving ? 'Saving…' : submitLabel}
+        {saving ? t('common.saving') : (submitLabel ?? t('admin.shared.save'))}
       </button>
     </>
   )

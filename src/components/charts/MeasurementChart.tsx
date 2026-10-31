@@ -1,3 +1,4 @@
+import i18n from '../../i18n/index'
 import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { tokens } from './StrengthChart'
 import { useUnits } from '../../context/UnitContext'
@@ -7,7 +8,7 @@ import type { WeightPoint } from '../../types/me'
 // the body-fat Line would be dropped silently.
 
 const formatDate = (value: string) =>
-  new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+  new Date(value).toLocaleDateString(i18n.language, { month: 'short', day: 'numeric' })
 
 // Callers pass weights already converted for display, so the tooltip only has
 // to label them correctly -- it must never convert a second time.

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { ArticleCard } from '../components/cards'
 import SearchInput from '../components/ui/SearchInput'
@@ -8,6 +9,7 @@ import { useDebounced } from '../hooks/useDebounced'
 import { useTaxonomies } from '../hooks/useTaxonomies'
 
 export default function ArticlesListing() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<string | null>(null)
 
@@ -23,20 +25,20 @@ export default function ArticlesListing() {
     <div className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
       <header className="mb-xl">
         <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-sm">
-          Performance Journal
+          {t('common.performanceJournal')}
         </h1>
         <p className="font-body-md text-body-md text-secondary max-w-2xl mb-lg">
-          Evidence-led writing on training, nutrition, recovery, and the mental side of lifting.
+          {t('articlesListing.evidenceLedWritingOnTrainingNutrition')}
         </p>
-        <SearchInput value={search} onChange={setSearch} placeholder="Search articles..." className="max-w-xl mb-lg" />
+        <SearchInput value={search} onChange={setSearch} placeholder={t('common.searchArticles')} className="max-w-xl mb-lg" />
         {/* articleCategories, not categories -- the latter is the exercise
             taxonomy (strength/cardio/...) and never matches an article. */}
         <FilterChips
-          label="Category"
+          label={t('common.category')}
           options={taxonomies?.articleCategories ?? []}
           value={category}
           onChange={setCategory}
-          allLabel="All topics"
+          allLabel={t('articlesListing.allTopics')}
         />
       </header>
 
@@ -51,8 +53,8 @@ export default function ArticlesListing() {
       ) : articles.length === 0 ? (
         <EmptyState
           icon="book-open"
-          title="No articles found"
-          body="Try a different topic or clear the search box."
+          title={t('articlesListing.noArticlesFound')}
+          body={t('articlesListing.tryADifferentTopicOrClear')}
         />
       ) : (
         <>

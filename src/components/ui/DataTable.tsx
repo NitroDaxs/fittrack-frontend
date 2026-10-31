@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import type { ReactNode } from 'react'
 import Icon from './Icon'
 import type { Sort } from '../../hooks/useCrud'
@@ -25,6 +26,7 @@ interface DataTableProps<TRow> {
  * `sort` is controlled by the parent so the sort travels to the API.
  */
 export default function DataTable<TRow extends { id: number }>({ columns, rows, sort, onSortChange, empty }: DataTableProps<TRow>) {
+  const { t } = useTranslation()
   const toggleSort = (key: string) => {
     if (!onSortChange) return
     if (sort?.key === key) onSortChange({ key, dir: sort.dir === 'asc' ? 'desc' : 'asc' })
@@ -74,7 +76,7 @@ export default function DataTable<TRow extends { id: number }>({ columns, rows, 
           {rows.length === 0 ? (
             <tr>
               <td colSpan={columns.length} className="py-xl text-center text-secondary">
-                {empty ?? 'Nothing to show.'}
+                {empty ?? t('ui.nothingToShow')}
               </td>
             </tr>
           ) : (
@@ -109,7 +111,10 @@ interface RowActionsProps {
   deleteLabel?: string
 }
 
-export function RowActions({ onEdit, onDelete, editLabel = 'Edit', deleteLabel = 'Delete' }: RowActionsProps) {
+export function RowActions({ onEdit, onDelete, editLabel: editLabelProp, deleteLabel: deleteLabelProp }: RowActionsProps) {
+  const { t } = useTranslation()
+  const editLabel = editLabelProp ?? t('ui.edit')
+  const deleteLabel = deleteLabelProp ?? t('common.delete')
   return (
     <div className="flex justify-end">
       <button
