@@ -13,6 +13,7 @@ export function toProfile(raw: UserDto): Profile {
     id: raw.id,
     name: raw.name,
     email: raw.email,
+    role: raw.role,
     units: raw.units,
     plan: raw.role === 'admin' ? 'Admin' : 'Member',
     joined: new Date(raw.created_at).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' }),

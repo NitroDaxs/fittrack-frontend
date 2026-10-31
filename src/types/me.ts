@@ -106,6 +106,7 @@ export interface Profile {
   id: number
   name: string
   email: string
+  role: UserDto['role']
   units: UserDto['units']
   plan: string
   joined: string

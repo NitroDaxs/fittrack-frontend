@@ -1,4 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { useProfile } from '../hooks/useMe'
+import i18n from '../i18n'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { AuthResponse, LoginRequest, RegisterRequest, UserDto } from '../types/auth'
 import type { UserRole } from '../types/shared'
@@ -51,9 +54,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUnauthorizedHandler(() => {
       setSession(null)
       queryClient.clear()
+      // Several requests can fail at once, so all of them share one toast.
+      toast.error(i18n.t('errors.sessionExpired'), { id: 'session-expired' })
     })
     return () => setUnauthorizedHandler(() => {})
   }, [setSession, queryClient])
+
+  // Logging in or out in another tab applies to this one too.
+  useEffect(() => {
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== SESSION_KEY && event.key !== null) return
+      const next = readStoredSession()
+      setSessionState(next)
+      queryClient.clear()
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [queryClient])
+
+  // The stored session can go out of date, for example when an admin changes this
+  // user's role, so keep it in step with the account.
+  const { data: profile } = useProfile(session !== null)
+  useEffect(() => {
+    if (!profile || !session || profile.id !== session.user.id) return
+    const { user } = session
+    if (profile.role === user.role && profile.name === user.name && profile.email === user.email) return
+    setSession({ user: { ...user, role: profile.role, name: profile.name, email: profile.email }, role: profile.role })
+  }, [profile, session, setSession])
 
   const start = useCallback(
     ({ user, access_token }: AuthResponse) => {

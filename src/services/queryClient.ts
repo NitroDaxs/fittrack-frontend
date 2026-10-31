@@ -5,8 +5,10 @@ import { ApiError, errorMessage, fieldErrorsOf } from './http'
 
 export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
-    // Every failed write shows a toast, except field errors, which the form shows.
+    // Every failed write shows a toast, except field errors, which the form shows,
+    // and 401s, which end the session with their own message.
     onError: (error) => {
+      if (error instanceof ApiError && error.status === 401) return
       if (Object.keys(fieldErrorsOf(error)).length === 0) toast.error(errorMessage(error))
     },
   }),

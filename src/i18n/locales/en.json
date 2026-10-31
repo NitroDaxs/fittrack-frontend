@@ -590,7 +590,8 @@
     "requestFailed": "Request failed",
     "unreachable": "Could not reach the server. Check your connection and try again.",
     "generic": "Something went wrong. Please try again.",
-    "invalidValue": "This value is invalid."
+    "invalidValue": "This value is invalid.",
+    "sessionExpired": "Your session has ended. Please log in again."
   },
   "toast": {
     "saved": "Changes saved.",

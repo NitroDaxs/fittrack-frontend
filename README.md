@@ -189,9 +189,13 @@ Logging in returns a JWT, which is kept in `localStorage` and sent with every re
 A 401 on a signed-in request ends the session, and logging out clears the query
 cache.
 
-`RequireRole` sends visitors without the required role to `/login` and remembers
-where they were going. This only keeps people away from screens that would fail; the
-API enforces permissions on every request.
+`RequireRole` sends guests to `/login` and remembers where they were going, and sends
+signed-in users without the role to `/dashboard`. `RequireGuest` sends signed-in users
+away from login, sign-up and forgot password. These only keep people away from screens
+that would fail; the API enforces permissions on every request.
+
+The stored session stays in step with the account, and logging in or out in one tab
+applies to the others.
 
 To reset a password, the visitor requests a link at `/forgot-password`, and the API
 emails a link to `/reset-password`.

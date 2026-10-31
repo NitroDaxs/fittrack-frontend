@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import PublicLayout from '../layouts/PublicLayout'
 import AdminLayout from '../layouts/AdminLayout'
 import RequireRole from './RequireRole'
+import RequireGuest from './RequireGuest'
 
 import Home from '../pages/Home'
 import ExerciseLibrary from '../pages/ExerciseLibrary'
@@ -57,9 +58,10 @@ export default function App() {
         <Route path="calculators/macros" element={<MacroCalculator />} />
         <Route path="calculators/bodyfat" element={<BodyFatCalculator />} />
 
-        <Route path="login" element={<Login />} />
-        <Route path="signup" element={<Signup />} />
-        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="login" element={<RequireGuest><Login /></RequireGuest>} />
+        <Route path="signup" element={<RequireGuest><Signup /></RequireGuest>} />
+        <Route path="forgot-password" element={<RequireGuest><ForgotPassword /></RequireGuest>} />
+        {/* Left open so a reset link from an email works even when already signed in. */}
         <Route path="reset-password" element={<ResetPassword />} />
 
         <Route path="about" element={<StaticPage />} />

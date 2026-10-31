@@ -11,10 +11,13 @@ export default function RequireRole({ role = 'member', children }: { role?: 'mem
   const { isMember, isAdmin } = useAuth()
   const location = useLocation()
 
-  const allowed = role === 'admin' ? isAdmin : isMember
+  if (!isMember) {
+    return <Navigate to="/login" state={{ from: location.pathname + location.search }} replace />
+  }
 
-  if (!allowed) {
-    return <Navigate to="/login" state={{ from: location.pathname, needs: role }} replace />
+  // Signed in without the role: logging in again wouldn't help.
+  if (role === 'admin' && !isAdmin) {
+    return <Navigate to="/dashboard" replace />
   }
 
   return children
