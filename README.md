@@ -57,7 +57,7 @@ Core.
 - Dashboard with strength progression, body-weight trend and a consistency heatmap
 - Workout history and body measurements
 - Saved exercises and routines
-- Profile settings: name, email, password, and metric or imperial units
+- Profile settings: picture, name, email, password, and metric or imperial units
 
 **Admins**
 

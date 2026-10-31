@@ -55,6 +55,22 @@ export function useLogMeasurement() {
   })
 }
 
+export function useUploadAvatar() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: meService.uploadAvatar,
+    onSuccess: (user) => queryClient.setQueryData(PROFILE_KEY, toProfile(user)),
+  })
+}
+
+export function useRemoveAvatar() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: meService.removeAvatar,
+    onSuccess: (user) => queryClient.setQueryData(PROFILE_KEY, toProfile(user)),
+  })
+}
+
 export function useChangePassword() {
   const queryClient = useQueryClient()
   return useMutation({

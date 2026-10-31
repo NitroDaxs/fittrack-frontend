@@ -56,8 +56,13 @@ export function setUnauthorizedHandler(handler: () => void): void {
   onUnauthorized = handler
 }
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
+
+/** The full address of a file the API serves, given its path such as /uploads/x.png. */
+export const assetUrl = (path: string): string => new URL(path, new URL(API_URL, window.location.origin)).href
+
 const client = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: API_URL,
   headers: { Accept: 'application/json' },
 })
 

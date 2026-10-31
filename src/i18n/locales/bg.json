@@ -347,8 +347,15 @@
       "currentPasswordWrong": "Текущата парола е грешна.",
       "passwordRules": "Използвайте поне 8 символа, включително цифра.",
       "passwordSame": "Изберете парола, различна от текущата.",
-      "passwordMismatch": "Паролите не съвпадат."
-    }
+      "passwordMismatch": "Паролите не съвпадат.",
+      "imageType": "Изберете изображение във формат JPEG, PNG или WebP.",
+      "imageSize": "Изображението трябва да е до 2 MB."
+    },
+    "changePicture": "Смени снимката",
+    "removePicture": "Премахни снимката",
+    "uploading": "Качване…",
+    "pictureSaved": "Снимката ви е обновена.",
+    "pictureRemoved": "Снимката ви е премахната."
   },
   "home": {
     "achieveMore": "Постигайте повече",

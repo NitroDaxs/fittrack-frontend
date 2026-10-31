@@ -347,8 +347,15 @@
       "currentPasswordWrong": "The current password is incorrect.",
       "passwordRules": "Use at least 8 characters, including a number.",
       "passwordSame": "Choose a password different from your current one.",
-      "passwordMismatch": "The passwords do not match."
-    }
+      "passwordMismatch": "The passwords do not match.",
+      "imageType": "Choose a JPEG, PNG or WebP image.",
+      "imageSize": "The image must be 2 MB or smaller."
+    },
+    "changePicture": "Change picture",
+    "removePicture": "Remove picture",
+    "uploading": "Uploading…",
+    "pictureSaved": "Your picture has been updated.",
+    "pictureRemoved": "Your picture has been removed."
   },
   "home": {
     "achieveMore": "Achieve More",

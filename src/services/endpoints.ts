@@ -11,6 +11,7 @@ export const endpoints = {
   me: {
     profile: '/me',
     password: '/me/password',
+    avatar: '/me/avatar',
     saved: '/me/saved',
     dashboard: '/me/dashboard',
     workouts: '/me/workouts',

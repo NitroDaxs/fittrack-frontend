@@ -7,8 +7,8 @@ import { useUnits } from '../context/UnitContext'
 import { ErrorState, Spinner } from '../components/ui/States'
 import ChangePasswordForm from '../components/profile/ChangePasswordForm'
 import EditProfileForm from '../components/profile/EditProfileForm'
+import ProfilePicture from '../components/profile/ProfilePicture'
 import Icon from '../components/ui/Icon'
-import Img from '../components/ui/Img'
 import { useProfile, useSaved } from '../hooks/useMe'
 
 export default function ProfileSettings() {
@@ -28,9 +28,7 @@ export default function ProfileSettings() {
     <div className="max-w-[900px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
       {/* Identity */}
       <header className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant flex flex-col sm:flex-row items-center gap-lg mb-xl">
-        <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-primary-container shrink-0">
-          <Img alt={profile.name} icon="user" />
-        </div>
+        <ProfilePicture url={profile.avatarUrl} />
         <div className="text-center sm:text-left flex-1">
           <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">{profile.name}</h1>
           <p className="font-body-md text-body-md text-secondary">

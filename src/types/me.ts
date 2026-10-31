@@ -115,6 +115,7 @@ export interface Profile {
   units: UserDto['units']
   plan: string
   joined: string
+  avatarUrl: string | null
 }
 
 export interface LoggedSet {

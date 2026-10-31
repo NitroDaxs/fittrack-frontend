@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useCallback, useId, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import Avatar from '../components/ui/Avatar'
 import Icon from '../components/ui/Icon'
 import { useAuth } from '../context/AuthContext'
 import { useDismiss } from '../hooks/useDismiss'
@@ -40,13 +41,13 @@ export default function ProfileMenu() {
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((value) => !value)}
-        className={`flex h-10 w-10 items-center justify-center rounded-full border transition-colors active:scale-95 ${
+        className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border transition-colors active:scale-95 ${
           open
             ? 'border-primary bg-primary-fixed text-primary'
             : 'border-outline-variant text-on-surface-variant hover:bg-surface-container hover:text-primary'
         }`}
       >
-        <Icon name="user" size={20} />
+        {profile?.avatarUrl ? <Avatar url={profile.avatarUrl} size={38} /> : <Icon name="user" size={20} />}
       </button>
 
       {open ? (
@@ -55,9 +56,7 @@ export default function ProfileMenu() {
           className="absolute right-0 top-full z-50 mt-sm w-72 max-w-[calc(100vw-2rem)] rounded-xl border border-surface-variant bg-surface-container-lowest p-sm elev-overlay"
         >
           <div className="flex items-center gap-sm p-sm">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-fixed text-on-primary-fixed-variant">
-              <Icon name="user" size={20} />
-            </span>
+            <Avatar url={profile?.avatarUrl} />
             <span className="min-w-0">
               <span className="block truncate font-label-bold text-label-bold text-on-surface">
                 {profile?.name ?? user?.name}

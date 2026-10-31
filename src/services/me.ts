@@ -1,6 +1,6 @@
 import i18n from '../i18n/index'
 import { endpoints } from './endpoints'
-import { del, get, post, put } from './http'
+import { assetUrl, del, get, post, put } from './http'
 import type { AuthResponse, UserDto } from '../types/auth'
 import { toExercise } from './exercises'
 import type { BodyMeasurementDto, ChangePasswordRequest, ConsistencyDay, Dashboard, DashboardDto, DayCountDto, FavoritesDto, LogMeasurementRequest, LogWorkoutRequest, Measurement, MeasurementForm, Profile, ProgressionDto, Saved, UpdateProfileRequest, Workout, WorkoutEntry, WorkoutLogDto, WorkoutLogForm, WorkoutQuery } from '../types/me'
@@ -17,6 +17,7 @@ export function toProfile(raw: UserDto): Profile {
     units: raw.units,
     plan: raw.role === 'admin' ? 'Admin' : 'Member',
     joined: new Date(raw.created_at).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' }),
+    avatarUrl: raw.avatar_url ? assetUrl(raw.avatar_url) : null,
   }
 }
 
@@ -123,6 +124,12 @@ export const toDashboard = (raw: DashboardDto): Dashboard => ({
 export const meService = {
   profile: () => get<UserDto>(endpoints.me.profile).then(toProfile),
   updateProfile: (body: UpdateProfileRequest) => put<UserDto>(endpoints.me.profile, body),
+  uploadAvatar: (file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return post<UserDto>(endpoints.me.avatar, form)
+  },
+  removeAvatar: () => del<UserDto>(endpoints.me.avatar),
   changePassword: (body: ChangePasswordRequest) => put<AuthResponse>(endpoints.me.password, body),
   saved: () => get<FavoritesDto>(endpoints.me.saved).then(toSaved),
   dashboard: () => get<DashboardDto>(endpoints.me.dashboard).then(toDashboard),
