@@ -2,7 +2,7 @@
 // Tokens mirrored from stitch_fittrack_fitness_web_app/kinetic_performance_system/DESIGN.md
 // so that markup lifted from the design files renders unchanged.
 export default {
-  content: ['./index.html', './src/**/*.{js,jsx}'],
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
   darkMode: 'class',
   theme: {
     extend: {

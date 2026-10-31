@@ -5,11 +5,11 @@ routines, a workout builder and live logger, progress charts, body measurements,
 fitness calculators, and an admin console for managing the content.
 
 This repository is the React single-page app. The API it talks to lives in
-[fittrack-backend](https://github.com/NitroDaxs/fittrack-backend) (Laravel).
+the `fitness-backend-csharp` repository (ASP.NET Core).
 
 ## Stack
 
-React 18 · React Router 6 · Vite · Tailwind CSS 3 · Recharts · Axios
+React 18 · TypeScript · TanStack Query · Axios · React Router 6 · Vite · Tailwind CSS 3 · Recharts
 
 ## Features
 
@@ -20,8 +20,7 @@ React 18 · React Router 6 · Vite · Tailwind CSS 3 · Recharts · Axios
 - Routines catalog with day-by-day programme breakdowns
 - Articles on nutrition, recovery and mindset
 - Calculators: one-rep max, TDEE, BMI, macros and body fat
-- A chat assistant that answers questions from the app's own data
-- Sign up and log in
+- Sign up, log in and reset a forgotten password
 
 **Member**
 
@@ -55,7 +54,8 @@ The app runs at http://localhost:5173.
 | Script | What it does |
 | --- | --- |
 | `npm run dev` | Start the Vite dev server |
-| `npm run build` | Build for production into `dist/` |
+| `npm run typecheck` | Check types without building |
+| `npm run build` | Type-check, then build for production into `dist/` |
 | `npm run preview` | Serve the production build locally |
 
 ## Connecting to the API
@@ -64,39 +64,49 @@ The app runs at http://localhost:5173.
 `http://localhost:8000/api`. Start the back end first (see its README) and log
 in with one of its seeded accounts.
 
-If `VITE_API_URL` is not set, the app falls back to an in-memory mock of the
-API. The mock predates the real back end, so it covers browsing the catalog
-but not every newer feature.
 
 ## Project structure
 
 ```
 src/
-  api/          HTTP client, endpoint functions and data hooks
-  components/   Layout, UI primitives, charts, chat widget, admin tables
-  context/      Auth, units, taxonomy and active-workout state
+  router/       Page routes and the RequireRole guard
+  layouts/      Public and admin page shells, navigation, footer
   pages/        One file per screen; admin screens in pages/admin
-  data/         Calculator definitions
-  utils/        Unit conversion helpers
+  components/   UI primitives, charts, admin tables, calculator form parts
+  hooks/        TanStack Query hooks; what pages use to read and write data
+  services/     API calls, per domain
+  types/        TypeScript types, per domain
+  context/      Auth, units and active-workout state
+  data/         Calculator list for the hub page
+  utils/        Unit conversion for displaying stored values
 ```
 
-Everything network-shaped goes through `src/api/`:
+Data flows `pages -> hooks -> services -> http`. Pages never call a service or
+Axios directly.
+
+Each domain has two files:
 
 | File | Role |
 | --- | --- |
-| `axios.js` | Axios instance; attaches the bearer token to every request |
-| `client.js` | `request()`, the only place a request is issued |
-| `resources.js` | Endpoint functions such as `exercisesApi.list()` and `meApi.dashboard()` |
-| `hooks.js` | `useResource`, `useMutation` and `useDebounced` |
-| `mockServer.js`, `db.js` | The in-memory mock and its seed data |
+| `services/exercises.ts` | The endpoint functions, plus mappers between the API's JSON and UI models |
+| `types/exercises.ts` | Types for the API's JSON (mirroring the backend DTOs), UI models, forms and queries |
 
-Components only call the functions in `resources.js`. Filtering, sorting and
-pagination are sent as query parameters and handled by the server.
+`endpoints.ts` lists every API path, and services use it instead of hardcoded
+URLs. `http.ts` holds the Axios instance, bearer token, `ApiError` and 401 handling, and
+`queryClient.ts` the cache and retry defaults. Filtering, sorting and pagination
+are sent as query parameters and handled by the server.
+
+## Calculators
+
+All calculator logic lives in the API. The pages open with empty forms, send what
+was entered to `POST /api/calculators/*`, and display the result or the API's
+validation messages. Switching units clears the form.
 
 ## Authentication and roles
 
-Logging in returns a Sanctum bearer token, which is kept in `localStorage` and
-sent with every request. The session holds the user and their role (`member` or
+Logging in returns a JWT bearer token, which is kept in `localStorage` and sent
+with every request. A 401 ends the session, and logging out clears the query
+cache. The session holds the user and their role (`member` or
 `admin`), and `RequireRole` guards the member and admin routes.
 
 ## Implementation notes
@@ -111,5 +121,6 @@ sent with every request. The session holds the user and their role (`member` or
 
 ## Known gaps
 
-Progress-photo upload, social sign-in, and password or email changes are not
-implemented. Those controls are present but disabled, with a tooltip saying why.
+Progress-photo upload, social sign-in, and changing your email or password from
+the profile page are not implemented. The API already supports the last two
+through `PUT /me`.
