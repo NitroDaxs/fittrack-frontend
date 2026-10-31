@@ -327,7 +327,28 @@
     "loadingProfile": "Зареждане на профила",
     "metricKgCm": "Метрични (kg, cm)",
     "savedRoutines": "Запазени програми",
-    "joined": "{{plan}} • Присъедини се през {{date}}"
+    "joined": "{{plan}} • Присъедини се през {{date}}",
+    "personalDetails": "Лични данни",
+    "saveChanges": "Запази промените",
+    "detailsSaved": "Данните ви са запазени.",
+    "currentPassword": "Текуща парола",
+    "emailPasswordHint": "Въведете паролата си, за да потвърдите новия имейл адрес.",
+    "changePassword": "Смяна на паролата",
+    "changePasswordHint": "Тук ще останете влезли, а на другите си устройства ще излезете от профила.",
+    "newPassword": "Нова парола",
+    "confirmNewPassword": "Потвърдете новата парола",
+    "updatePassword": "Смени паролата",
+    "passwordChanged": "Паролата ви е сменена.",
+    "errors": {
+      "nameRequired": "Въведете името си.",
+      "emailInvalid": "Въведете валиден имейл адрес.",
+      "emailTaken": "Този имейл адрес вече се използва.",
+      "currentPasswordRequired": "Въведете текущата си парола.",
+      "currentPasswordWrong": "Текущата парола е грешна.",
+      "passwordRules": "Използвайте поне 8 символа, включително цифра.",
+      "passwordSame": "Изберете парола, различна от текущата.",
+      "passwordMismatch": "Паролите не съвпадат."
+    }
   },
   "home": {
     "achieveMore": "Постигайте повече",

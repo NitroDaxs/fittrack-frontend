@@ -57,7 +57,7 @@ Core.
 - Dashboard with strength progression, body-weight trend and a consistency heatmap
 - Workout history and body measurements
 - Saved exercises and routines
-- Profile settings, including metric or imperial units
+- Profile settings: name, email, password, and metric or imperial units
 
 **Admins**
 
@@ -265,5 +265,3 @@ Deploy API changes before frontend changes that depend on them.
   the only automated checks.
 - The main JavaScript bundle is over 500 kB, because routes aren't code-split.
 - Progress-photo upload and social sign-in aren't implemented.
-- Changing your email or password from the profile page isn't implemented, though the
-  API supports both through `PUT /me`.

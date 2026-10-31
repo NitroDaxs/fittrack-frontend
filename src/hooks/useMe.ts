@@ -1,6 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import i18n from '../i18n'
+import { setToken } from '../services/http'
 import { meService, toProfile } from '../services/me'
 import type { WorkoutQuery } from '../types/me'
 
@@ -50,6 +51,18 @@ export function useLogMeasurement() {
     onSuccess: () => {
       toast.success(i18n.t('toast.measurementSaved'))
       return queryClient.invalidateQueries({ queryKey: ['me'] })
+    },
+  })
+}
+
+export function useChangePassword() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: meService.changePassword,
+    onSuccess: ({ user, access_token }) => {
+      // The old token stopped working when the password changed.
+      setToken(access_token)
+      queryClient.setQueryData(PROFILE_KEY, toProfile(user))
     },
   })
 }

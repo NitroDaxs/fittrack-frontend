@@ -82,9 +82,14 @@ export interface UpdateProfileRequest {
   name?: string
   email?: string
   units?: Units
+  /** Required when changing the email. */
   current_password?: string
-  new_password?: string
-  new_password_confirmation?: string
+}
+
+export interface ChangePasswordRequest {
+  current_password: string
+  new_password: string
+  new_password_confirmation: string
 }
 
 export interface LogWorkoutRequest {

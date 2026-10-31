@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useUnits } from '../context/UnitContext'
 import { ErrorState, Spinner } from '../components/ui/States'
+import ChangePasswordForm from '../components/profile/ChangePasswordForm'
+import EditProfileForm from '../components/profile/EditProfileForm'
 import Icon from '../components/ui/Icon'
 import Img from '../components/ui/Img'
 import { useProfile, useSaved } from '../hooks/useMe'
@@ -79,7 +81,7 @@ export default function ProfileSettings() {
               <Icon name="heart" size={20} className="text-primary-container shrink-0" filled />
               <span className="min-w-0">
                 <span className="block font-label-bold text-label-bold text-on-surface truncate">{exercise.name}</span>
-                <span className="block font-label-sm text-label-sm text-secondary">{exercise.muscleGroups[0]}</span>
+                <span className="block font-label-sm text-label-sm text-secondary">{tLabel(exercise.muscleGroups[0] ?? '')}</span>
               </span>
             </Link>
           ))}
@@ -90,15 +92,8 @@ export default function ProfileSettings() {
       <section>
         <h2 className="font-headline-md text-headline-md text-on-surface mb-md">{t('profileSettings.accountSettings')}</h2>
         <div className="bg-surface-container-lowest rounded-xl elev-card border border-surface-variant divide-y divide-surface-variant overflow-hidden">
-          <div className="p-md flex items-center justify-between gap-md">
-            <div className="flex items-center gap-md min-w-0">
-              <Icon name="mail" className="text-secondary shrink-0" />
-              <div className="min-w-0">
-                <span className="block font-label-bold text-label-bold text-on-surface">{t('common.email')}</span>
-                <span className="block font-body-md text-body-md text-secondary truncate">{profile.email}</span>
-              </div>
-            </div>
-          </div>
+          <EditProfileForm key={profile.id} profile={profile} />
+          <ChangePasswordForm />
 
           <div className="p-md flex items-center justify-between gap-md">
             <div className="flex items-center gap-md">

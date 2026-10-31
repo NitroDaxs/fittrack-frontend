@@ -327,7 +327,28 @@
     "loadingProfile": "Loading profile",
     "metricKgCm": "Metric (kg, cm)",
     "savedRoutines": "Saved Routines",
-    "joined": "{{plan}} • Joined {{date}}"
+    "joined": "{{plan}} • Joined {{date}}",
+    "personalDetails": "Personal details",
+    "saveChanges": "Save changes",
+    "detailsSaved": "Your details have been saved.",
+    "currentPassword": "Current password",
+    "emailPasswordHint": "Enter your password to confirm the new email address.",
+    "changePassword": "Change password",
+    "changePasswordHint": "You will stay logged in here and be logged out on your other devices.",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "updatePassword": "Update password",
+    "passwordChanged": "Your password has been changed.",
+    "errors": {
+      "nameRequired": "Enter your name.",
+      "emailInvalid": "Enter a valid email address.",
+      "emailTaken": "This email address is already in use.",
+      "currentPasswordRequired": "Enter your current password.",
+      "currentPasswordWrong": "The current password is incorrect.",
+      "passwordRules": "Use at least 8 characters, including a number.",
+      "passwordSame": "Choose a password different from your current one.",
+      "passwordMismatch": "The passwords do not match."
+    }
   },
   "home": {
     "achieveMore": "Achieve More",

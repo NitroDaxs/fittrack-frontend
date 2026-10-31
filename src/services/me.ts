@@ -1,9 +1,9 @@
 import i18n from '../i18n/index'
 import { endpoints } from './endpoints'
 import { del, get, post, put } from './http'
-import type { UserDto } from '../types/auth'
+import type { AuthResponse, UserDto } from '../types/auth'
 import { toExercise } from './exercises'
-import type { BodyMeasurementDto, ConsistencyDay, Dashboard, DashboardDto, DayCountDto, FavoritesDto, LogMeasurementRequest, LogWorkoutRequest, Measurement, MeasurementForm, Profile, ProgressionDto, Saved, UpdateProfileRequest, Workout, WorkoutEntry, WorkoutLogDto, WorkoutLogForm, WorkoutQuery } from '../types/me'
+import type { BodyMeasurementDto, ChangePasswordRequest, ConsistencyDay, Dashboard, DashboardDto, DayCountDto, FavoritesDto, LogMeasurementRequest, LogWorkoutRequest, Measurement, MeasurementForm, Profile, ProgressionDto, Saved, UpdateProfileRequest, Workout, WorkoutEntry, WorkoutLogDto, WorkoutLogForm, WorkoutQuery } from '../types/me'
 import { toRoutine } from './routines'
 import { toPage } from './shared'
 import type { MessageResponse, PagedDto } from '../types/shared'
@@ -123,6 +123,7 @@ export const toDashboard = (raw: DashboardDto): Dashboard => ({
 export const meService = {
   profile: () => get<UserDto>(endpoints.me.profile).then(toProfile),
   updateProfile: (body: UpdateProfileRequest) => put<UserDto>(endpoints.me.profile, body),
+  changePassword: (body: ChangePasswordRequest) => put<AuthResponse>(endpoints.me.password, body),
   saved: () => get<FavoritesDto>(endpoints.me.saved).then(toSaved),
   dashboard: () => get<DashboardDto>(endpoints.me.dashboard).then(toDashboard),
   workouts: (query: WorkoutQuery, signal?: AbortSignal) =>
