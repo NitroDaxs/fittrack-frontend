@@ -19,6 +19,8 @@ import MacroCalculator from './pages/MacroCalculator'
 import BodyFatCalculator from './pages/BodyFatCalculator'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import StaticPage from './pages/StaticPage'
 import NotFound from './pages/NotFound'
 
@@ -57,6 +59,8 @@ export default function App() {
 
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<Signup />} />
+        <Route path="forgot-password" element={<ForgotPassword />} />
+        <Route path="reset-password" element={<ResetPassword />} />
 
         <Route path="about" element={<StaticPage />} />
         <Route path="contact" element={<StaticPage />} />

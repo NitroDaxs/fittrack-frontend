@@ -84,7 +84,7 @@ export default function Login() {
               <label className="block font-label-bold text-label-bold text-on-surface" htmlFor="password">
                 Password
               </label>
-              <Link to="/login" className="font-label-sm text-label-sm text-primary hover:text-primary-container">
+              <Link to="/forgot-password" className="font-label-sm text-label-sm text-primary hover:text-primary-container">
                 Forgot password?
               </Link>
             </div>

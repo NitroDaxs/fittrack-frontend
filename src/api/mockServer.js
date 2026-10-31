@@ -368,6 +368,9 @@ const handlers = {
     token: 'mock-token',
     user: { ...state.currentUser, name: (body.name || 'Athlete').split(' ')[0], fullName: body.name, email: body.email, role: 'member' },
   }),
+
+  'POST /forgot-password': () => ({ message: "If an account exists for that email, we've sent a password reset link." }),
+  'POST /reset-password': () => ({ message: 'Your password has been reset.' }),
 }
 
 // --- tiny router ------------------------------------------------------------

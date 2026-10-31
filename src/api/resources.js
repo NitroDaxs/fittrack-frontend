@@ -591,6 +591,8 @@ export const adminApi = {
 export const authApi = {
   login: (body) => post('/login', body),
   register: (body) => post('/register', body),
+  forgotPassword: (body) => post('/forgot-password', body),
+  resetPassword: (body) => post('/reset-password', body),
   // AuthContext already calls this if present. Without it, signing out only
   // cleared localStorage and the Sanctum token stayed valid server-side forever.
   logout: () => post('/logout'),
