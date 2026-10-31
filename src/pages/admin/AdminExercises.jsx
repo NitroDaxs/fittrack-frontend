@@ -156,7 +156,7 @@ export default function AdminExercises() {
           label="Category"
           value={category}
           onChange={setCategory}
-          options={['All', 'Strength', 'Cardio', 'Conditioning', 'Core']}
+          options={['All', ...(taxonomies?.categories ?? []).map((option) => option.label)]}
         />
       </AdminToolbar>
 

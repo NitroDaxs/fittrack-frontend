@@ -141,7 +141,7 @@ export default function AdminUsers() {
       <Notice message={crud.notice} />
 
       <AdminToolbar search={crud.search} onSearch={crud.setSearch} placeholder="Search by name or email...">
-        <AdminSelect label="Role" value={role} onChange={setRole} options={['All Roles', 'Admin', 'Editor', 'Member']} />
+        <AdminSelect label="Role" value={role} onChange={setRole} options={['All Roles', 'Admin', 'Member']} />
         <AdminSelect
           label="Status"
           value={status}

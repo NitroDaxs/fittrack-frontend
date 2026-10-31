@@ -106,7 +106,7 @@ function normalizeExercise(raw) {
     equipment: equipmentNames.join(', ') || (typeof raw.equipment === 'string' ? raw.equipment : ''),
     equipmentDetail: equipmentNames.join(', '),
     difficulty: capitalize(raw.difficulty),
-    category: raw.category ?? capitalize(raw.exercise_type),
+    category: raw.category ?? titleCase(raw.exercise_type),
     mechanics: raw.mechanics ?? '',
     steps: raw.steps ?? parseInstructions(raw.instructions),
     tips: raw.tips ?? [],
@@ -348,15 +348,19 @@ export const meApi = {
     post('/me/workouts', {
       name: body.name,
       duration_minutes: body.minutes,
-      exercises: (body.entries ?? body.exercises ?? []).map((entry, index) => ({
-        exercise_id: entry.exerciseId ?? entry.exercise_id,
-        order: index + 1,
-        sets: (entry.sets ?? []).map((set, setIndex) => ({
-          set_number: setIndex + 1,
-          weight: set.weight,
-          reps: set.reps,
+      // An exercise the user skipped has no sets, and the API rejects the whole
+      // workout over an empty `sets` array -- so leave those out.
+      exercises: (body.entries ?? body.exercises ?? [])
+        .filter((entry) => entry.sets?.length > 0)
+        .map((entry, index) => ({
+          exercise_id: entry.exerciseId ?? entry.exercise_id,
+          order: index + 1,
+          sets: entry.sets.map((set, setIndex) => ({
+            set_number: setIndex + 1,
+            weight: set.weight,
+            reps: set.reps,
+          })),
         })),
-      })),
     }),
   measurements: () =>
     get('/me/measurements').then((res) => (Array.isArray(res) ? res : res?.data ?? []).map(normalizeMeasurement)),
@@ -455,7 +459,7 @@ function denormalizeRoutine(form) {
     goal: toSnake(form.goal),
     level: toSlug(form.level),
     days_per_week: Number(form.daysPerWeek ?? form.days_per_week ?? 3),
-    is_public: form.isPublic ?? true,
+    is_public: form.isPublic ?? form.is_public ?? true,
   }
 
   // Omit `days` entirely when the builder never loaded (or the routine genuinely
