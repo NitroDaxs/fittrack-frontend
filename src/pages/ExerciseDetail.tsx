@@ -18,7 +18,7 @@ export default function ExerciseDetail() {
 
   const { data: exercise, isPending: loading, error, refetch } = useExercise(slug)
   const primaryMuscle = exercise?.muscleGroups[0]
-  const { data: relatedData } = useExercises({ muscleGroup: primaryMuscle, perPage: 5 }, Boolean(primaryMuscle))
+  const { data: relatedData } = useExercises({ muscleGroups: primaryMuscle ? [primaryMuscle] : [], perPage: 5 }, Boolean(primaryMuscle))
   const { isSaved, toggle: toggleSaved, pending: saving, canSave } = useFavorite('exercise', exercise?.id)
 
   if (loading) return <Spinner label={t('exerciseDetail.loadingExercise')} />

@@ -44,8 +44,8 @@ Core.
 
 **Everyone**
 
-- Exercise library with search and filters, plus detail pages with video and
-  step-by-step instructions
+- Exercise library with search, multi-select filters and a clickable body map, plus detail pages
+  with video and step-by-step instructions
 - Routines catalog with day-by-day programmes
 - Articles on nutrition, recovery and mindset
 - Calculators for one-rep max, TDEE, BMI, macros and body fat

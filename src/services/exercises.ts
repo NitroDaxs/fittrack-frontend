@@ -120,7 +120,11 @@ export function toExerciseRequest(form: ExerciseForm): ExerciseRequest {
 }
 
 export const exerciseService = {
-  list: (query: ExerciseQuery, signal?: AbortSignal) =>
-    get<PagedDto<ExerciseDto>>(endpoints.exercises.list, { ...query }, signal).then((res) => toPage(res, toExercise)),
+  list: ({ muscleGroups, equipment, ...query }: ExerciseQuery, signal?: AbortSignal) =>
+    get<PagedDto<ExerciseDto>>(
+      endpoints.exercises.list,
+      { ...query, muscleGroup: muscleGroups?.join(','), equipment: equipment?.join(',') },
+      signal,
+    ).then((res) => toPage(res, toExercise)),
   show: (key: string) => get<ExerciseDto>(endpoints.exercises.show(key)).then(toExercise),
 }

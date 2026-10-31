@@ -561,7 +561,24 @@
     "filtering": "Филтриране…",
     "muscleGroup": "Мускулна група",
     "noExercisesMatchThoseFilters": "Няма упражнения, отговарящи на филтрите",
-    "tryWideningTheMuscleGroupOr": "Разширете филтъра за мускулна група или оборудване или изчистете търсенето."
+    "tryWideningTheMuscleGroupOr": "Разширете филтъра за мускулна група или оборудване или изчистете търсенето.",
+    "matching_one": "{{count}} намерено упражнение",
+    "matching_other": "{{count}} намерени упражнения",
+    "body": {
+      "title": "Изберете мускули",
+      "front": "Отпред",
+      "back": "Отзад"
+    },
+    "filters": {
+      "title": "Филтри",
+      "allMuscles": "Всички мускули",
+      "allEquipment": "Всякакво оборудване",
+      "showMap": "Покажи картата на тялото",
+      "hideMap": "Скрий картата на тялото",
+      "remove": "Премахни филтъра: {{name}}",
+      "showResults_one": "Покажи {{count}} упражнение",
+      "showResults_other": "Покажи {{count}} упражнения"
+    }
   },
   "login": {
     "donTHaveAnAccount": "Нямате профил?",

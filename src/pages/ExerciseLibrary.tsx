@@ -1,7 +1,9 @@
 import { useTranslation } from 'react-i18next'
+import ActiveFilters from '../components/library/ActiveFilters'
+import ExerciseFilters, { NO_FILTERS, type ExerciseFilterValues } from '../components/library/ExerciseFilters'
 import { useState } from 'react'
 import { ExerciseCard } from '../components/cards'
-import FilterChips from '../components/ui/FilterChips'
+import Modal from '../components/ui/Modal'
 import SearchInput from '../components/ui/SearchInput'
 import { EmptyState, ErrorState, SkeletonCard } from '../components/ui/States'
 import Icon from '../components/ui/Icon'
@@ -15,20 +17,24 @@ const PER_PAGE = 8
 export default function ExerciseLibrary() {
   const { t } = useTranslation()
   const [search, setSearch] = useState('')
-  const [muscleGroup, setMuscleGroup] = useState<string | null>(null)
-  const [equipment, setEquipment] = useState<string | null>(null)
-  const [difficulty, setDifficulty] = useState<string | null>(null)
+  const [filters, setFilters] = useState<ExerciseFilterValues>(NO_FILTERS)
+  const [sheetOpen, setSheetOpen] = useState(false)
   const [page, setPage] = useState(1)
 
   const debouncedSearch = useDebounced(search)
 
   const taxonomies = useTaxonomies()
 
-  const { data, isPending: loading, error, refetch } = useExercises({ search: debouncedSearch, muscleGroup, equipment, difficulty, page, perPage: PER_PAGE })
+  const { data, isPending: loading, error, refetch } = useExercises({ search: debouncedSearch, ...filters, page, perPage: PER_PAGE })
 
   const exercises = data?.data ?? []
   const meta = data?.meta
-  const activeFilters = [muscleGroup, equipment, difficulty].filter(Boolean).length
+  const activeFilters = filters.muscleGroups.length + filters.equipment.length + (filters.difficulty ? 1 : 0)
+  const filterOptions = {
+    muscleGroups: taxonomies?.muscleGroups ?? [],
+    equipment: taxonomies?.equipment ?? [],
+    difficulties: taxonomies?.difficulties ?? [],
+  }
 
   // Any filter change invalidates the current page number.
   const withPageReset = <T,>(setter: (value: T) => void) => (value: T) => {
@@ -36,11 +42,11 @@ export default function ExerciseLibrary() {
     setPage(1)
   }
 
+  const applyFilters = withPageReset(setFilters)
+
   const clearAll = () => {
     setSearch('')
-    setMuscleGroup(null)
-    setEquipment(null)
-    setDifficulty(null)
+    setFilters(NO_FILTERS)
     setPage(1)
   }
 
@@ -61,43 +67,62 @@ export default function ExerciseLibrary() {
         />
       </header>
 
-      <section className="mb-xl bg-surface-container-lowest p-md rounded-xl elev-card border border-surface-variant">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-lg">
-          <FilterChips
-            label={t('exerciseLibrary.muscleGroup')}
-            options={taxonomies?.muscleGroups ?? []}
-            value={muscleGroup}
-            onChange={withPageReset(setMuscleGroup)}
+      {/* Desktop: always visible */}
+      <section className="hidden lg:block mb-lg bg-surface-container-lowest p-md rounded-xl elev-card border border-surface-variant">
+        <ExerciseFilters values={filters} options={filterOptions} onChange={applyFilters}>
+          <ActiveFilters
+            values={filters}
+            options={filterOptions}
+            onChange={applyFilters}
+            onClearAll={activeFilters > 0 || search ? clearAll : undefined}
+            total={meta?.total}
           />
-          <FilterChips
-            label={t('common.equipment')}
-            options={taxonomies?.equipment ?? []}
-            value={equipment}
-            onChange={withPageReset(setEquipment)}
-          />
-          <FilterChips
-            label={t('common.difficulty')}
-            options={taxonomies?.difficulties ?? []}
-            value={difficulty}
-            onChange={withPageReset(setDifficulty)}
-          />
-        </div>
-        {activeFilters > 0 || search ? (
-          <div className="flex items-center justify-between mt-lg pt-md border-t border-surface-variant">
-            <span className="font-label-sm text-label-sm text-secondary">
-              {meta ? `${meta.total} matching ${meta.total === 1 ? 'exercise' : 'exercises'}` : t('exerciseLibrary.filtering')}
-            </span>
-            <button
-              type="button"
-              onClick={clearAll}
-              className="font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors flex items-center gap-xs"
-            >
-              <Icon name="funnel-x" size={18} />
-              {t('common.clearFilters')}
-            </button>
-          </div>
-        ) : null}
+        </ExerciseFilters>
       </section>
+
+      {/* Phones and tablets: in a sheet, so the exercises come first */}
+      <div className="lg:hidden mb-md">
+        <button
+          type="button"
+          onClick={() => setSheetOpen(true)}
+          className="flex w-full items-center justify-center gap-sm rounded-lg border border-outline bg-surface py-sm font-label-bold text-label-bold text-on-surface transition-colors hover:bg-surface-container"
+        >
+          <Icon name="sliders-horizontal" size={18} />
+          {t('exerciseLibrary.filters.title')}
+          {activeFilters > 0 ? (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary-container px-xs font-label-sm text-label-sm text-on-primary">
+              {activeFilters}
+            </span>
+          ) : null}
+        </button>
+      </div>
+      <Modal
+        open={sheetOpen}
+        title={t('exerciseLibrary.filters.title')}
+        size="lg"
+        onClose={() => setSheetOpen(false)}
+        footer={
+          <button
+            type="button"
+            onClick={() => setSheetOpen(false)}
+            className="w-full rounded-lg bg-primary-container py-sm font-label-bold text-label-bold text-on-primary transition-colors hover:bg-primary"
+          >
+            {meta ? t('exerciseLibrary.filters.showResults', { count: meta.total }) : t('exerciseLibrary.filtering')}
+          </button>
+        }
+      >
+        <ExerciseFilters values={filters} options={filterOptions} onChange={applyFilters} />
+      </Modal>
+
+      <div className="lg:hidden mb-lg">
+        <ActiveFilters
+          values={filters}
+          options={filterOptions}
+          onChange={applyFilters}
+          onClearAll={activeFilters > 0 || search ? clearAll : undefined}
+          total={meta?.total}
+        />
+      </div>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-gutter">
         {error ? (

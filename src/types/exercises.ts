@@ -103,7 +103,9 @@ export interface ExerciseForm {
 // One function per endpoint. Components call these and never see the wire format.
 export interface ExerciseQuery extends PageQuery {
   search?: string
-  muscleGroup?: string | null
-  equipment?: string | null
+  /** Exercises matching any of these. */
+  muscleGroups?: string[]
+  /** Exercises using any of these. */
+  equipment?: string[]
   difficulty?: string | null
 }

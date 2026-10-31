@@ -561,7 +561,24 @@
     "filtering": "Filtering…",
     "muscleGroup": "Muscle Group",
     "noExercisesMatchThoseFilters": "No exercises match those filters",
-    "tryWideningTheMuscleGroupOr": "Try widening the muscle group or equipment filter, or clear the search box."
+    "tryWideningTheMuscleGroupOr": "Try widening the muscle group or equipment filter, or clear the search box.",
+    "matching_one": "{{count}} matching exercise",
+    "matching_other": "{{count}} matching exercises",
+    "body": {
+      "title": "Choose muscles",
+      "front": "Front",
+      "back": "Back"
+    },
+    "filters": {
+      "title": "Filters",
+      "allMuscles": "All muscles",
+      "allEquipment": "All equipment",
+      "showMap": "Show body map",
+      "hideMap": "Hide body map",
+      "remove": "Remove filter: {{name}}",
+      "showResults_one": "Show {{count}} exercise",
+      "showResults_other": "Show {{count}} exercises"
+    }
   },
   "login": {
     "donTHaveAnAccount": "Don't have an account?",
