@@ -35,7 +35,7 @@ export default function ExerciseDetail() {
         to="/library"
         className="inline-flex items-center gap-xs font-label-bold text-label-bold text-secondary hover:text-primary transition-colors mb-lg"
       >
-        <Icon name="arrow_back" size={20} />
+        <Icon name="arrow-left" size={20} />
         Library
       </Link>
 
@@ -56,13 +56,13 @@ export default function ExerciseDetail() {
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-md mb-lg">
             <div className="bg-surface-container-lowest rounded-xl p-md border border-surface-variant elev-card">
               <dt className="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-xs flex items-center gap-xs">
-                <Icon name="exercise" size={16} /> Primary Muscle
+                <Icon name="dumbbell" size={16} /> Primary Muscle
               </dt>
               <dd className="font-label-bold text-label-bold text-on-surface">{exercise.primaryMuscles}</dd>
             </div>
             <div className="bg-surface-container-lowest rounded-xl p-md border border-surface-variant elev-card">
               <dt className="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-xs flex items-center gap-xs">
-                <Icon name="fitness_center" size={16} /> Equipment
+                <Icon name="dumbbell" size={16} /> Equipment
               </dt>
               <dd className="font-label-bold text-label-bold text-on-surface">{exercise.equipment}</dd>
             </div>
@@ -88,7 +88,7 @@ export default function ExerciseDetail() {
               onClick={addToBuilder}
               className="flex items-center gap-sm bg-primary-container text-on-primary font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-primary transition-colors active:scale-95 elev-card"
             >
-              <Icon name="add" size={20} />
+              <Icon name="plus" size={20} />
               Add to workout
             </button>
             <Link
@@ -111,7 +111,7 @@ export default function ExerciseDetail() {
                     : 'border-outline text-on-surface hover:bg-surface-container'
                 }`}
               >
-                <Icon name="favorite" size={20} filled={isSaved} />
+                <Icon name="heart" size={20} filled={isSaved} />
                 {isSaved ? 'Favorited' : 'Favorite'}
               </button>
             ) : null}

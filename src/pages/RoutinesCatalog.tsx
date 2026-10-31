@@ -132,7 +132,7 @@ export default function RoutinesCatalog() {
             Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />)
           ) : routines.length === 0 ? (
             <EmptyState
-              icon="event_busy"
+              icon="calendar-x"
               title="No routines match those filters"
               body="Loosen the goal or experience filters to see more programmes."
               action={

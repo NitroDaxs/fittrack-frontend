@@ -13,7 +13,7 @@ function Block({ block }: { block: ArticleBlock }) {
     case 'quote':
       return (
         <blockquote className="my-lg border-l-4 border-primary-container pl-lg py-sm">
-          <Icon name="format_quote" size={28} className="text-primary-container mb-xs" />
+          <Icon name="quote" size={28} className="text-primary-container mb-xs" />
           <p className="font-body-lg text-body-lg text-on-surface italic">{block.text}</p>
         </blockquote>
       )
@@ -30,7 +30,7 @@ function Block({ block }: { block: ArticleBlock }) {
       return (
         <aside className="mt-xl border-t border-surface-variant pt-lg">
           <h2 className="font-label-bold text-label-bold text-secondary uppercase tracking-widest mb-md flex items-center gap-xs">
-            <Icon name="menu_book" size={18} />
+            <Icon name="book-open" size={18} />
             Sources
           </h2>
           <ol className="flex flex-col gap-sm list-decimal pl-lg">
@@ -44,7 +44,7 @@ function Block({ block }: { block: ArticleBlock }) {
                   className="text-primary hover:underline inline-flex items-center gap-[2px] whitespace-nowrap"
                 >
                   View study
-                  <Icon name="open_in_new" size={14} />
+                  <Icon name="external-link" size={14} />
                 </a>
               </li>
             ))}
@@ -70,7 +70,7 @@ export default function ArticleDetail() {
         to="/articles"
         className="inline-flex items-center gap-xs font-label-bold text-label-bold text-secondary hover:text-primary transition-colors mb-lg"
       >
-        <Icon name="arrow_back" size={20} />
+        <Icon name="arrow-left" size={20} />
         Performance Journal
       </Link>
 
@@ -82,11 +82,11 @@ export default function ArticleDetail() {
           </h1>
           <div className="flex flex-wrap items-center gap-md font-label-sm text-label-sm text-secondary">
             <span className="flex items-center gap-xs">
-              <Icon name="person" size={16} />
+              <Icon name="user" size={16} />
               {article.author}
             </span>
             <span className="flex items-center gap-xs">
-              <Icon name="calendar_today" size={16} />
+              <Icon name="calendar" size={16} />
               {new Date(article.date).toLocaleDateString(undefined, {
                 year: 'numeric',
                 month: 'long',
@@ -94,7 +94,7 @@ export default function ArticleDetail() {
               })}
             </span>
             <span className="flex items-center gap-xs">
-              <Icon name="schedule" size={16} />
+              <Icon name="clock" size={16} />
               {article.readMinutes} min read
             </span>
           </div>
@@ -104,7 +104,7 @@ export default function ArticleDetail() {
             than reserving 24rem for a placeholder icon. */}
         {article.image ? (
           <div className="rounded-xl overflow-hidden h-64 md:h-96 mb-xl elev-card bg-surface-container-high">
-            <Img src={article.image} alt="" icon="article" imgClassName="w-full h-full object-cover" />
+            <Img src={article.image} alt="" icon="file-text" imgClassName="w-full h-full object-cover" />
           </div>
         ) : null}
 

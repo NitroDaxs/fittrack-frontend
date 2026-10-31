@@ -35,7 +35,7 @@ export default function RoutineDetail() {
         to="/routines"
         className="inline-flex items-center gap-xs font-label-bold text-label-bold text-secondary hover:text-primary transition-colors mb-lg"
       >
-        <Icon name="arrow_back" size={20} />
+        <Icon name="arrow-left" size={20} />
         Back to Routines
       </Link>
 
@@ -115,7 +115,7 @@ export default function RoutineDetail() {
             onClick={startDay}
             className="hidden sm:flex items-center gap-sm bg-primary-container text-on-primary font-label-bold text-label-bold px-lg py-sm rounded-lg hover:bg-primary transition-colors active:scale-95"
           >
-            <Icon name="play_arrow" size={20} filled />
+            <Icon name="play" size={20} filled />
             Load this day
           </button>
         </header>
@@ -167,7 +167,7 @@ export default function RoutineDetail() {
           disabled={!day}
           className="disabled:opacity-40 disabled:cursor-not-allowed flex-1 flex items-center justify-center gap-sm bg-primary-container text-on-primary font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-primary transition-colors active:scale-95 elev-card"
         >
-          <Icon name="play_arrow" size={20} filled />
+          <Icon name="play" size={20} filled />
           Load {day?.name ?? 'day'} into builder
         </button>
         {canSave ? (

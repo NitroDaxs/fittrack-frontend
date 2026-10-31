@@ -32,7 +32,7 @@ export function toRoutine(raw: RoutineDto): Routine {
     level: titleCase(raw.level),
     daysPerWeek: raw.days_per_week,
     isPublic: raw.is_public,
-    icon: 'event_note',
+    icon: 'calendar-days',
     days: (raw.workouts ?? []).map(toRoutineDay),
   }
 }

@@ -1,3 +1,4 @@
+import type { IconName } from '../components/ui/Icon'
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { errorMessage } from '../services/http'
 import MeasurementChart from '../components/charts/MeasurementChart'
@@ -11,12 +12,12 @@ import { useLogMeasurement, useMeasurements } from '../hooks/useMe'
 // body fat is a percentage and so belongs to neither unit system.
 type FieldName = 'weight' | 'bodyFat' | 'waist' | 'chest' | 'arms'
 
-const fields: { name: FieldName; label: string; kind: 'weight' | 'percent' | 'length'; step: string; icon: string }[] = [
-  { name: 'weight', label: 'Weight', kind: 'weight', step: '0.1', icon: 'monitor_weight' },
+const fields: { name: FieldName; label: string; kind: 'weight' | 'percent' | 'length'; step: string; icon: IconName }[] = [
+  { name: 'weight', label: 'Weight', kind: 'weight', step: '0.1', icon: 'weight' },
   { name: 'bodyFat', label: 'Body Fat %', kind: 'percent', step: '0.1', icon: 'percent' },
-  { name: 'waist', label: 'Waist', kind: 'length', step: '0.1', icon: 'straighten' },
-  { name: 'chest', label: 'Chest', kind: 'length', step: '0.1', icon: 'straighten' },
-  { name: 'arms', label: 'Arms', kind: 'length', step: '0.1', icon: 'straighten' },
+  { name: 'waist', label: 'Waist', kind: 'length', step: '0.1', icon: 'ruler' },
+  { name: 'chest', label: 'Chest', kind: 'length', step: '0.1', icon: 'ruler' },
+  { name: 'arms', label: 'Arms', kind: 'length', step: '0.1', icon: 'ruler' },
 ]
 
 const emptyForm: Record<FieldName, string> = { weight: '', bodyFat: '', waist: '', chest: '', arms: '' }
@@ -25,12 +26,12 @@ function Delta({ current, previous, suffix = '' }: { current: number | null; pre
   if (previous == null || current == null) {
     return (
       <span className="flex items-center gap-xs font-label-sm text-label-sm text-secondary">
-        <Icon name="horizontal_rule" size={16} />—
+        <Icon name="minus" size={16} />—
       </span>
     )
   }
   const diff = Number((current - previous).toFixed(1))
-  const icon = diff === 0 ? 'horizontal_rule' : diff > 0 ? 'arrow_upward' : 'arrow_downward'
+  const icon = diff === 0 ? 'minus' : diff > 0 ? 'arrow-up' : 'arrow-down'
   return (
     <span className="flex items-center gap-xs font-label-sm text-label-sm text-secondary">
       <Icon name={icon} size={16} className={diff === 0 ? '' : 'text-primary'} />
@@ -149,7 +150,7 @@ export default function BodyMeasurements() {
 
             {saved ? (
               <p className="font-label-sm text-label-sm text-primary flex items-center gap-xs justify-center">
-                <Icon name="check_circle" size={16} filled />
+                <Icon name="circle-check" size={16} filled />
                 Entry added to your history.
               </p>
             ) : null}

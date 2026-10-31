@@ -1,3 +1,4 @@
+import type { IconName } from '../components/ui/Icon'
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
 import type { Exercise } from '../types/exercises'
 import type { LoggedSet } from '../types/me'
@@ -12,7 +13,7 @@ export interface DraftItem {
   name: string
   image: string
   imageWide: string
-  icon: string
+  icon: IconName
   tags: string[]
   // Strings while being typed into the builder's number inputs.
   sets: number | string

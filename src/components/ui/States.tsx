@@ -1,3 +1,4 @@
+import type { IconName } from './Icon'
 import type { ReactNode } from 'react'
 import Icon from './Icon'
 
@@ -11,13 +12,13 @@ export function Spinner({ label = 'Loading' }: { label?: string }) {
 }
 
 interface EmptyStateProps {
-  icon?: string
+  icon?: IconName
   title: string
   body?: string
   action?: ReactNode
 }
 
-export function EmptyState({ icon = 'search_off', title, body, action }: EmptyStateProps) {
+export function EmptyState({ icon = 'search-x', title, body, action }: EmptyStateProps) {
   return (
     <div className="col-span-full flex flex-col items-center justify-center text-center py-xl px-md">
       <div className="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-outline mb-md">
@@ -34,7 +35,7 @@ export function ErrorState({ error, onRetry }: { error?: Error | null; onRetry?:
   return (
     <div className="col-span-full flex flex-col items-center justify-center text-center py-xl px-md">
       <div className="w-16 h-16 rounded-full bg-error-container flex items-center justify-center text-on-error-container mb-md">
-        <Icon name="error" size={32} />
+        <Icon name="circle-alert" size={32} />
       </div>
       <h3 className="font-headline-md text-headline-md text-on-surface mb-xs">Something went wrong</h3>
       <p className="font-body-md text-body-md text-secondary max-w-md">

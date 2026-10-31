@@ -30,7 +30,7 @@ export default function SearchInput({ value, onChange, placeholder = 'Search...'
           aria-label="Clear search"
           className="absolute right-sm top-1/2 -translate-y-1/2 text-secondary hover:text-on-surface"
         >
-          <Icon name="close" size={18} />
+          <Icon name="x" size={18} />
         </button>
       ) : null}
     </div>

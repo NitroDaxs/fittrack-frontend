@@ -34,7 +34,7 @@ export default function StaticPage() {
         to="/"
         className="inline-flex items-center gap-xs font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors"
       >
-        <Icon name="arrow_back" size={20} />
+        <Icon name="arrow-left" size={20} />
         Back to home
       </Link>
     </div>

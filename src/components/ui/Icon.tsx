@@ -1,24 +1,213 @@
-import type { HTMLAttributes } from 'react'
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  Ban,
+  Bed,
+  BookOpen,
+  Bookmark,
+  Box,
+  Cable,
+  Calculator,
+  Calendar,
+  CalendarDays,
+  CalendarX,
+  ChartLine,
+  ChartPie,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ChevronsUpDown,
+  Circle,
+  CircleAlert,
+  CircleCheck,
+  CircleDot,
+  CirclePlus,
+  Clock,
+  Cog,
+  Columns3,
+  Disc,
+  Dumbbell,
+  Equal,
+  ExternalLink,
+  FilePen,
+  FileText,
+  Flag,
+  Flame,
+  Flower2,
+  Footprints,
+  FunnelX,
+  Globe,
+  GripHorizontal,
+  GripVertical,
+  Heart,
+  History,
+  House,
+  Info,
+  KeyRound,
+  LayoutDashboard,
+  Library,
+  Lightbulb,
+  Link,
+  List,
+  ListPlus,
+  Lock,
+  LogOut,
+  Mail,
+  MapPinOff,
+  Menu,
+  Minus,
+  Pencil,
+  Percent,
+  PersonStanding,
+  Play,
+  Plus,
+  Quote,
+  RotateCw,
+  Ruler,
+  Scale,
+  Search,
+  SearchX,
+  Settings,
+  ShieldUser,
+  SlidersHorizontal,
+  Spline,
+  Star,
+  Timer,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  Unlink,
+  User,
+  UserPlus,
+  Users,
+  Volleyball,
+  Weight,
+  X,
+  Zap,
+  type LucideIcon,
+  type LucideProps,
+} from 'lucide-react'
 
-interface IconProps extends HTMLAttributes<HTMLSpanElement> {
-  name: string
+// Lucide icons the app uses. Importing them by name keeps the rest of the library
+// out of the bundle. To add one, import it above and list it here.
+const icons = {
+  'arrow-down': ArrowDown,
+  'arrow-left': ArrowLeft,
+  'arrow-right': ArrowRight,
+  'arrow-up': ArrowUp,
+  'ban': Ban,
+  'bed': Bed,
+  'book-open': BookOpen,
+  'bookmark': Bookmark,
+  'box': Box,
+  'cable': Cable,
+  'calculator': Calculator,
+  'calendar': Calendar,
+  'calendar-days': CalendarDays,
+  'calendar-x': CalendarX,
+  'chart-line': ChartLine,
+  'chart-pie': ChartPie,
+  'check': Check,
+  'chevron-down': ChevronDown,
+  'chevron-left': ChevronLeft,
+  'chevron-right': ChevronRight,
+  'chevron-up': ChevronUp,
+  'chevrons-up-down': ChevronsUpDown,
+  'circle': Circle,
+  'circle-alert': CircleAlert,
+  'circle-check': CircleCheck,
+  'circle-dot': CircleDot,
+  'circle-plus': CirclePlus,
+  'clock': Clock,
+  'cog': Cog,
+  'columns-3': Columns3,
+  'disc': Disc,
+  'dumbbell': Dumbbell,
+  'equal': Equal,
+  'external-link': ExternalLink,
+  'file-pen': FilePen,
+  'file-text': FileText,
+  'flag': Flag,
+  'flame': Flame,
+  'flower-2': Flower2,
+  'footprints': Footprints,
+  'funnel-x': FunnelX,
+  'globe': Globe,
+  'grip-horizontal': GripHorizontal,
+  'grip-vertical': GripVertical,
+  'heart': Heart,
+  'history': History,
+  'house': House,
+  'info': Info,
+  'key-round': KeyRound,
+  'layout-dashboard': LayoutDashboard,
+  'library': Library,
+  'lightbulb': Lightbulb,
+  'link': Link,
+  'list': List,
+  'list-plus': ListPlus,
+  'lock': Lock,
+  'log-out': LogOut,
+  'mail': Mail,
+  'map-pin-off': MapPinOff,
+  'menu': Menu,
+  'minus': Minus,
+  'pencil': Pencil,
+  'percent': Percent,
+  'person-standing': PersonStanding,
+  'play': Play,
+  'plus': Plus,
+  'quote': Quote,
+  'rotate-cw': RotateCw,
+  'ruler': Ruler,
+  'scale': Scale,
+  'search': Search,
+  'search-x': SearchX,
+  'settings': Settings,
+  'shield-user': ShieldUser,
+  'sliders-horizontal': SlidersHorizontal,
+  'spline': Spline,
+  'star': Star,
+  'timer': Timer,
+  'trash-2': Trash2,
+  'trending-down': TrendingDown,
+  'trending-up': TrendingUp,
+  'unlink': Unlink,
+  'user': User,
+  'user-plus': UserPlus,
+  'users': Users,
+  'volleyball': Volleyball,
+  'weight': Weight,
+  'x': X,
+  'zap': Zap,
+} satisfies Record<string, LucideIcon>
+
+export type IconName = keyof typeof icons
+
+// Solid versions only suit these outline shapes; others use a heavier stroke instead.
+const FILLABLE = new Set<IconName>(['bookmark', 'heart', 'play', 'star'])
+
+interface IconProps extends Omit<LucideProps, 'ref' | 'size'> {
+  name: IconName
   size?: number
   filled?: boolean
 }
 
-export default function Icon({ name, size = 24, filled = false, className = '', style, ...rest }: IconProps) {
+export default function Icon({ name, size = 24, filled = false, className = '', ...rest }: IconProps) {
+  const Glyph = icons[name]
+  const solid = filled && FILLABLE.has(name)
   return (
-    <span
+    <Glyph
       aria-hidden="true"
-      className={`material-symbols-outlined ${className}`}
-      style={{
-        fontSize: `${size}px`,
-        fontVariationSettings: `'FILL' ${filled ? 1 : 0}`,
-        ...style,
-      }}
+      size={size}
+      fill={solid ? 'currentColor' : 'none'}
+      strokeWidth={filled && !solid ? 2.5 : 2}
+      className={`inline-block shrink-0 align-[-0.125em] ${className}`}
       {...rest}
-    >
-      {name}
-    </span>
+    />
   )
 }

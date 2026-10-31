@@ -1,3 +1,4 @@
+import type { IconName } from '../components/ui/Icon'
 import type { DifficultyValue, PageQuery } from './shared'
 
 export type ExerciseCategoryValue =
@@ -77,7 +78,7 @@ export interface Exercise {
   image: string
   /** Natively 16:9, for square crops where `image`'s letterboxing would show. */
   imageWide: string
-  icon: string
+  icon: IconName
   muscleGroups: string[]
   /** Comma-separated names. */
   primaryMuscles: string

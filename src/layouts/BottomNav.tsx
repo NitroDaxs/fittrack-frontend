@@ -1,18 +1,24 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import Icon from '../components/ui/Icon'
+import Icon, { type IconName } from '../components/ui/Icon'
 
-const guestItems = [
-  { to: '/library', label: 'Library', icon: 'menu_book' },
-  { to: '/routines', label: 'Routines', icon: 'view_list' },
-  { to: '/calculators', label: 'Calculators', icon: 'calculate' },
-  { to: '/articles', label: 'Articles', icon: 'article' },
+interface NavItem {
+  to: string
+  label: string
+  icon: IconName
+}
+
+const guestItems: NavItem[] = [
+  { to: '/library', label: 'Library', icon: 'book-open' },
+  { to: '/routines', label: 'Routines', icon: 'list' },
+  { to: '/calculators', label: 'Calculators', icon: 'calculator' },
+  { to: '/articles', label: 'Articles', icon: 'file-text' },
 ]
 
-const memberItems = [
-  { to: '/dashboard', label: 'Workout', icon: 'fitness_center' },
+const memberItems: NavItem[] = [
+  { to: '/dashboard', label: 'Workout', icon: 'dumbbell' },
   { to: '/history', label: 'History', icon: 'history' },
-  { to: '/measurements', label: 'Stats', icon: 'monitoring' },
+  { to: '/measurements', label: 'Stats', icon: 'chart-line' },
   { to: '/profile', label: 'Settings', icon: 'settings' },
 ]
 

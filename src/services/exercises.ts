@@ -1,42 +1,40 @@
+import type { IconName } from '../components/ui/Icon'
 import { endpoints } from './endpoints'
 import { get } from './http'
 import type { Exercise, ExerciseCategoryValue, ExerciseDto, ExerciseForm, ExerciseQuery, ExerciseRequest, ExerciseStep } from '../types/exercises'
 import { capitalize, splitList, titleCase, toPage, toSlug, toSnake } from './shared'
 import type { DifficultyValue, PagedDto } from '../types/shared'
 
-// Material Symbols name per equipment type. Every glyph here was checked against
-// the loaded variable font -- an unknown name renders as the literal word rather
-// than an icon, so do not add one without verifying it exists (`kettlebell` and
-// `dumbbell`, for instance, do not).
+// Lucide icon per equipment type.
 //
 // Key order doubles as priority: an exercise usually lists several pieces of
 // equipment ("Barbell, Bench") and we want the one that characterises the
 // movement. Accessories that show up alongside everything sort last.
-const EQUIPMENT_ICONS: Record<string, string> = {
-  Landmine: 'rotate_right',
-  'Smith Machine': 'view_week',
+const EQUIPMENT_ICONS: Record<string, IconName> = {
+  Landmine: 'rotate-cw',
+  'Smith Machine': 'columns-3',
   'Cable Machine': 'cable',
-  'Pull-up Bar': 'sports_gymnastics',
-  'Dip Bar': 'drag_handle',
+  'Pull-up Bar': 'grip-horizontal',
+  'Dip Bar': 'equal',
   Kettlebell: 'weight',
-  'EZ-Bar': 'line_curve',
-  Barbell: 'fitness_center',
-  Dumbbell: 'exercise',
-  Machine: 'settings_input_component',
-  'Bosu Ball': 'trip_origin',
+  'EZ-Bar': 'spline',
+  Barbell: 'dumbbell',
+  Dumbbell: 'dumbbell',
+  Machine: 'cog',
+  'Bosu Ball': 'circle-dot',
   'Exercise Ball': 'circle',
-  'Medicine Ball': 'sports_volleyball',
+  'Medicine Ball': 'volleyball',
   'Suspension Straps': 'link',
-  Box: 'deployed_code',
-  'Weight Plate': 'album',
-  Bench: 'airline_seat_flat',
-  Mat: 'self_improvement',
-  Bodyweight: 'accessibility_new',
+  Box: 'box',
+  'Weight Plate': 'disc',
+  Bench: 'bed',
+  Mat: 'flower-2',
+  Bodyweight: 'person-standing',
 }
 
-function iconForEquipment(names: string[]): string {
+function iconForEquipment(names: string[]): IconName {
   const match = Object.keys(EQUIPMENT_ICONS).find((name) => names.includes(name))
-  return match ? EQUIPMENT_ICONS[match] : 'fitness_center'
+  return match ? EQUIPMENT_ICONS[match] : 'dumbbell'
 }
 
 // Admins may paste any of the usual YouTube URL shapes, so accept them all.

@@ -61,7 +61,7 @@ export function Pagination({ page, lastPage, onPageChange, className = 'mt-xl' }
                 aria-label="Previous page"
                 className="w-10 h-10 rounded-lg flex items-center justify-center border border-surface-variant text-secondary hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-                <Icon name="chevron_left" />
+                <Icon name="chevron-left" />
             </button>
 
             <span className="sm:hidden flex items-center px-md font-label-bold text-label-bold text-secondary">
@@ -102,7 +102,7 @@ export function Pagination({ page, lastPage, onPageChange, className = 'mt-xl' }
                 aria-label="Next page"
                 className="w-10 h-10 rounded-lg flex items-center justify-center border border-surface-variant text-secondary hover:bg-surface-container transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
-                <Icon name="chevron_right" />
+                <Icon name="chevron-right" />
             </button>
         </div>
     )

@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import Icon from '../components/ui/Icon'
+import ProfileMenu from './ProfileMenu'
 
 const publicLinks = [
   { to: '/library', label: 'Library' },
@@ -17,9 +18,8 @@ const memberLinks = [
 ]
 
 export default function TopNav() {
-  const { isAuthenticated, isAdmin, user, logout } = useAuth()
+  const { isAuthenticated } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
-  const navigate = useNavigate()
 
   const links = isAuthenticated ? [...publicLinks, ...memberLinks] : publicLinks
 
@@ -29,12 +29,6 @@ export default function TopNav() {
         ? 'text-primary border-b-2 border-primary'
         : 'text-secondary hover:text-primary-container border-b-2 border-transparent'
     }`
-
-  const handleLogout = () => {
-    logout()
-    setMenuOpen(false)
-    navigate('/')
-  }
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-surface shadow-sm">
@@ -55,44 +49,19 @@ export default function TopNav() {
           </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-sm">
+        <div className="flex items-center gap-sm">
           {isAuthenticated ? (
             <>
-              {isAdmin ? (
-                <Link
-                  to="/admin"
-                  className="font-label-bold text-label-bold text-secondary hover:text-primary-container px-sm py-xs transition-colors flex items-center gap-xs"
-                >
-                  <Icon name="shield_person" size={20} />
-                  Admin
-                </Link>
-              ) : null}
               <Link
                 to="/builder"
-                className="font-label-bold text-label-bold border border-outline text-on-surface px-md py-sm rounded-lg hover:bg-surface-container transition-colors"
+                className="hidden md:block font-label-bold text-label-bold border border-outline text-on-surface px-md py-sm rounded-lg hover:bg-surface-container transition-colors"
               >
                 Build a workout
               </Link>
-              <Link
-                to="/profile"
-                className="flex items-center gap-sm pl-sm font-label-bold text-label-bold text-on-surface hover:text-primary transition-colors"
-              >
-                <span className="w-9 h-9 rounded-full bg-primary-fixed text-on-primary-fixed-variant flex items-center justify-center font-bold">
-                  {(user?.name ?? 'A').charAt(0)}
-                </span>
-                {user?.name}
-              </Link>
-              <button
-                type="button"
-                onClick={handleLogout}
-                aria-label="Log out"
-                className="text-secondary hover:text-error p-xs rounded-full hover:bg-surface-container transition-colors"
-              >
-                <Icon name="logout" size={20} />
-              </button>
+              <ProfileMenu />
             </>
           ) : (
-            <>
+            <div className="hidden md:flex items-center gap-sm">
               <Link
                 to="/login"
                 className="font-label-bold text-label-bold text-secondary hover:text-primary-container px-sm py-xs transition-colors"
@@ -105,19 +74,19 @@ export default function TopNav() {
               >
                 Sign up free
               </Link>
-            </>
+            </div>
           )}
-        </div>
 
-        <button
-          type="button"
-          aria-label="Toggle menu"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((open) => !open)}
-          className="lg:hidden text-primary p-xs active:scale-95 transition-transform"
-        >
-          <Icon name={menuOpen ? 'close' : 'menu'} />
-        </button>
+          <button
+            type="button"
+            aria-label="Toggle menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((open) => !open)}
+            className="lg:hidden text-primary p-xs active:scale-95 transition-transform"
+          >
+            <Icon name={menuOpen ? 'x' : 'menu'} />
+          </button>
+        </div>
       </div>
 
       {menuOpen ? (
@@ -136,35 +105,8 @@ export default function TopNav() {
               {link.label}
             </NavLink>
           ))}
-          <div className="border-t border-surface-variant mt-sm pt-sm flex flex-col gap-sm">
-            {isAuthenticated ? (
-              <>
-                {isAdmin ? (
-                  <Link
-                    to="/admin"
-                    onClick={() => setMenuOpen(false)}
-                    className="font-label-bold text-label-bold py-sm px-sm rounded-lg text-on-surface hover:bg-surface-container"
-                  >
-                    Admin
-                  </Link>
-                ) : null}
-                <Link
-                  to="/profile"
-                  onClick={() => setMenuOpen(false)}
-                  className="font-label-bold text-label-bold py-sm px-sm rounded-lg text-on-surface hover:bg-surface-container"
-                >
-                  Profile
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="font-label-bold text-label-bold py-sm px-sm rounded-lg text-error text-left hover:bg-error-container"
-                >
-                  Log out
-                </button>
-              </>
-            ) : (
-              <>
+          {!isAuthenticated ? (
+            <div className="border-t border-surface-variant mt-sm pt-sm flex flex-col gap-sm">
                 <Link
                   to="/login"
                   onClick={() => setMenuOpen(false)}
@@ -179,9 +121,8 @@ export default function TopNav() {
                 >
                   Sign up free
                 </Link>
-              </>
-            )}
-          </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </nav>

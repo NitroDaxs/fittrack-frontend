@@ -57,7 +57,7 @@ export default function DataTable<TRow extends { id: number }>({ columns, rows, 
                     >
                       {column.header}
                       <Icon
-                        name={sort && active ? (sort.dir === 'asc' ? 'arrow_upward' : 'arrow_downward') : 'unfold_more'}
+                        name={sort && active ? (sort.dir === 'asc' ? 'arrow-up' : 'arrow-down') : 'chevrons-up-down'}
                         size={16}
                         className={active ? '' : 'opacity-40'}
                       />
@@ -119,7 +119,7 @@ export function RowActions({ onEdit, onDelete, editLabel = 'Edit', deleteLabel =
         title={editLabel}
         className="p-xs text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container"
       >
-        <Icon name="edit" size={20} />
+        <Icon name="pencil" size={20} />
       </button>
       <button
         type="button"
@@ -128,7 +128,7 @@ export function RowActions({ onEdit, onDelete, editLabel = 'Edit', deleteLabel =
         title={deleteLabel}
         className="p-xs text-on-surface-variant hover:text-error transition-colors rounded-full hover:bg-error-container"
       >
-        <Icon name="delete" size={20} />
+        <Icon name="trash-2" size={20} />
       </button>
     </div>
   )

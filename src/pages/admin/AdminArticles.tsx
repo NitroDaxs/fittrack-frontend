@@ -64,7 +64,7 @@ export default function AdminArticles() {
       render: (row) => (
         <span className="flex items-center gap-md">
           <span className="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center shrink-0 text-primary">
-            <Icon name="article" />
+            <Icon name="file-text" />
           </span>
           <span className="min-w-0">
             <span className="block font-medium text-on-surface truncate">{row.title}</span>
@@ -95,7 +95,7 @@ export default function AdminArticles() {
               : 'bg-surface-container text-on-surface-variant'
           }`}
         >
-          <Icon name={row.status === 'Published' ? 'check_circle' : 'edit_document'} size={14} />
+          <Icon name={row.status === 'Published' ? 'circle-check' : 'file-pen'} size={14} />
           {row.status}
         </span>
       ),

@@ -25,7 +25,7 @@ export function AdminHeader({ title, description, actionLabel, onAction }: Admin
           onClick={onAction}
           className="bg-primary-container text-on-primary font-label-bold text-label-bold px-lg py-md rounded-lg shadow-sm hover:bg-primary transition-colors flex items-center gap-sm w-full md:w-auto justify-center"
         >
-          <Icon name="add" size={20} />
+          <Icon name="plus" size={20} />
           {actionLabel}
         </button>
       ) : null}
@@ -75,7 +75,7 @@ export function AdminSelect({ label, value, onChange, options }: AdminSelectProp
         ))}
       </select>
       <Icon
-        name="expand_more"
+        name="chevron-down"
         size={20}
         className="absolute right-sm top-1/2 -translate-y-1/2 text-secondary pointer-events-none"
       />
@@ -93,7 +93,7 @@ export function Notice({ notice }: { notice: NoticeValue | null }) {
         isError ? 'bg-error-container text-on-error-container' : 'bg-primary-fixed text-on-primary-fixed-variant'
       }`}
     >
-      <Icon name={isError ? 'error' : 'check_circle'} size={18} filled />
+      <Icon name={isError ? 'circle-alert' : 'circle-check'} size={18} filled />
       {notice.message}
     </p>
   )

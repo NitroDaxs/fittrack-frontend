@@ -33,6 +33,7 @@ Core.
 | Build | Vite 8 |
 | Styling | Tailwind CSS 3 |
 | Charts | Recharts |
+| Icons | Lucide |
 | Hosting config | Vercel |
 
 ## Features
@@ -212,6 +213,8 @@ display conversion.
   `tailwind.config.js`.
 - **UI primitives:** reusable parts such as `DataTable`, `Modal`, `Pagination` and
   `Field` are in `components/ui/`.
+- **Icons:** `components/ui/Icon.tsx` lists the Lucide icons the app uses. Import and
+  list a new one there, then use it as `<Icon name="dumbbell" />`.
 - **Images:** `<Img>` falls back to a tinted icon tile if a URL stops resolving.
 - **Charts:** `MeasurementChart` uses a `ComposedChart` rather than an `AreaChart`,
   because `AreaChart` silently discards `Line` children. The consistency heatmap is

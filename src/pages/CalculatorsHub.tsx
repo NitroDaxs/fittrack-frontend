@@ -27,7 +27,7 @@ export default function CalculatorsHub() {
             <h2 className="font-headline-md text-headline-md text-on-surface mb-xs flex items-center gap-xs">
               {calculator.name}
               <Icon
-                name="arrow_forward"
+                name="arrow-right"
                 size={18}
                 className="text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all"
               />

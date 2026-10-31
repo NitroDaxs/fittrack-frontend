@@ -1,3 +1,4 @@
+import type { IconName } from './Icon'
 import { useState } from 'react'
 import Icon from './Icon'
 import Img from './Img'
@@ -14,11 +15,11 @@ interface VideoEmbedProps {
   videoId: string | null
   poster?: string
   title?: string
-  icon?: string
+  icon?: IconName
   className?: string
 }
 
-export default function VideoEmbed({ videoId, poster, title = '', icon = 'fitness_center', className = '' }: VideoEmbedProps) {
+export default function VideoEmbed({ videoId, poster, title = '', icon = 'dumbbell', className = '' }: VideoEmbedProps) {
   const [playing, setPlaying] = useState(false)
 
   // 16:9 matches both the player and YouTube's thumbnails. hqdefault is 4:3
@@ -51,7 +52,7 @@ export default function VideoEmbed({ videoId, poster, title = '', icon = 'fitnes
           className="absolute inset-0 flex items-center justify-center group focus:outline-none focus-visible:ring-4 focus-visible:ring-primary/50"
         >
           <span className="w-16 h-16 rounded-full bg-surface/90 backdrop-blur-sm flex items-center justify-center text-primary elev-overlay transition-transform duration-200 group-hover:scale-110 group-active:scale-95">
-            <Icon name="play_arrow" size={32} filled />
+            <Icon name="play" size={32} filled />
           </span>
         </button>
       ) : null}

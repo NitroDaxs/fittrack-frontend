@@ -100,7 +100,7 @@ export default function Signup() {
           <TextField
             label="Full Name"
             name="name"
-            icon="person"
+            icon="user"
             placeholder="Alex Alexson"
             autoComplete="name"
             value={values.name}
@@ -156,7 +156,7 @@ export default function Signup() {
             label="Confirm Password"
             name="confirm"
             type="password"
-            icon="lock_reset"
+            icon="key-round"
             placeholder="••••••••"
             autoComplete="new-password"
             value={values.confirm}
@@ -177,7 +177,7 @@ export default function Signup() {
             className="w-full flex justify-center items-center gap-xs py-sm px-md rounded-lg shadow-sm font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-colors duration-200 active:scale-[0.98] disabled:opacity-60"
           >
             {submitting ? 'Creating account…' : 'Create account'}
-            {!submitting ? <Icon name="arrow_forward" size={18} /> : null}
+            {!submitting ? <Icon name="arrow-right" size={18} /> : null}
           </button>
         </form>
 

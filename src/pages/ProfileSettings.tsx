@@ -23,7 +23,7 @@ export default function ProfileSettings() {
       {/* Identity */}
       <header className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant flex flex-col sm:flex-row items-center gap-lg mb-xl">
         <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-primary-container shrink-0">
-          <Img alt={profile.name} icon="person" />
+          <Img alt={profile.name} icon="user" />
         </div>
         <div className="text-center sm:text-left flex-1">
           <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">{profile.name}</h1>
@@ -73,7 +73,7 @@ export default function ProfileSettings() {
               to={`/library/${exercise.slug}`}
               className="bg-surface-container-lowest rounded-xl p-md elev-card border border-surface-variant hover:border-primary/40 transition-colors flex items-center gap-sm"
             >
-              <Icon name="favorite" size={20} className="text-primary-container shrink-0" filled />
+              <Icon name="heart" size={20} className="text-primary-container shrink-0" filled />
               <span className="min-w-0">
                 <span className="block font-label-bold text-label-bold text-on-surface truncate">{exercise.name}</span>
                 <span className="block font-label-sm text-label-sm text-secondary">{exercise.muscleGroups[0]}</span>
@@ -99,7 +99,7 @@ export default function ProfileSettings() {
 
           <div className="p-md flex items-center justify-between gap-md">
             <div className="flex items-center gap-md">
-              <Icon name="straighten" className="text-secondary shrink-0" />
+              <Icon name="ruler" className="text-secondary shrink-0" />
               <div>
                 <span className="block font-label-bold text-label-bold text-on-surface">Units</span>
                 <span className="block font-body-md text-body-md text-secondary">
@@ -137,7 +137,7 @@ export default function ProfileSettings() {
           }}
           className="mt-lg w-full flex items-center justify-center gap-sm border border-outline text-error font-label-bold text-label-bold py-md rounded-lg hover:bg-error-container transition-colors"
         >
-          <Icon name="logout" size={20} />
+          <Icon name="log-out" size={20} />
           Log out
         </button>
       </section>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import Icon from './ui/Icon'
+import Icon, { type IconName } from './ui/Icon'
 import Img from './ui/Img'
 import type { Article } from '../types/articles'
 import type { Exercise } from '../types/exercises'
@@ -58,12 +58,12 @@ const goalTone: Record<string, string> = {
   'General Fitness': 'bg-surface-container-high text-on-surface-variant',
 }
 
-const goalIcon: Record<string, string> = {
-  Strength: 'bolt',
-  Hypertrophy: 'fitness_center',
-  'Fat Loss': 'local_fire_department',
-  Endurance: 'directions_run',
-  'General Fitness': 'favorite',
+const goalIcon: Record<string, IconName> = {
+  Strength: 'zap',
+  Hypertrophy: 'dumbbell',
+  'Fat Loss': 'flame',
+  Endurance: 'footprints',
+  'General Fitness': 'heart',
 }
 
 export function RoutineCard({ routine }: { routine: Routine }) {
@@ -97,7 +97,7 @@ export function RoutineCard({ routine }: { routine: Routine }) {
             {routine.goal}
           </span>
           <span className="bg-surface-variant text-on-surface-variant px-sm py-xs rounded-full font-label-sm text-label-sm flex items-center gap-xs">
-            <Icon name="trending_up" size={16} />
+            <Icon name="trending-up" size={16} />
             {routine.level}
           </span>
         </div>
@@ -116,7 +116,7 @@ export function ArticleCard({ article, featured = false }: { article: Article; f
         <Img
           src={article.image}
           alt={article.title}
-          icon="article"
+          icon="file-text"
           imgClassName="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
       </div>
@@ -132,11 +132,11 @@ export function ArticleCard({ article, featured = false }: { article: Article; f
         <p className="font-body-md text-body-md text-secondary line-clamp-2 mb-md flex-grow">{article.excerpt}</p>
         <div className="flex items-center gap-md text-secondary font-label-sm text-label-sm mt-auto pt-sm border-t border-outline-variant/30">
           <span className="flex items-center gap-xs">
-            <Icon name="person" size={16} />
+            <Icon name="user" size={16} />
             {article.author}
           </span>
           <span className="flex items-center gap-xs">
-            <Icon name="schedule" size={16} />
+            <Icon name="clock" size={16} />
             {article.readMinutes} min read
           </span>
         </div>

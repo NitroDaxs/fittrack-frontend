@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import Icon from '../components/ui/Icon'
+import Icon, { type IconName } from '../components/ui/Icon'
+import ProfileMenu from './ProfileMenu'
 
-const navItems = [
-  { to: '/admin', label: 'Dashboard', icon: 'dashboard', end: true },
-  { to: '/admin/exercises', label: 'Exercises', icon: 'fitness_center' },
-  { to: '/admin/routines', label: 'Routines', icon: 'event_note' },
-  { to: '/admin/articles', label: 'Articles', icon: 'article' },
-  { to: '/admin/users', label: 'Users', icon: 'group' },
+const navItems: { to: string; label: string; icon: IconName; end?: boolean }[] = [
+  { to: '/admin', label: 'Dashboard', icon: 'layout-dashboard', end: true },
+  { to: '/admin/exercises', label: 'Exercises', icon: 'dumbbell' },
+  { to: '/admin/routines', label: 'Routines', icon: 'calendar-days' },
+  { to: '/admin/articles', label: 'Articles', icon: 'file-text' },
+  { to: '/admin/users', label: 'Users', icon: 'users' },
 ]
 
 export default function AdminLayout() {
-  const { user, logout } = useAuth()
+  const { logout } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
 
@@ -50,7 +51,7 @@ export default function AdminLayout() {
 
       <div className="mt-auto border-t border-outline-variant pt-md flex flex-col gap-xs">
         <NavLink to="/" className="flex items-center gap-3 px-md py-xs text-on-surface-variant hover:text-primary transition-colors rounded-lg">
-          <Icon name="public" size={20} />
+          <Icon name="globe" size={20} />
           <span className="font-label-bold text-label-bold">View site</span>
         </NavLink>
         <button
@@ -61,7 +62,7 @@ export default function AdminLayout() {
           }}
           className="flex items-center gap-3 px-md py-xs text-on-surface-variant hover:text-error transition-colors rounded-lg text-left"
         >
-          <Icon name="logout" size={20} />
+          <Icon name="log-out" size={20} />
           <span className="font-label-bold text-label-bold">Logout</span>
         </button>
       </div>
@@ -101,11 +102,7 @@ export default function AdminLayout() {
 
           <div className="hidden md:block" />
 
-          <div className="flex items-center gap-sm">
-            <span className="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center ml-sm border border-outline-variant font-label-bold text-label-bold">
-              {(user?.name ?? 'A').charAt(0)}
-            </span>
-          </div>
+          <ProfileMenu />
         </header>
 
         <div className="flex-1 p-margin-mobile md:p-margin-desktop overflow-auto">

@@ -50,7 +50,7 @@ export default function ArticlesListing() {
         </div>
       ) : articles.length === 0 ? (
         <EmptyState
-          icon="menu_book"
+          icon="book-open"
           title="No articles found"
           body="Try a different topic or clear the search box."
         />

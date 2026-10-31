@@ -125,7 +125,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
             onClick={addDay}
             className="flex items-center gap-xs font-label-bold text-label-sm border border-outline text-on-surface px-sm py-xs rounded-lg hover:bg-surface-container transition-colors"
           >
-            <Icon name="add" size={16} />
+            <Icon name="plus" size={16} />
             Add day
           </button>
         </div>
@@ -184,7 +184,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                   className="text-secondary hover:text-error p-sm rounded-lg hover:bg-error-container/40 transition-colors"
                   aria-label={`Remove ${current.name || 'day'}`}
                 >
-                  <Icon name="delete" size={20} />
+                  <Icon name="trash-2" size={20} />
                 </button>
               </div>
 
@@ -214,7 +214,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                           aria-label="Move up"
                           className="text-secondary hover:text-primary p-xs rounded disabled:opacity-30 disabled:pointer-events-none"
                         >
-                          <Icon name="arrow_upward" size={16} />
+                          <Icon name="arrow-up" size={16} />
                         </button>
                         <button
                           type="button"
@@ -223,7 +223,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                           aria-label="Move down"
                           className="text-secondary hover:text-primary p-xs rounded disabled:opacity-30 disabled:pointer-events-none"
                         >
-                          <Icon name="arrow_downward" size={16} />
+                          <Icon name="arrow-down" size={16} />
                         </button>
                         <button
                           type="button"
@@ -231,7 +231,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                           aria-label={`Remove ${entry.name}`}
                           className="text-secondary hover:text-error p-xs rounded"
                         >
-                          <Icon name="close" size={16} />
+                          <Icon name="x" size={16} />
                         </button>
                       </div>
 
@@ -317,7 +317,7 @@ export default function RoutineDayBuilder({ days, onChange, daysPerWeek }: Routi
                             disabled={already}
                             className="flex items-center gap-sm text-left px-sm py-xs rounded-lg border border-surface-variant hover:border-primary hover:text-primary transition-colors disabled:opacity-40 disabled:pointer-events-none"
                           >
-                            <Icon name={already ? 'check' : 'add'} size={16} />
+                            <Icon name={already ? 'check' : 'plus'} size={16} />
                             <span className="font-label-sm text-label-sm flex-1 truncate">{exercise.name}</span>
                             <span className="font-label-sm text-[10px] text-secondary truncate max-w-[40%]">
                               {exercise.primaryMuscles}

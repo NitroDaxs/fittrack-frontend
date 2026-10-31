@@ -1,3 +1,4 @@
+import type { IconName } from '../components/ui/Icon'
 import { useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { fieldErrorsOf } from '../services/http'
@@ -20,7 +21,7 @@ function validate(values: Values): Errors {
   return errors
 }
 
-function Notice({ icon, title, children, action, to }: { icon: string; title: string; children: ReactNode; action: string; to: string }) {
+function Notice({ icon, title, children, action, to }: { icon: IconName; title: string; children: ReactNode; action: string; to: string }) {
   return (
     <div className="text-center" role="status">
       <Icon name={icon} size={40} className="text-primary mb-sm" />
@@ -94,11 +95,11 @@ export default function ResetPassword() {
 
       <div className="w-full max-w-md bg-surface-container-lowest elev-card rounded-xl p-lg md:p-xl relative z-10 border border-surface-variant/50">
         {stage === 'done' ? (
-          <Notice icon="check_circle" title="Password updated" action="Log in" to="/login">
+          <Notice icon="circle-check" title="Password updated" action="Log in" to="/login">
             You can now log in with your new password.
           </Notice>
         ) : stage === 'invalid' ? (
-          <Notice icon="link_off" title="This link doesn't work" action="Request a new link" to="/forgot-password">
+          <Notice icon="unlink" title="This link doesn't work" action="Request a new link" to="/forgot-password">
             Reset links work once and expire after 60 minutes. Request a new one to continue.
           </Notice>
         ) : (

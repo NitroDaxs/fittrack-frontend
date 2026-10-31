@@ -66,7 +66,7 @@ export default function TdeeCalculator() {
         <form onSubmit={submit} noValidate className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant">
           <div className="flex flex-wrap items-center justify-between gap-sm mb-lg">
             <h2 className="font-headline-md text-headline-md text-on-surface flex items-center gap-xs">
-              <Icon name="tune" size={20} className="text-primary" />
+              <Icon name="sliders-horizontal" size={20} className="text-primary" />
               Your details
             </h2>
             <UnitToggle unit={unit} onChange={setUnit} />
@@ -97,7 +97,7 @@ export default function TdeeCalculator() {
                     </option>
                   ))}
                 </select>
-                <Icon name="expand_more" size={20} className="absolute right-sm top-1/2 -translate-y-1/2 text-secondary pointer-events-none" />
+                <Icon name="chevron-down" size={20} className="absolute right-sm top-1/2 -translate-y-1/2 text-secondary pointer-events-none" />
               </div>
               <FieldError message={errors.activity} />
             </div>
@@ -109,7 +109,7 @@ export default function TdeeCalculator() {
         <section className="flex flex-col gap-lg">
           <div className="bg-primary-fixed rounded-xl p-xl text-center border border-outline-variant">
             <span className="font-label-bold text-label-bold text-on-primary-fixed-variant uppercase tracking-widest flex items-center justify-center gap-xs">
-              <Icon name="bolt" size={18} />
+              <Icon name="zap" size={18} />
               Your Daily Calorie Needs
             </span>
             <p className="font-display-stat text-display-stat text-primary mt-sm">{result ? result.tdee.toLocaleString() : '—'}</p>
@@ -119,14 +119,14 @@ export default function TdeeCalculator() {
           <div className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant space-y-md">
             <div className="flex justify-between items-center">
               <span className="font-body-md text-body-md text-secondary flex items-center gap-xs">
-                <Icon name="pie_chart" size={18} />
+                <Icon name="chart-pie" size={18} />
                 Basal Metabolic Rate (BMR)
               </span>
               <span className="font-label-bold text-label-bold text-on-surface">{result ? `${result.bmr.toLocaleString()} kcal` : '—'}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="font-body-md text-body-md text-secondary flex items-center gap-xs">
-                <Icon name="directions_run" size={18} />
+                <Icon name="footprints" size={18} />
                 Activity Calories
               </span>
               <span className="font-label-bold text-label-bold text-on-surface">

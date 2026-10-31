@@ -69,7 +69,7 @@ export default function Modal({ open, title, description, onClose, children, foo
             aria-label="Close dialog"
             className="text-secondary hover:text-on-surface hover:bg-surface-container rounded-full p-xs transition-colors shrink-0"
           >
-            <Icon name="close" size={20} />
+            <Icon name="x" size={20} />
           </button>
         </header>
 

@@ -35,7 +35,7 @@ function Stepper({ label, value, step, onAdjust, onSet }: StepperProps) {
           aria-label={`Decrease ${label} by ${step}`}
           className="w-16 h-16 rounded-full bg-surface-container-low text-secondary flex items-center justify-center active:bg-surface-container-high active:scale-95 transition-all shadow-sm border border-surface-variant"
         >
-          <Icon name="remove" size={32} />
+          <Icon name="minus" size={32} />
         </button>
 
         <input
@@ -55,7 +55,7 @@ function Stepper({ label, value, step, onAdjust, onSet }: StepperProps) {
           aria-label={`Increase ${label} by ${step}`}
           className="w-16 h-16 rounded-full bg-surface-container-low text-secondary flex items-center justify-center active:bg-surface-container-high active:scale-95 transition-all shadow-sm border border-surface-variant"
         >
-          <Icon name="add" size={32} />
+          <Icon name="plus" size={32} />
         </button>
       </div>
     </div>
@@ -138,7 +138,7 @@ export default function ActiveWorkout() {
     return (
       <div className="max-w-md mx-auto px-margin-mobile py-xl text-center">
         <div className="w-20 h-20 rounded-full bg-primary-fixed text-primary flex items-center justify-center mx-auto mb-lg">
-          <Icon name="check_circle" size={40} filled />
+          <Icon name="circle-check" size={40} filled />
         </div>
         <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-sm">Workout complete</h1>
         <p className="font-body-md text-body-md text-secondary mb-xl">{session.name}</p>
@@ -204,7 +204,7 @@ export default function ActiveWorkout() {
             aria-label="Quit workout"
             className="text-secondary hover:bg-surface-container-high transition-colors p-sm rounded-full active:scale-95"
           >
-            <Icon name="close" />
+            <Icon name="x" />
           </button>
           <span className="font-label-bold text-label-bold text-primary">
             Exercise {session.exerciseIndex + 1} of {session.exercises.length}
@@ -284,7 +284,7 @@ export default function ActiveWorkout() {
                 }`}
               >
                 <Icon
-                  name={exercise.logged.length >= exercise.targetSets ? 'check_circle' : 'radio_button_unchecked'}
+                  name={exercise.logged.length >= exercise.targetSets ? 'circle-check' : 'circle'}
                   size={18}
                   filled={exercise.logged.length >= exercise.targetSets}
                 />
@@ -346,7 +346,7 @@ export default function ActiveWorkout() {
           onClick={handleComplete}
           className="w-full max-w-md bg-primary-container text-on-primary font-headline-md text-headline-md py-md rounded-xl shadow-lg active:scale-[0.98] transition-transform duration-150 flex items-center justify-center gap-sm hover:bg-primary"
         >
-          <Icon name="check_circle" filled />
+          <Icon name="circle-check" filled />
           Complete Set
         </button>
       </div>

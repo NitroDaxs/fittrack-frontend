@@ -9,10 +9,10 @@ const heroImage =
   'https://lh3.googleusercontent.com/aida-public/AB6AXuA2r1u89fi_WJDaENJkStZCajqT8QBjZ6jAsDJwxmlOFbNth1K6tXp_agWld0hazUAdWENSDwZH2UV1M3s1rIi3bzRGAH6tLMxOobPh_85W371_vwqHN-pfabSCjJuyCPjoxbfEq4DlsnKq1xayO_McgICgN9TSyzBI7lfhS8Q3XdX_IcGpxjiopo3bvnUS_WuQBbCMMhM1HYBqz0HBwTS9JY-jj0AehNadzcN6MnLDJ7wgFsrmhFv06dRzYSLAF4AaRkKCPfIKdYkP'
 
 const features = [
-  { icon: 'library_books', title: 'Exercise Library', body: 'Hundreds of movements with step-by-step instructions, videos, and difficulty ratings.', to: '/library' },
-  { icon: 'event_note', title: 'Proven Routines', body: 'Structured programmes for muscle gain, fat loss, strength, and endurance.', to: '/routines' },
-  { icon: 'monitoring', title: 'Progress Tracking', body: 'Strength curves, body measurements, and a consistency heatmap that keeps you honest.', to: '/dashboard' },
-  { icon: 'calculate', title: 'Training Calculators', body: 'Estimate your one-rep max and daily calorie needs in seconds.', to: '/calculators' },
+  { icon: 'library' as const, title: 'Exercise Library', body: 'Hundreds of movements with step-by-step instructions, videos, and difficulty ratings.', to: '/library' },
+  { icon: 'calendar-days' as const, title: 'Proven Routines', body: 'Structured programmes for muscle gain, fat loss, strength, and endurance.', to: '/routines' },
+  { icon: 'chart-line' as const, title: 'Progress Tracking', body: 'Strength curves, body measurements, and a consistency heatmap that keeps you honest.', to: '/dashboard' },
+  { icon: 'calculator' as const, title: 'Training Calculators', body: 'Estimate your one-rep max and daily calorie needs in seconds.', to: '/calculators' },
 ]
 
 export default function Home() {
@@ -43,7 +43,7 @@ export default function Home() {
                 className="font-label-bold text-label-bold bg-primary-container text-on-primary px-xl py-md rounded-lg hover:bg-primary transition-all active:scale-95 elev-card text-center flex items-center justify-center gap-xs"
               >
                 Start Tracking Now
-                <Icon name="arrow_forward" size={18} />
+                <Icon name="arrow-right" size={18} />
               </Link>
               <a
                 href="#features"
@@ -59,7 +59,7 @@ export default function Home() {
             <Img
               src={heroImage}
               alt="Athlete mid-workout in a modern gym"
-              icon="exercise"
+              icon="dumbbell"
               className="absolute inset-0 rounded-xl md:rounded-[32px] overflow-hidden"
               imgClassName="absolute inset-0 w-full h-full object-cover rounded-xl md:rounded-[32px] elev-overlay z-10"
             />
@@ -106,7 +106,7 @@ export default function Home() {
             to="/routines"
             className="hidden md:flex font-label-bold text-label-bold text-primary items-center gap-xs hover:text-primary-container transition-colors"
           >
-            View All <Icon name="arrow_forward" size={16} />
+            View All <Icon name="arrow-right" size={16} />
           </Link>
         </div>
 

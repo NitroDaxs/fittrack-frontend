@@ -1,3 +1,4 @@
+import type { IconName } from './Icon'
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
 import Icon from './Icon'
 
@@ -7,7 +8,7 @@ interface FieldProps {
 }
 
 interface TextFieldProps extends FieldProps, InputHTMLAttributes<HTMLInputElement> {
-  icon?: string
+  icon?: IconName
   hint?: string
 }
 
@@ -49,7 +50,7 @@ export function TextField({ label, icon, error, hint, id, className = '', ...pro
       </div>
       {error ? (
         <p id={`${fieldId}-error`} className="font-label-sm text-label-sm text-error mt-xs flex items-center gap-xs">
-          <Icon name="error" size={14} />
+          <Icon name="circle-alert" size={14} />
           {error}
         </p>
       ) : hint ? (
@@ -81,14 +82,14 @@ export function SelectField({ label, error, id, children, className = '', ...pro
           {children}
         </select>
         <Icon
-          name="expand_more"
+          name="chevron-down"
           size={20}
           className="absolute right-sm top-1/2 -translate-y-1/2 text-secondary pointer-events-none"
         />
       </div>
       {error ? (
         <p className="font-label-sm text-label-sm text-error mt-xs flex items-center gap-xs">
-          <Icon name="error" size={14} />
+          <Icon name="circle-alert" size={14} />
           {error}
         </p>
       ) : null}
@@ -113,7 +114,7 @@ export function TextAreaField({ label, error, id, className = '', ...props }: Te
       />
       {error ? (
         <p className="font-label-sm text-label-sm text-error mt-xs flex items-center gap-xs">
-          <Icon name="error" size={14} />
+          <Icon name="circle-alert" size={14} />
           {error}
         </p>
       ) : null}

@@ -1,7 +1,15 @@
 import { Link } from 'react-router-dom'
 import { ErrorState, Spinner } from '../../components/ui/States'
-import Icon from '../../components/ui/Icon'
+import Icon, { type IconName } from '../../components/ui/Icon'
 import { useAdminActivity, useAdminStats } from '../../hooks/useAdmin'
+
+// The API names each activity type's icon; these are the Lucide versions.
+const activityIcons: Record<string, IconName> = {
+  fitness_center: 'dumbbell',
+  article: 'file-text',
+  person_add: 'user-plus',
+  exercise: 'dumbbell',
+}
 
 const toneClasses = {
   primary: 'bg-primary-fixed text-primary-container',
@@ -19,10 +27,10 @@ export default function AdminDashboard() {
   if (!stats) return null
 
   const cards = [
-    { label: 'Total Exercises', value: stats.totalExercises, delta: stats.exerciseDelta, icon: 'fitness_center', to: '/admin/exercises', ring: 'bg-primary-fixed' },
-    { label: 'Total Routines', value: stats.totalRoutines, delta: stats.routineDelta, icon: 'event_note', to: '/admin/routines', ring: 'bg-secondary-fixed' },
-    { label: 'Published Articles', value: stats.publishedArticles, delta: stats.articleDelta, icon: 'article', to: '/admin/articles', ring: 'bg-tertiary-fixed' },
-    { label: 'Total Users', value: stats.totalUsers, delta: stats.userDelta, icon: 'group', to: '/admin/users', ring: 'bg-error-container' },
+    { label: 'Total Exercises', value: stats.totalExercises, delta: stats.exerciseDelta, icon: 'dumbbell' as const, to: '/admin/exercises', ring: 'bg-primary-fixed' },
+    { label: 'Total Routines', value: stats.totalRoutines, delta: stats.routineDelta, icon: 'calendar-days' as const, to: '/admin/routines', ring: 'bg-secondary-fixed' },
+    { label: 'Published Articles', value: stats.publishedArticles, delta: stats.articleDelta, icon: 'file-text' as const, to: '/admin/articles', ring: 'bg-tertiary-fixed' },
+    { label: 'Total Users', value: stats.totalUsers, delta: stats.userDelta, icon: 'users' as const, to: '/admin/users', ring: 'bg-error-container' },
   ]
 
   return (
@@ -52,7 +60,7 @@ export default function AdminDashboard() {
               <p className="font-display-stat text-display-stat text-on-surface">{card.value}</p>
               <p className="font-label-sm text-label-sm text-tertiary flex items-center gap-1 mt-1">
                 <Icon
-                  name={card.delta.startsWith('+') ? 'arrow_upward' : 'horizontal_rule'}
+                  name={card.delta.startsWith('+') ? 'arrow-up' : 'minus'}
                   size={16}
                   className={card.delta.startsWith('+') ? 'text-primary' : 'text-secondary'}
                 />
@@ -77,7 +85,7 @@ export default function AdminDashboard() {
                 <span
                   className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 mt-1 ${toneClasses[item.tone]}`}
                 >
-                  <Icon name={item.icon} size={20} />
+                  <Icon name={activityIcons[item.icon] ?? 'circle'} size={20} />
                 </span>
                 <span className="flex-1">
                   <span className="block font-body-md text-body-md text-on-surface">{item.text}</span>
@@ -108,9 +116,9 @@ export default function AdminDashboard() {
             <h2 className="font-headline-md text-headline-md text-on-surface mb-md">Quick actions</h2>
             <div className="flex flex-col gap-sm">
               {[
-                { to: '/admin/exercises', label: 'Add an exercise', icon: 'fitness_center' },
-                { to: '/admin/routines', label: 'Create a routine', icon: 'event_note' },
-                { to: '/admin/articles', label: 'Draft an article', icon: 'article' },
+                { to: '/admin/exercises', label: 'Add an exercise', icon: 'dumbbell' as const },
+                { to: '/admin/routines', label: 'Create a routine', icon: 'calendar-days' as const },
+                { to: '/admin/articles', label: 'Draft an article', icon: 'file-text' as const },
               ].map((action) => (
                 <Link
                   key={action.to}
@@ -119,7 +127,7 @@ export default function AdminDashboard() {
                 >
                   <Icon name={action.icon} size={20} className="text-primary" />
                   {action.label}
-                  <Icon name="chevron_right" size={18} className="ml-auto text-secondary" />
+                  <Icon name="chevron-right" size={18} className="ml-auto text-secondary" />
                 </Link>
               ))}
             </div>

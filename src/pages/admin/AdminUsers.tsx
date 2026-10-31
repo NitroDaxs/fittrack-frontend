@@ -129,7 +129,7 @@ export default function AdminUsers() {
             title={row.status === 'Suspended' ? 'Reinstate' : 'Suspend'}
             className="p-xs text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container"
           >
-            <Icon name={row.status === 'Suspended' ? 'check_circle' : 'block'} size={20} />
+            <Icon name={row.status === 'Suspended' ? 'circle-check' : 'ban'} size={20} />
           </button>
           <RowActions onEdit={() => crud.setEditing(row)} onDelete={() => crud.setDeleting(row)} />
         </span>

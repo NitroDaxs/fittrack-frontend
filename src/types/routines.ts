@@ -1,3 +1,4 @@
+import type { IconName } from '../components/ui/Icon'
 import type { Exercise, ExerciseDto } from './exercises'
 import type { DifficultyValue, PageQuery } from './shared'
 
@@ -87,7 +88,7 @@ export interface Routine {
   level: string
   daysPerWeek: number
   isPublic: boolean
-  icon: string
+  icon: IconName
   days: RoutineDay[]
 }
 

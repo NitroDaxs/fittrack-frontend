@@ -1,10 +1,11 @@
+import type { IconName } from './Icon'
 import { useState } from 'react'
 import Icon from './Icon'
 
 interface ImgProps {
   src?: string | null
   alt?: string
-  icon?: string
+  icon?: IconName
   className?: string
   imgClassName?: string
 }
@@ -13,7 +14,7 @@ interface ImgProps {
  * Image with a themed fallback: a missing or failed URL shows a tinted tile with
  * the exercise/routine icon rather than a broken-image glyph.
  */
-export default function Img({ src, alt = '', icon = 'fitness_center', className = '', imgClassName = '' }: ImgProps) {
+export default function Img({ src, alt = '', icon = 'dumbbell', className = '', imgClassName = '' }: ImgProps) {
   const [failed, setFailed] = useState(!src)
 
   if (failed) {

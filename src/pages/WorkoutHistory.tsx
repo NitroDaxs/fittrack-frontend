@@ -66,7 +66,7 @@ export default function WorkoutHistory() {
             />
             <div className="relative w-full md:w-56">
               <Icon
-                  name="calendar_today"
+                  name="calendar"
                   size={20}
                   className="absolute left-sm top-1/2 -translate-y-1/2 text-secondary pointer-events-none"
               />
@@ -83,7 +83,7 @@ export default function WorkoutHistory() {
                 ))}
               </select>
               <Icon
-                  name="expand_more"
+                  name="chevron-down"
                   size={20}
                   className="absolute right-sm top-1/2 -translate-y-1/2 text-secondary pointer-events-none"
               />
@@ -97,7 +97,7 @@ export default function WorkoutHistory() {
             <Spinner label="Loading workouts" />
         ) : workouts.length === 0 ? (
             <EmptyState
-                icon="history_toggle_off"
+                icon="history"
                 title="No workouts in this range"
                 body="Try widening the date filter or clearing your search."
             />
@@ -114,7 +114,7 @@ export default function WorkoutHistory() {
                         <div className="p-md flex flex-col md:flex-row md:items-center justify-between gap-md">
                           <div className="flex items-start gap-md min-w-0">
                       <span className="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center shrink-0 text-primary">
-                        <Icon name="fitness_center" />
+                        <Icon name="dumbbell" />
                       </span>
                             <div className="min-w-0">
                               <h2 className="font-headline-md text-body-lg md:text-headline-md text-on-surface mb-xs group-hover:text-primary transition-colors truncate">
@@ -136,7 +136,7 @@ export default function WorkoutHistory() {
                                 className="font-label-bold text-label-bold text-primary-container hover:text-primary transition-colors flex items-center gap-1 md:mt-sm"
                             >
                               {expanded ? 'Hide details' : 'View Details'}
-                              <Icon name={expanded ? 'expand_less' : 'chevron_right'} size={18} />
+                              <Icon name={expanded ? 'chevron-up' : 'chevron-right'} size={18} />
                             </button>
                           </div>
                         </div>

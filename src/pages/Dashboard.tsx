@@ -48,21 +48,21 @@ export default function Dashboard() {
             onClick={() => navigate('/builder')}
             className="flex items-center gap-sm bg-primary text-on-primary font-label-bold text-label-bold px-lg py-md rounded-lg elev-card hover:bg-surface-tint transition-colors"
           >
-            <Icon name="play_arrow" size={20} filled />
+            <Icon name="play" size={20} filled />
             Start a workout
           </button>
           <Link
             to="/measurements"
             className="flex items-center gap-sm border border-outline text-on-surface font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-surface-container transition-colors"
           >
-            <Icon name="add" size={20} />
+            <Icon name="plus" size={20} />
             Log measurements
           </Link>
           <Link
             to="/builder"
             className="flex items-center gap-sm border border-outline text-on-surface font-label-bold text-label-bold px-lg py-md rounded-lg hover:bg-surface-container transition-colors"
           >
-            <Icon name="construction" size={20} />
+            <Icon name="list-plus" size={20} />
             Build a workout
           </Link>
         </div>
@@ -99,7 +99,7 @@ export default function Dashboard() {
                 Strength Progression{strength ? ` — ${strength.lift}` : ''}
               </h2>
               <p className="font-label-sm text-label-sm text-secondary mt-xs flex items-center gap-xs">
-                <Icon name={delta >= 0 ? 'trending_up' : 'trending_down'} size={16} className="text-primary" />
+                <Icon name={delta >= 0 ? 'trending-up' : 'trending-down'} size={16} className="text-primary" />
                 {delta >= 0 ? '+' : ''}
                 {delta} {weightLabel} since your first logged session
               </p>
@@ -114,7 +114,7 @@ export default function Dashboard() {
           <div className="mb-lg">
             <h2 className="font-headline-md text-headline-md text-on-surface">Body Weight</h2>
             <p className="font-label-sm text-label-sm text-secondary mt-xs flex items-center gap-xs">
-              <Icon name={weightDelta <= 0 ? 'arrow_downward' : 'arrow_upward'} size={16} className="text-primary" />
+              <Icon name={weightDelta <= 0 ? 'arrow-down' : 'arrow-up'} size={16} className="text-primary" />
               {weightDelta} {weightLabel} across your recent entries
             </p>
           </div>
@@ -148,7 +148,7 @@ export default function Dashboard() {
               className="bg-surface-container-lowest rounded-xl p-md elev-card border border-surface-variant hover:border-primary/40 transition-colors flex items-center gap-md"
             >
               <span className="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center text-primary shrink-0">
-                <Icon name="fitness_center" />
+                <Icon name="dumbbell" />
               </span>
               <span className="min-w-0">
                 <span className="block font-label-bold text-label-bold text-on-surface truncate">{workout.name}</span>

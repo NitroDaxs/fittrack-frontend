@@ -90,7 +90,7 @@ export default function ExerciseLibrary() {
               onClick={clearAll}
               className="font-label-bold text-label-bold text-primary hover:text-primary-container transition-colors flex items-center gap-xs"
             >
-              <Icon name="filter_alt_off" size={18} />
+              <Icon name="funnel-x" size={18} />
               Clear filters
             </button>
           </div>

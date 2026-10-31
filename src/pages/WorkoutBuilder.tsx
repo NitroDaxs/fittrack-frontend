@@ -132,7 +132,7 @@ export default function WorkoutBuilder() {
                             {exercise.muscleGroups.join(', ')} • {exercise.equipment}
                           </span>
                         </span>
-                        <Icon name="add_circle" size={22} className="text-primary shrink-0" />
+                        <Icon name="circle-plus" size={22} className="text-primary shrink-0" />
                       </button>
                     </li>
                   ))}
@@ -147,7 +147,7 @@ export default function WorkoutBuilder() {
       {draft.items.length === 0 ? (
         <div className="bg-surface-container-lowest rounded-xl border border-dashed border-outline-variant">
           <EmptyState
-            icon="playlist_add"
+            icon="list-plus"
             title="No exercises yet"
             body="Search the library above and pick a few movements. You can set targets and reorder them afterwards."
           />
@@ -185,7 +185,7 @@ export default function WorkoutBuilder() {
                   title="Drag to reorder"
                   aria-hidden="true"
                 >
-                  <Icon name="drag_indicator" />
+                  <Icon name="grip-vertical" />
                 </span>
 
                 {/* Keyboard/touch fallback for reordering */}
@@ -197,7 +197,7 @@ export default function WorkoutBuilder() {
                     aria-label={`Move ${item.name} up`}
                     className="text-secondary hover:text-primary disabled:opacity-30 disabled:hover:text-secondary transition-colors leading-none"
                   >
-                    <Icon name="keyboard_arrow_up" size={18} />
+                    <Icon name="chevron-up" size={18} />
                   </button>
                   <button
                     type="button"
@@ -206,7 +206,7 @@ export default function WorkoutBuilder() {
                     aria-label={`Move ${item.name} down`}
                     className="text-secondary hover:text-primary disabled:opacity-30 disabled:hover:text-secondary transition-colors leading-none"
                   >
-                    <Icon name="keyboard_arrow_down" size={18} />
+                    <Icon name="chevron-down" size={18} />
                   </button>
                 </span>
 
@@ -239,7 +239,7 @@ export default function WorkoutBuilder() {
                   aria-label={`Remove ${item.name}`}
                   className="md:hidden text-outline hover:text-error transition-colors p-2 shrink-0"
                 >
-                  <Icon name="close" />
+                  <Icon name="x" />
                 </button>
               </div>
 
@@ -261,7 +261,7 @@ export default function WorkoutBuilder() {
                   aria-label={`Remove ${item.name}`}
                   className="hidden md:flex text-outline hover:text-error transition-colors p-2 ml-2"
                 >
-                  <Icon name="close" />
+                  <Icon name="x" />
                 </button>
               </div>
             </li>
@@ -293,7 +293,7 @@ export default function WorkoutBuilder() {
             disabled={draft.items.length === 0}
             className="flex-1 bg-primary-container text-on-primary py-md rounded-xl font-label-bold text-label-bold active:scale-[0.98] transition-transform shadow-md hover:bg-primary disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-sm"
           >
-            <Icon name="play_arrow" size={20} filled />
+            <Icon name="play" size={20} filled />
             Start workout
           </button>
         </div>

@@ -16,7 +16,7 @@ export function FieldError({ message }: { message?: string }) {
   if (!message) return null
   return (
     <p role="alert" className="font-label-sm text-label-sm text-error mt-xs flex items-center gap-xs">
-      <Icon name="error" size={14} />
+      <Icon name="circle-alert" size={14} />
       {message}
     </p>
   )
@@ -152,7 +152,7 @@ export function CalculateButton({ pending }: { pending: boolean }) {
       disabled={pending}
       className="w-full flex justify-center items-center gap-sm py-sm px-md rounded-lg shadow-sm font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-colors active:scale-[0.98] disabled:opacity-60"
     >
-      <Icon name="calculate" size={20} />
+      <Icon name="calculator" size={20} />
       {pending ? 'Calculating…' : 'Calculate'}
     </button>
   )
@@ -175,7 +175,7 @@ export function CalculatorHeader({ title, description, action }: { title: string
         to="/calculators"
         className="inline-flex items-center gap-xs font-label-bold text-label-bold text-secondary hover:text-primary transition-colors mb-lg"
       >
-        <Icon name="arrow_back" size={20} />
+        <Icon name="arrow-left" size={20} />
         Calculators
       </Link>
       <header className="mb-xl flex flex-wrap items-start justify-between gap-md">
