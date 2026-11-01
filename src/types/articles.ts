@@ -38,6 +38,8 @@ export interface ArticleRequest {
   status: ArticleStatusValue
   /** Left out on edit to keep the current content. The API splits prose into blocks. */
   body?: string
+  /** An empty string removes the image. */
+  image_url: string
 }
 
 export interface Article {
@@ -60,6 +62,7 @@ export interface ArticleForm {
   body: string
   category: string
   status: string
+  imageUrl: string
 }
 
 export interface ArticleQuery extends PageQuery {

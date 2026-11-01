@@ -18,6 +18,7 @@ const blankArticle: ArticleForm = {
   body: '',
   category: 'Training Theory',
   status: 'Draft',
+  imageUrl: '',
 }
 
 type FormErrors = Partial<Record<keyof ArticleForm, string>>
@@ -42,7 +43,7 @@ export default function AdminArticles() {
     if (!crud.editing) return
     const row = crud.editingRow
     // The list has no article bodies, so editing starts with an empty body box.
-    setForm(row ? { title: row.title, body: '', category: row.category, status: row.status } : blankArticle)
+    setForm(row ? { title: row.title, body: '', category: row.category, status: row.status, imageUrl: row.image } : blankArticle)
     setErrors({})
   }, [crud.editing, crud.editingRow])
 
@@ -200,6 +201,15 @@ export default function AdminArticles() {
             onChange={setField('body')}
             error={errors.body ?? crud.fieldErrors.body}
             rows={8}
+          />
+          <TextField
+            label={t('admin.articles.imageUrl')}
+            name="imageUrl"
+            type="url"
+            value={form.imageUrl}
+            onChange={setField('imageUrl')}
+            error={crud.fieldErrors.image_url}
+            placeholder="https://images.unsplash.com/photo-..."
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
             <SelectField label={t('common.category')} name="category" value={form.category} onChange={setField('category')}>

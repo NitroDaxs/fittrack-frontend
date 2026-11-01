@@ -28,6 +28,7 @@ export function toArticleRequest(form: ArticleForm): ArticleRequest {
     category: toSnake(form.category) as ArticleCategoryValue,
     status: toSlug(form.status) as ArticleStatusValue,
     ...(body ? { body } : {}),
+    image_url: form.imageUrl.trim(),
   }
 }
 

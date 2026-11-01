@@ -104,8 +104,8 @@ export default function ArticleDetail() {
           </div>
         </header>
 
-        {/* Articles have no image column yet, so skip the hero entirely rather
-            than reserving 24rem for a placeholder icon. */}
+        {/* The image is optional, so skip the hero rather than reserving 24rem
+            for a placeholder icon. */}
         {article.image ? (
           <div className="rounded-xl overflow-hidden h-64 md:h-96 mb-xl elev-card bg-surface-container-high">
             <Img src={article.image} alt="" icon="file-text" imgClassName="w-full h-full object-cover" />

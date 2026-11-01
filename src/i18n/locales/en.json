@@ -86,6 +86,7 @@
       "date": "Date",
       "draft": "Draft",
       "editArticle": "Edit article",
+      "imageUrl": "Image URL",
       "leaveTheBodyEmptyToKeep": "Leave the body empty to keep the current content.",
       "loadingArticles": "Loading articles",
       "manageArticles": "Manage Articles",
