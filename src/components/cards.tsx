@@ -77,6 +77,7 @@ export function RoutineCard({ routine }: { routine: Routine }) {
     >
       <div className="h-40 bg-surface-container-low relative">
         <Img
+          src={routine.image}
           alt={routine.title}
           icon={routine.icon}
           imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

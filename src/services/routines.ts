@@ -33,6 +33,7 @@ export function toRoutine(raw: RoutineDto): Routine {
     daysPerWeek: raw.days_per_week,
     isPublic: raw.is_public,
     icon: 'calendar-days',
+    image: raw.image_url ?? '',
     days: (raw.workouts ?? []).map(toRoutineDay),
   }
 }
@@ -61,6 +62,7 @@ export function toRoutineRequest(form: RoutineForm): RoutineRequest {
     level: toSlug(form.level) as DifficultyValue,
     days_per_week: Number(form.daysPerWeek),
     is_public: form.isPublic,
+    image_url: form.imageUrl.trim(),
     // A metadata-only edit must not wipe an existing programme.
     ...(form.days.length > 0
       ? {

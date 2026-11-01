@@ -40,6 +40,7 @@ export interface RoutineDto {
   is_published: boolean
   created_at: string
   creator: CreatorDto | null
+  image_url: string | null
   /** Only on detail responses. */
   workouts?: WorkoutDto[]
 }
@@ -60,6 +61,8 @@ export interface RoutineRequest {
   level: DifficultyValue
   days_per_week: number
   is_public: boolean
+  /** An empty string removes the image. */
+  image_url: string
   /** Left out when unchanged: the API treats a missing key as "keep the schedule". */
   days?: { name: string; exercises: RoutineDayExerciseRequest[] }[]
 }
@@ -89,6 +92,7 @@ export interface Routine {
   daysPerWeek: number
   isPublic: boolean
   icon: IconName
+  image: string
   days: RoutineDay[]
 }
 
@@ -115,6 +119,7 @@ export interface RoutineForm {
   level: string
   daysPerWeek: number | string
   isPublic: boolean
+  imageUrl: string
   days: ProgrammeDay[]
 }
 

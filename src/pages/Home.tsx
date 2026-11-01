@@ -7,8 +7,7 @@ import Img from '../components/ui/Img'
 import { useRoutines } from '../hooks/useRoutines'
 
 const heroImage =
-  'https://lh3.googleusercontent.com/aida-public/AB6AXuA2r1u89fi_WJDaENJkStZCajqT8QBjZ6jAsDJwxmlOFbNth1K6tXp_agWld0hazUAdWENSDwZH2UV1M3s1rIi3bzRGAH6tLMxOobPh_85W371_vwqHN-pfabSCjJuyCPjoxbfEq4DlsnKq1xayO_McgICgN9TSyzBI7lfhS8Q3XdX_IcGpxjiopo3bvnUS_WuQBbCMMhM1HYBqz0HBwTS9JY-jj0AehNadzcN6MnLDJ7wgFsrmhFv06dRzYSLAF4AaRkKCPfIKdYkP'
-
+  'https://images.unsplash.com/photo-1712220403561-bcf3f59d5927?auto=format&fit=crop&w=1600&h=1400&q=80'
 const features = [
   { icon: 'library' as const, title: 'common.exerciseLibrary', body: 'home.hundredsOfMovementsWithStepBy', to: '/library' },
   { icon: 'calendar-days' as const, title: 'home.provenRoutines', body: 'home.structuredProgrammesForMuscleGainFat', to: '/routines' },
@@ -24,11 +23,11 @@ export default function Home() {
   return (
     <div className="overflow-x-hidden">
       {/* Hero */}
-      <header className="relative bg-surface-container-low pb-xl pt-lg md:pt-xl overflow-hidden [clip-path:polygon(0_0,100%_0,100%_90%,0_100%)]">
+      <header className="relative bg-surface-container-low pb-xl md:pb-[88px] pt-lg md:pt-xl overflow-hidden [clip-path:polygon(0_0,100%_0,100%_90%,0_100%)]">
         <div className="absolute top-0 right-0 w-1/2 h-full opacity-10 pointer-events-none bg-gradient-to-bl from-primary-container via-surface to-background blur-3xl" />
         <div className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 md:grid-cols-2 gap-xl items-center relative z-10">
           <div className="flex flex-col gap-lg order-2 md:order-1">
-            <span className="font-label-bold text-label-bold text-primary uppercase tracking-widest">{t('home.achieveMore')}</span>
+            <span className="font-label-bold text-label-bold text-primary uppercase tracking-widest">{t('home.allInOneTool')}</span>
             <h1 className="font-display-stat text-headline-lg md:text-display-stat text-on-surface">
               {t('home.yourUltimate')}{' '}<br className="hidden md:block" />
               <span className="bg-gradient-to-r from-primary-container to-primary bg-clip-text text-transparent">
@@ -59,7 +58,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-primary-container/5 rounded-xl md:rounded-[40px] rotate-3" />
             <Img
               src={heroImage}
-              alt={t('home.athleteMidWorkoutInAModern')}
+              alt={t('home.fullyEquippedModernGym')}
               icon="dumbbell"
               className="absolute inset-0 rounded-xl md:rounded-[32px] overflow-hidden"
               imgClassName="absolute inset-0 w-full h-full object-cover rounded-xl md:rounded-[32px] elev-overlay z-10"

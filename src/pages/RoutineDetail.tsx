@@ -44,7 +44,7 @@ export default function RoutineDetail() {
 
       <header className="relative rounded-xl overflow-hidden mb-xl elev-card">
         <div className="absolute inset-0">
-          <Img alt="" icon={routine.icon} imgClassName="w-full h-full object-cover" />
+          <Img src={routine.image} alt="" icon={routine.icon} imgClassName="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/55 to-black/25" />
         </div>
         <div className="relative z-10 p-lg md:p-xl flex flex-col justify-end min-h-[280px]">

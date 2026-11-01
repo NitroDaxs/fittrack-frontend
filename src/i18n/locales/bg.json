@@ -9,6 +9,7 @@
       "daysPerWeek": "Дни в седмицата",
       "describeTheProgrammeInASentence": "Опишете програмата с едно изречение.",
       "editRoutine": "Редактиране на програма",
+      "imageUrl": "URL на изображение",
       "level": "Ниво",
       "loadingRoutines": "Зареждане на програмите",
       "manageRoutines": "Управление на програми",
@@ -359,8 +360,8 @@
     "pictureRemoved": "Снимката ви е премахната."
   },
   "home": {
-    "achieveMore": "Постигайте повече",
-    "athleteMidWorkoutInAModern": "Спортист по време на тренировка в модерен фитнес",
+    "allInOneTool": "Вашият фитнес инструмент „всичко в едно“",
+    "fullyEquippedModernGym": "Модерен, напълно оборудван фитнес",
     "curatedProgramsToAccelerateYourProgress": "Подбрани програми за по-бърз напредък.",
     "dataDrivenInsightsMeetsHighOctane": "Анализ на данните среща силна мотивация. Записвайте тренировки, създавайте програми и поставяйте нови лични рекорди с точно проследяване за спортисти.",
     "estimateYourOneRepMaxAnd": "Изчислете максимума си за едно повторение и дневните си калории за секунди.",

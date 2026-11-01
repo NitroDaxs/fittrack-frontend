@@ -9,6 +9,7 @@
       "daysPerWeek": "Days per week",
       "describeTheProgrammeInASentence": "Describe the programme in a sentence.",
       "editRoutine": "Edit routine",
+      "imageUrl": "Image URL",
       "level": "Level",
       "loadingRoutines": "Loading routines",
       "manageRoutines": "Manage Routines",
@@ -359,8 +360,8 @@
     "pictureRemoved": "Your picture has been removed."
   },
   "home": {
-    "achieveMore": "Achieve More",
-    "athleteMidWorkoutInAModern": "Athlete mid-workout in a modern gym",
+    "allInOneTool": "Your all-in-one fitness tool",
+    "fullyEquippedModernGym": "A fully equipped modern gym",
     "curatedProgramsToAccelerateYourProgress": "Curated programs to accelerate your progress.",
     "dataDrivenInsightsMeetsHighOctane": "Data-driven insights meets high-octane motivation. Track workouts, build routines, and hit new PRs with precision tracking built for athletes.",
     "estimateYourOneRepMaxAnd": "Estimate your one-rep max and daily calorie needs in seconds.",

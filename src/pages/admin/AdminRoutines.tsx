@@ -23,6 +23,7 @@ const blankRoutine: RoutineForm = {
   level: 'Beginner',
   daysPerWeek: 3,
   isPublic: true,
+  imageUrl: '',
   days: [],
 }
 
@@ -63,6 +64,7 @@ export default function AdminRoutines() {
             level: row.level,
             daysPerWeek: row.daysPerWeek,
             isPublic: row.isPublic,
+            imageUrl: row.image,
             days: [],
           }
         : blankRoutine,
@@ -220,6 +222,15 @@ export default function AdminRoutines() {
             value={form.description}
             onChange={setField('description')}
             error={errors.description}
+          />
+          <TextField
+            label={t('admin.routines.imageUrl')}
+            name="imageUrl"
+            type="url"
+            value={form.imageUrl}
+            onChange={setField('imageUrl')}
+            error={crud.fieldErrors.image_url}
+            placeholder="https://images.unsplash.com/photo-..."
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
             <SelectField label={t('common.goal')} name="goal" value={form.goal} onChange={setField('goal')}>
