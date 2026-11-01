@@ -22,7 +22,7 @@ export default function SearchInput({ value, onChange, placeholder, className = 
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder ?? t('ui.search')}
         aria-label={placeholder}
-        className="w-full bg-surface-container-low border-none rounded-lg pl-xl pr-md py-sm focus:ring-2 focus:ring-primary focus:bg-surface transition-all text-on-background font-body-md shadow-sm outline-none"
+        className="w-full bg-surface-container-low border-none rounded-lg pl-xl pr-md py-sm focus:ring-2 focus:ring-primary focus:bg-surface transition-all text-on-background font-body-md shadow-sm outline-none [&::-webkit-search-cancel-button]:appearance-none"
         {...rest}
       />
       {value ? (
