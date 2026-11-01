@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import Icon from './Icon'
+import {useEffect} from "react";
 
 type PageItem = { key: number; page: number } | { key: string; gap: true }
 
@@ -51,6 +52,12 @@ interface PaginationProps {
  * only one page. `onPageChange` always receives the new page number.
  */
 export function Pagination({ page, lastPage, onPageChange, className = 'mt-xl' }: PaginationProps) {
+    useEffect(() => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // or 'auto' for instant
+        });
+    }, [page]);
   const { t } = useTranslation()
     if (lastPage <= 1) return null
 

@@ -12,7 +12,7 @@ import { useDebounced } from '../hooks/useDebounced'
 import { useExercises } from '../hooks/useExercises'
 import { useTaxonomies } from '../hooks/useTaxonomies'
 
-const PER_PAGE = 8
+const PER_PAGE = 16
 
 export default function ExerciseLibrary() {
   const { t } = useTranslation()
@@ -128,7 +128,7 @@ export default function ExerciseLibrary() {
         {error ? (
           <ErrorState error={error} onRetry={refetch} />
         ) : loading ? (
-          Array.from({ length: 8 }, (_, i) => <SkeletonCard key={i} />)
+          Array.from({ length: PER_PAGE }, (_, i) => <SkeletonCard key={i} />)
         ) : exercises.length === 0 ? (
           <EmptyState
             title={t('exerciseLibrary.noExercisesMatchThoseFilters')}
