@@ -38,6 +38,8 @@ export const endpoints = {
 
   taxonomies: '/taxonomies',
 
+  chat: '/chat',
+
   calculators: {
     oneRepMax: '/calculators/one-rep-max',
     bmi: '/calculators/bmi',

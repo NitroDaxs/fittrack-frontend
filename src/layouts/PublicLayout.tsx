@@ -3,9 +3,12 @@ import { useEffect } from 'react'
 import TopNav from './TopNav'
 import Footer from './Footer'
 import BottomNav from './BottomNav'
+import ChatBubble from '../components/chat/ChatBubble'
+import { useAuth } from '../context/AuthContext'
 
 export default function PublicLayout() {
   const { pathname } = useLocation()
+  const { isAuthenticated } = useAuth()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -19,6 +22,7 @@ export default function PublicLayout() {
       </main>
       <Footer />
       <BottomNav />
+      {isAuthenticated ? <ChatBubble /> : null}
     </div>
   )
 }

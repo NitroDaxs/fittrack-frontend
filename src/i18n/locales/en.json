@@ -651,5 +651,19 @@
     "measurementSaved": "Measurement saved.",
     "preferencesSaved": "Preferences saved."
   },
+  "chat": {
+    "title": "FitTrack Assistant",
+    "subtitle": "Ask about exercises, routines and nutrition",
+    "intro": "Hi! I can find exercises and routines, explain technique, or run the calculators for you.",
+    "suggestion1": "Suggest a 3-day beginner routine",
+    "suggestion2": "How do I do a Romanian deadlift?",
+    "suggestion3": "Calculate my daily calories",
+    "placeholder": "Ask the assistant...",
+    "send": "Send",
+    "open": "Open the assistant",
+    "close": "Close the assistant",
+    "newChat": "New chat",
+    "thinking": "The assistant is thinking"
+  },
   "labels": {}
 }
