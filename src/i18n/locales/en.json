@@ -320,7 +320,7 @@
     "viewSite": "View site",
     "workout": "Workout",
     "joined": "{{role}} · Joined {{date}}",
-    "x2024FittrackAllRightsReserved": "© 2024 FitTrack. All rights reserved."
+    "fittrackAllRightsReserved": "© {{year}} FitTrack. All rights reserved."
   },
   "profileSettings": {
     "accountSettings": "Account Settings",

@@ -10,6 +10,7 @@ const links = [
 
 export default function Footer() {
   const { t } = useTranslation()
+  const currentYear = new Date().getFullYear();
   return (
     <footer className="w-full py-xl bg-surface-container border-t border-outline-variant mt-auto">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-lg px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
@@ -32,7 +33,7 @@ export default function Footer() {
         </div>
         <div className="md:col-span-4 mt-lg pt-lg border-t border-outline-variant/50 text-center md:text-left">
           <p className="font-body-md text-body-md text-on-surface-variant text-sm">
-            {t('nav.x2024FittrackAllRightsReserved')}
+            {t('nav.fittrackAllRightsReserved', {year: currentYear})}
           </p>
         </div>
       </div>

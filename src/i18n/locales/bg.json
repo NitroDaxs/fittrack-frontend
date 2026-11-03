@@ -320,7 +320,7 @@
     "viewSite": "Към сайта",
     "workout": "Тренировка",
     "joined": "{{role}} · Присъедини се през {{date}}",
-    "x2024FittrackAllRightsReserved": "© 2024 FitTrack. Всички права запазени."
+    "fittrackAllRightsReserved": "© {{year}} FitTrack. Всички права запазени."
   },
   "profileSettings": {
     "accountSettings": "Настройки на профила",
