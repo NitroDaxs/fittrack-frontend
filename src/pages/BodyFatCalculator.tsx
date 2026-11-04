@@ -1,21 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { useState, type FormEvent } from 'react'
-import {
-  CalculateButton,
-  CalculatorHeader,
-  emptyHeight,
-  FormError,
-  heightRequest,
-  HeightInput,
-  NumberInput,
-  SexToggle,
-  toNumber,
-  useCalculatorUnit,
-} from '../components/calculators/shared'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CalculateButton, CalculatorHeader, HeightInput, NumberInput, SexToggle, useCalculatorUnit } from '../components/calculators/shared'
+import { bodyFatSchema, emptyHeight, type BodyFatInput } from '../schemas/calculators.schema'
+import type { Units } from '../types/shared'
 import UnitToggle from '../components/ui/UnitToggle'
 import { useBodyFat } from '../hooks/useCalculators'
 import type { BodyFatCategory, Sex } from '../types/calculators'
-import { fieldErrorsOf } from '../services/http'
 
 const categoryLabels: Record<BodyFatCategory, string> = {
   essential_fat: 'calculators.bodyFat.essentialFat',
@@ -25,41 +16,25 @@ const categoryLabels: Record<BodyFatCategory, string> = {
   above_average: 'calculators.bodyFat.aboveAverage',
 }
 
+const blank = (units: Units, sex: Sex = 'male'): BodyFatInput => ({ units, sex, neck: '', waist: '', hip: '', ...emptyHeight })
+
 export default function BodyFatCalculator() {
   const { t } = useTranslation()
-  const [sex, setSex] = useState<Sex>('male')
-  const [height, setHeight] = useState(emptyHeight)
-  const [neck, setNeck] = useState('')
-  const [waist, setWaist] = useState('')
-  const [hip, setHip] = useState('')
   const calculation = useBodyFat()
-  const { unit, setUnit, lengthLabel } = useCalculatorUnit(() => {
-    setHeight(emptyHeight)
-    setNeck('')
-    setWaist('')
-    setHip('')
+  const { unit, setUnit, lengthLabel } = useCalculatorUnit((next) => {
+    reset(blank(next, getValues('sex')))
     calculation.reset()
   })
+  const { register, control, handleSubmit, reset, getValues, watch, formState: { errors } } = useForm({
+    resolver: zodResolver(bodyFatSchema),
+    mode: 'onTouched',
+    defaultValues: blank(unit),
+  })
+  const sex = watch('sex')
 
-  const errors = fieldErrorsOf(calculation.error)
   const result = calculation.data
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    calculation.mutate({
-      units: unit,
-      sex,
-      neck: toNumber(neck),
-      waist: toNumber(waist),
-      hip: sex === 'female' ? toNumber(hip) : null,
-      ...heightRequest(height),
-    })
-  }
-
-  const changeSex = (next: Sex) => {
-    setSex(next)
-    calculation.reset()
-  }
+  // Hip only counts for women; a value left over from switching is not sent.
+  const submit = handleSubmit((values) => calculation.mutate({ ...values, hip: values.sex === 'female' ? values.hip : null }))
 
   return (
     <div className="max-w-[800px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
@@ -70,17 +45,33 @@ export default function BodyFatCalculator() {
       />
 
       <form onSubmit={submit} noValidate className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant mb-xl space-y-md">
-        <SexToggle value={sex} onChange={changeSex} />
+        <Controller
+          control={control}
+          name="sex"
+          render={({ field }) => (
+            <SexToggle
+              value={field.value}
+              onChange={(next) => {
+                field.onChange(next)
+                calculation.reset()
+              }}
+            />
+          )}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-          <HeightInput value={height} onChange={setHeight} errors={errors} />
-          <NumberInput id="neck" label={t('calculators.bodyFat.neck', { unit: lengthLabel })} value={neck} onChange={setNeck} error={errors.neck} />
-          <NumberInput id="waist" label={t('calculators.bodyFat.waistAtTheNavel', { unit: lengthLabel })} value={waist} onChange={setWaist} error={errors.waist} />
+          <HeightInput
+            feet={register('height_feet')}
+            inches={register('height_inches')}
+            cm={register('height_cm')}
+            errors={{ height_feet: errors.height_feet?.message, height_inches: errors.height_inches?.message, height_cm: errors.height_cm?.message }}
+          />
+          <NumberInput id="neck" label={t('calculators.bodyFat.neck', { unit: lengthLabel })} error={errors.neck?.message} {...register('neck')} />
+          <NumberInput id="waist" label={t('calculators.bodyFat.waistAtTheNavel', { unit: lengthLabel })} error={errors.waist?.message} {...register('waist')} />
           {sex === 'female' ? (
-            <NumberInput id="hip" label={t('calculators.bodyFat.hipAtTheWidestPoint', { unit: lengthLabel })} value={hip} onChange={setHip} error={errors.hip} />
+            <NumberInput id="hip" label={t('calculators.bodyFat.hipAtTheWidestPoint', { unit: lengthLabel })} error={errors.hip?.message} {...register('hip')} />
           ) : null}
         </div>
         <CalculateButton pending={calculation.isPending} />
-        <FormError error={calculation.error} />
       </form>
 
       {result ? (

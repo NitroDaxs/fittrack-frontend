@@ -1,4 +1,5 @@
 import type { PageQuery, UserRole } from './shared'
+import type { AdminUserValues } from '../schemas/admin-user.schema'
 
 export interface AdminStatsDto {
   totalExercises: number
@@ -37,12 +38,8 @@ export interface AdminUser {
   joined: string
 }
 
-export interface UserForm {
-  name: string
-  email: string
-  role: string
-  status: string
-}
+/** The admin form's values, inferred from `adminUserSchema` so there is one source. */
+export type UserForm = AdminUserValues
 
 export interface AdminQuery extends PageQuery {
   search?: string

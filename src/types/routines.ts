@@ -1,6 +1,7 @@
 import type { IconName } from '../components/ui/Icon'
 import type { Exercise, ExerciseDto } from './exercises'
 import type { DifficultyValue, PageQuery } from './shared'
+import type { AdminRoutineValues } from '../schemas/admin-routine.schema'
 
 export type RoutineGoalValue = 'strength' | 'hypertrophy' | 'fat_loss' | 'endurance' | 'general_fitness'
 
@@ -112,16 +113,8 @@ export interface ProgrammeDay {
   exercises: ProgrammeExercise[]
 }
 
-export interface RoutineForm {
-  title: string
-  description: string
-  goal: string
-  level: string
-  daysPerWeek: number | string
-  isPublic: boolean
-  imageUrl: string
-  days: ProgrammeDay[]
-}
+/** The admin form's values, inferred from `adminRoutineSchema` so there is one source. */
+export type RoutineForm = AdminRoutineValues
 
 export interface RoutineQuery extends PageQuery {
   search?: string

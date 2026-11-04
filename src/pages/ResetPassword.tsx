@@ -1,27 +1,15 @@
 import { useTranslation } from 'react-i18next'
-import i18n from '../i18n/index'
 import type { IconName } from '../components/ui/Icon'
-import { useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { fieldErrorsOf } from '../services/http'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { errorMessage, fieldErrorsOf } from '../services/http'
 import { authService } from '../services/auth'
 import { TextField } from '../components/ui/Field'
 import Icon from '../components/ui/Icon'
-
-type Values = { password: string; confirm: string }
-type Errors = Partial<Record<keyof Values, string>>
-
-function validate(values: Values): Errors {
-  const errors: Errors = {}
-  if (!values.password) errors.password = i18n.t('resetPassword.chooseANewPassword2')
-  else if (values.password.length < 8) errors.password = i18n.t('common.mustBeAtLeast8Characters')
-  else if (!/[0-9]/.test(values.password)) errors.password = i18n.t('common.includeAtLeastOneNumber')
-
-  if (!values.confirm) errors.confirm = i18n.t('resetPassword.confirmYourNewPassword')
-  else if (values.confirm !== values.password) errors.confirm = i18n.t('common.passwordsDoNotMatch')
-
-  return errors
-}
+import { resetPasswordSchema, type ResetPasswordValues } from '../schemas/reset-password.schema'
 
 function Notice({ icon, title, children, action, to }: { icon: IconName; title: string; children: ReactNode; action: string; to: string }) {
   return (
@@ -43,52 +31,27 @@ export default function ResetPassword() {
   const { t } = useTranslation()
   const [params] = useSearchParams()
   const token = params.get('token')
-
-  const [values, setValues] = useState<Values>({ password: '', confirm: '' })
-  const [errors, setErrors] = useState<Errors>({})
-  const [touched, setTouched] = useState<Partial<Record<keyof Values, boolean>>>({})
-  const [submitting, setSubmitting] = useState(false)
   const [stage, setStage] = useState<'form' | 'done' | 'invalid'>(token ? 'form' : 'invalid')
-  const [formError, setFormError] = useState<string>()
 
-  const setField = (name: keyof Values) => (event: ChangeEvent<HTMLInputElement>) => {
-    const next = { ...values, [name]: event.target.value }
-    setValues(next)
-    if (touched[name]) setErrors(validate(next))
-  }
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: { password: '', confirm: '' },
+    mode: 'onTouched',
+  })
 
-  const blur = (name: keyof Values) => () => {
-    setTouched((t) => ({ ...t, [name]: true }))
-    setErrors(validate(values))
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-    const found = validate(values)
-    setErrors(found)
-    setTouched({ password: true, confirm: true })
-    setFormError(undefined)
-    if (!token || Object.keys(found).length > 0) return
-
-    setSubmitting(true)
+  const onValid = async ({ password, confirm }: ResetPasswordValues) => {
+    if (!token) return
     try {
-      await authService.resetPassword({
-        token,
-        password: values.password,
-        password_confirmation: values.confirm,
-      })
+      await authService.resetPassword({ token, password, password_confirmation: confirm })
       setStage('done')
     } catch (err) {
-      const fields = fieldErrorsOf(err)
-      if (fields.token) {
-        setStage('invalid')
-      } else if (fields.password || fields.password_confirmation) {
-        setErrors({ password: fields.password, confirm: fields.password_confirmation })
-      } else {
-        setFormError(t('common.somethingWentWrongPleaseTryAgain'))
-      }
-    } finally {
-      setSubmitting(false)
+      // An expired or used link gets its own screen; anything else is a toast.
+      if (fieldErrorsOf(err).token) setStage('invalid')
+      else toast.error(errorMessage(err))
     }
   }
 
@@ -114,44 +77,34 @@ export default function ResetPassword() {
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} noValidate className="space-y-lg">
+            <form onSubmit={handleSubmit(onValid)} noValidate className="space-y-lg">
               <TextField
                 label={t('resetPassword.newPassword')}
-                name="password"
+                id="password"
                 type="password"
                 icon="lock"
                 placeholder="••••••••"
                 autoComplete="new-password"
-                value={values.password}
-                onChange={setField('password')}
-                onBlur={blur('password')}
-                error={touched.password ? errors.password : undefined}
+                error={errors.password?.message}
+                {...register('password')}
               />
               <TextField
                 label={t('resetPassword.confirmNewPassword')}
-                name="confirm"
+                id="confirm"
                 type="password"
                 icon="lock"
                 placeholder="••••••••"
                 autoComplete="new-password"
-                value={values.confirm}
-                onChange={setField('confirm')}
-                onBlur={blur('confirm')}
-                error={touched.confirm ? errors.confirm : undefined}
+                error={errors.confirm?.message}
+                {...register('confirm')}
               />
-
-              {formError ? (
-                <p role="alert" className="font-label-sm text-label-sm text-error text-center">
-                  {formError}
-                </p>
-              ) : null}
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={isSubmitting}
                 className="w-full flex justify-center items-center gap-sm py-sm px-md rounded-lg shadow-sm font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-colors duration-200 active:scale-[0.98] disabled:opacity-60"
               >
-                {submitting ? t('resetPassword.updating') : t('resetPassword.updatePassword')}
+                {isSubmitting ? t('resetPassword.updating') : t('resetPassword.updatePassword')}
               </button>
             </form>
           </>

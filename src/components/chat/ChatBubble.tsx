@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import Icon from '../ui/Icon'
@@ -6,8 +8,8 @@ import Img from '../ui/Img'
 import { chatService } from '../../services/chat'
 import { errorMessage } from '../../services/http'
 import type { ChatCards, ChatMessage } from '../../types/chat'
+import { CHAT_MESSAGE_MAX, chatMessageSchema, type ChatMessageValues } from '../../schemas/chat.schema'
 
-const MAX_LENGTH = 1000
 // The API accepts up to 40 turns; it only reads the last few, so send fewer.
 const HISTORY_TURNS = 12
 
@@ -18,15 +20,17 @@ export default function ChatBubble() {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [draft, setDraft] = useState('')
+  const { register, handleSubmit, setValue, setFocus } = useForm<ChatMessageValues>({
+    resolver: zodResolver(chatMessageSchema),
+    defaultValues: { message: '' },
+  })
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<{ text: string; message: string } | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
-    if (open) inputRef.current?.focus()
-  }, [open])
+    if (open) setFocus('message')
+  }, [open, setFocus])
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' })
@@ -47,7 +51,7 @@ export default function ChatBubble() {
 
     const history = messages.slice(-HISTORY_TURNS).map(({ role, content }) => ({ role, content }))
     setMessages((current) => [...current, { id: nextId++, role: 'user', content: message }])
-    setDraft('')
+    setValue('message', '')
     setError(null)
     setPending(true)
 
@@ -70,22 +74,20 @@ export default function ChatBubble() {
     }
   }
 
-  function onSubmit(event: FormEvent) {
-    event.preventDefault()
-    void send(draft)
-  }
+  // The schema only lets through a non-blank message within the API's length limit.
+  const onSubmit = handleSubmit(({ message }) => send(message))
 
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault()
-      void send(draft)
+      void onSubmit()
     }
   }
 
   function reset() {
     setMessages([])
     setError(null)
-    setDraft('')
+    setValue('message', '')
   }
 
   const suggestions = [t('chat.suggestion1'), t('chat.suggestion2'), t('chat.suggestion3')]
@@ -185,9 +187,8 @@ export default function ChatBubble() {
 
           <form onSubmit={onSubmit} className="flex items-end gap-xs p-sm border-t border-surface-variant bg-surface">
             <textarea
-              ref={inputRef}
-              value={draft}
-              onChange={(event) => setDraft(event.target.value.slice(0, MAX_LENGTH))}
+              maxLength={CHAT_MESSAGE_MAX}
+              {...register('message')}
               onKeyDown={onKeyDown}
               rows={1}
               placeholder={t('chat.placeholder')}
@@ -196,7 +197,7 @@ export default function ChatBubble() {
             />
             <button
               type="submit"
-              disabled={pending || !draft.trim()}
+              disabled={pending}
               className="shrink-0 h-9 w-9 flex items-center justify-center rounded-full bg-primary text-on-primary disabled:opacity-40 transition-opacity"
               aria-label={t('chat.send')}
             >

@@ -1,5 +1,5 @@
 import type { IconName } from './Icon'
-import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react'
+import { forwardRef, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react'
 import Icon from './Icon'
 
 interface FieldProps {
@@ -21,7 +21,12 @@ type TextAreaFieldProps = FieldProps & TextareaHTMLAttributes<HTMLTextAreaElemen
 const base =
   'block w-full rounded-lg border-0 py-sm px-sm text-on-surface ring-1 ring-inset bg-surface-container-low focus:ring-2 focus:ring-inset focus:bg-surface-container-lowest transition-all duration-200 font-body-md text-body-md placeholder:text-secondary-fixed-dim outline-none'
 
-export function TextField({ label, icon, error, hint, id, className = '', ...props }: TextFieldProps) {
+// The fields forward their ref so react-hook-form's `register` can attach to them.
+
+export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function TextField(
+  { label, icon, error, hint, id, className = '', ...props },
+  ref,
+) {
   const fieldId = id ?? props.name
   return (
     <div className={className}>
@@ -39,6 +44,7 @@ export function TextField({ label, icon, error, hint, id, className = '', ...pro
           />
         ) : null}
         <input
+          ref={ref}
           id={fieldId}
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={error ? `${fieldId}-error` : hint ? `${fieldId}-hint` : undefined}
@@ -60,9 +66,12 @@ export function TextField({ label, icon, error, hint, id, className = '', ...pro
       ) : null}
     </div>
   )
-}
+})
 
-export function SelectField({ label, error, id, children, className = '', ...props }: SelectFieldProps) {
+export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(function SelectField(
+  { label, error, id, children, className = '', ...props },
+  ref,
+) {
   const fieldId = id ?? props.name
   return (
     <div className={className}>
@@ -73,7 +82,10 @@ export function SelectField({ label, error, id, children, className = '', ...pro
       ) : null}
       <div className="relative">
         <select
+          ref={ref}
           id={fieldId}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={error ? `${fieldId}-error` : undefined}
           className={`${base} appearance-none pr-xl ${
             error ? 'ring-error focus:ring-error' : 'ring-surface-variant focus:ring-primary'
           }`}
@@ -88,16 +100,19 @@ export function SelectField({ label, error, id, children, className = '', ...pro
         />
       </div>
       {error ? (
-        <p className="font-label-sm text-label-sm text-error mt-xs flex items-center gap-xs">
+        <p id={`${fieldId}-error`} className="font-label-sm text-label-sm text-error mt-xs flex items-center gap-xs">
           <Icon name="circle-alert" size={14} />
           {error}
         </p>
       ) : null}
     </div>
   )
-}
+})
 
-export function TextAreaField({ label, error, id, className = '', ...props }: TextAreaFieldProps) {
+export const TextAreaField = forwardRef<HTMLTextAreaElement, TextAreaFieldProps>(function TextAreaField(
+  { label, error, id, className = '', ...props },
+  ref,
+) {
   const fieldId = id ?? props.name
   return (
     <div className={className}>
@@ -107,17 +122,20 @@ export function TextAreaField({ label, error, id, className = '', ...props }: Te
         </label>
       ) : null}
       <textarea
+        ref={ref}
         id={fieldId}
+        aria-invalid={error ? 'true' : undefined}
+        aria-describedby={error ? `${fieldId}-error` : undefined}
         rows={3}
         className={`${base} ${error ? 'ring-error focus:ring-error' : 'ring-surface-variant focus:ring-primary'}`}
         {...props}
       />
       {error ? (
-        <p className="font-label-sm text-label-sm text-error mt-xs flex items-center gap-xs">
+        <p id={`${fieldId}-error`} className="font-label-sm text-label-sm text-error mt-xs flex items-center gap-xs">
           <Icon name="circle-alert" size={14} />
           {error}
         </p>
       ) : null}
     </div>
   )
-}
+})

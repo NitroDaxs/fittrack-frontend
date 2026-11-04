@@ -1,5 +1,6 @@
 import type { IconName } from '../components/ui/Icon'
 import type { DifficultyValue, PageQuery } from './shared'
+import type { AdminExerciseValues } from '../schemas/admin-exercise.schema'
 
 export type ExerciseCategoryValue =
   | 'strength'
@@ -87,18 +88,8 @@ export interface Exercise {
   steps: ExerciseStep[]
 }
 
-export interface ExerciseForm {
-  name: string
-  description: string
-  instructions: string
-  muscleGroups: string[]
-  equipmentList: string[]
-  difficulty: string
-  category: string
-  primaryMuscles: string
-  videoUrl: string
-  thumbnailUrl: string
-}
+/** The admin form's values, inferred from `adminExerciseSchema` so there is one source. */
+export type ExerciseForm = AdminExerciseValues
 
 // One function per endpoint. Components call these and never see the wire format.
 export interface ExerciseQuery extends PageQuery {

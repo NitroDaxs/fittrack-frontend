@@ -1,18 +1,15 @@
-import type { Units } from './shared'
+import type { BmiValues, BodyFatValues, MacroValues, OneRepMaxValues, TdeeValues } from '../schemas/calculators.schema'
 
-// Blank inputs are sent as null, and the API replies with a message for each one it needs.
-type Input = number | null
+// Request bodies are the calculator forms' values: the schemas use the API's field
+// names, so these are inferred from them rather than written out a second time.
 
-export type Sex = 'male' | 'female'
-export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'heavy' | 'athlete'
-export type MacroSplit = 'balanced' | 'high_protein' | 'low_carb' | 'keto'
+export type Sex = BodyFatValues['sex']
+export type ActivityLevel = TdeeValues['activity']
+export type MacroSplit = MacroValues['split']
 export type BmiCategory = 'underweight' | 'normal_weight' | 'overweight' | 'obese'
 export type BodyFatCategory = 'essential_fat' | 'athletic' | 'fitness' | 'average' | 'above_average'
 
-export interface OneRepMaxRequest {
-  weight: Input
-  reps: Input
-}
+export type OneRepMaxRequest = OneRepMaxValues
 
 export interface OneRepMaxResult {
   one_rep_max: number
@@ -20,27 +17,14 @@ export interface OneRepMaxResult {
   zones: { percent: number; load: number; typical_reps: number }[]
 }
 
-export interface BodyHeightRequest {
-  units: Units
-  height_feet: Input
-  height_inches: Input
-  height_cm: Input
-}
-
-export interface BmiRequest extends BodyHeightRequest {
-  weight: Input
-}
+export type BmiRequest = BmiValues
 
 export interface BmiResult {
   bmi: number
   category: BmiCategory
 }
 
-export interface TdeeRequest extends BmiRequest {
-  sex: Sex
-  age: Input
-  activity: ActivityLevel | null
-}
+export type TdeeRequest = TdeeValues
 
 export interface TdeeResult {
   tdee: number
@@ -50,22 +34,14 @@ export interface TdeeResult {
   lean_bulk: number
 }
 
-export interface MacroRequest {
-  calories: Input
-  split: MacroSplit | null
-}
+export type MacroRequest = MacroValues
 
 export interface MacroResult {
   calories: number
   targets: { macro: 'protein' | 'carbs' | 'fat'; percent: number; grams: number }[]
 }
 
-export interface BodyFatRequest extends BodyHeightRequest {
-  sex: Sex
-  neck: Input
-  waist: Input
-  hip: Input
-}
+export type BodyFatRequest = BodyFatValues
 
 export interface BodyFatResult {
   body_fat: number

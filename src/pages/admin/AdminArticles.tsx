@@ -1,8 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import i18n, { tLabel } from '../../i18n/index'
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { adminService } from '../../services/admin'
 import type { Article, ArticleForm } from '../../types/articles'
+import { adminArticleSchema, type AdminArticleValues } from '../../schemas/admin-article.schema'
 import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter } from '../../components/admin/AdminPage'
 import DataTable, { RowActions, TableFooter, type Column } from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
@@ -13,15 +16,13 @@ import Icon from '../../components/ui/Icon'
 import { useCrud } from '../../hooks/useCrud'
 import { useTaxonomies } from '../../hooks/useTaxonomies'
 
-const blankArticle: ArticleForm = {
+const blankArticle: AdminArticleValues = {
   title: '',
   body: '',
   category: 'Training Theory',
   status: 'Draft',
   imageUrl: '',
 }
-
-type FormErrors = Partial<Record<keyof ArticleForm, string>>
 
 export default function AdminArticles() {
   const { t } = useTranslation()
@@ -35,30 +36,27 @@ export default function AdminArticles() {
     extraQuery: { status, author },
   })
 
-  const [form, setForm] = useState<ArticleForm>(blankArticle)
-  const [errors, setErrors] = useState<FormErrors>({})
   const isNew = crud.editing === 'new'
+  // A new article needs a body; an edit with a blank body keeps the current one.
+  const schema = useMemo(() => adminArticleSchema(isNew), [isNew])
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<AdminArticleValues>({
+    resolver: zodResolver(schema),
+    mode: 'onTouched',
+    defaultValues: blankArticle,
+  })
 
   useEffect(() => {
     if (!crud.editing) return
     const row = crud.editingRow
     // The list has no article bodies, so editing starts with an empty body box.
-    setForm(row ? { title: row.title, body: '', category: row.category, status: row.status, imageUrl: row.image } : blankArticle)
-    setErrors({})
-  }, [crud.editing, crud.editingRow])
+    reset(
+      row
+        ? { title: row.title, body: '', category: row.category, status: row.status as AdminArticleValues['status'], imageUrl: row.image ?? '' }
+        : blankArticle,
+    )
+  }, [crud.editing, crud.editingRow, reset])
 
-  const setField = (name: keyof ArticleForm) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [name]: event.target.value }))
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    const found: FormErrors = {}
-    if (!form.title.trim()) found.title = t('common.titleIsRequired')
-    if (isNew && !form.body.trim()) found.body = t('admin.articles.writeTheArticleBody')
-    setErrors(found)
-    if (Object.keys(found).length > 0) return
-    crud.save(form)
-  }
+  const submit = handleSubmit((values) => crud.save(values))
 
   const columns: Column<Article>[] = [
     {
@@ -185,40 +183,32 @@ export default function AdminArticles() {
         footer={<ModalFooter onCancel={() => crud.setEditing(null)} saving={crud.saving} submitLabel={t('admin.articles.saveArticle')} />}
       >
         <form id="crud-form" onSubmit={submit} noValidate className="space-y-md">
-          <TextField
-            label={t('common.title')}
-            name="title"
-            value={form.title}
-            onChange={setField('title')}
-            error={errors.title ?? crud.fieldErrors.title}
-          />
+          <TextField label={t('common.title')} id="title" error={errors.title?.message} {...register('title')} />
           {/* The API splits this into blocks: blank lines separate paragraphs,
               and a short line ending in a colon becomes a heading. */}
           <TextAreaField
             label={t('admin.articles.bodyBlankLineBetweenParagraphsEnd')}
-            name="body"
-            value={form.body}
-            onChange={setField('body')}
-            error={errors.body ?? crud.fieldErrors.body}
+            id="body"
+            error={errors.body?.message}
             rows={8}
+            {...register('body')}
           />
           <TextField
             label={t('admin.articles.imageUrl')}
-            name="imageUrl"
+            id="imageUrl"
             type="url"
-            value={form.imageUrl}
-            onChange={setField('imageUrl')}
-            error={crud.fieldErrors.image_url}
+            error={errors.imageUrl?.message}
             placeholder="https://images.unsplash.com/photo-..."
+            {...register('imageUrl')}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-            <SelectField label={t('common.category')} name="category" value={form.category} onChange={setField('category')}>
+            <SelectField label={t('common.category')} id="category" error={errors.category?.message} {...register('category')}>
               {(taxonomies?.articleCategories ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
                   {tLabel(option.label)}</option>
               ))}
             </SelectField>
-            <SelectField label={t('common.status')} name="status" value={form.status} onChange={setField('status')}>
+            <SelectField label={t('common.status')} id="status" {...register('status')}>
               <option value="Draft">{t('admin.articles.draft')}</option>
               <option value="Published">{t('admin.articles.published')}</option>
             </SelectField>

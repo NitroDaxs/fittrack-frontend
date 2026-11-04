@@ -1,15 +1,17 @@
 import { MutationCache, QueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import i18n from '../i18n'
-import { ApiError, errorMessage, fieldErrorsOf } from './http'
+import { ApiError, errorMessage } from './http'
 
 export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
-    // Every failed write shows a toast, except field errors, which the form shows,
-    // and 401s, which end the session with their own message.
+    // Every failed write shows the server's message as a toast. Forms validate
+    // with their schemas first, so what reaches the server is already in shape;
+    // what it still rejects (a taken email, a wrong password) is reported here.
+    // 401s end the session with their own message.
     onError: (error) => {
       if (error instanceof ApiError && error.status === 401) return
-      if (Object.keys(fieldErrorsOf(error)).length === 0) toast.error(errorMessage(error))
+      toast.error(errorMessage(error))
     },
   }),
   defaultOptions: {

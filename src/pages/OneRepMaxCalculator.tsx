@@ -1,35 +1,28 @@
 import { useTranslation } from 'react-i18next'
-import { useState, type FormEvent } from 'react'
-import {
-  CalculateButton,
-  CalculatorHeader,
-  FormError,
-  NumberInput,
-  toNumber,
-  useCalculatorUnit,
-} from '../components/calculators/shared'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CalculateButton, CalculatorHeader, NumberInput, useCalculatorUnit } from '../components/calculators/shared'
+import { oneRepMaxSchema } from '../schemas/calculators.schema'
 import Icon from '../components/ui/Icon'
 import UnitToggle from '../components/ui/UnitToggle'
 import { useOneRepMax } from '../hooks/useCalculators'
-import { fieldErrorsOf } from '../services/http'
 
 export default function OneRepMaxCalculator() {
   const { t } = useTranslation()
-  const [weight, setWeight] = useState('')
-  const [reps, setReps] = useState('')
   const calculation = useOneRepMax()
+  const { register, handleSubmit, resetField, formState: { errors } } = useForm({
+    resolver: zodResolver(oneRepMaxSchema),
+    mode: 'onTouched',
+    defaultValues: { weight: '', reps: '' },
+  })
+  // Reps mean the same in either unit; only the weight is cleared.
   const { unit, setUnit, weightLabel } = useCalculatorUnit(() => {
-    setWeight('')
+    resetField('weight')
     calculation.reset()
   })
 
-  const errors = fieldErrorsOf(calculation.error)
   const result = calculation.data
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    calculation.mutate({ weight: toNumber(weight), reps: toNumber(reps) })
-  }
+  const submit = handleSubmit((values) => calculation.mutate(values))
 
   return (
     <div className="max-w-[800px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
@@ -41,11 +34,10 @@ export default function OneRepMaxCalculator() {
 
       <form onSubmit={submit} noValidate className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant mb-xl space-y-md">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-          <NumberInput id="weight" label={t('calculators.oneRepMax.weightLifted', { unit: weightLabel })} value={weight} onChange={setWeight} error={errors.weight} />
-          <NumberInput id="reps" label={t('calculators.oneRepMax.repsPerformed')} value={reps} onChange={setReps} error={errors.reps} />
+          <NumberInput id="weight" label={t('calculators.oneRepMax.weightLifted', { unit: weightLabel })} error={errors.weight?.message} {...register('weight')} />
+          <NumberInput id="reps" label={t('calculators.oneRepMax.repsPerformed')} error={errors.reps?.message} {...register('reps')} />
         </div>
         <CalculateButton pending={calculation.isPending} />
-        <FormError error={calculation.error} />
       </form>
 
       {result ? (

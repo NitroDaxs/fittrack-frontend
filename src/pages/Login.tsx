@@ -1,24 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import i18n from '../i18n/index'
-import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
 import { useAuth } from '../context/AuthContext'
-import { errorMessage, fieldErrorsOf } from '../services/http'
+import { errorMessage } from '../services/http'
 import { TextField } from '../components/ui/Field'
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-type Values = { email: string; password: string }
-type Errors = Partial<Record<keyof Values, string>>
-
-function validate(values: Values): Errors {
-  const errors: Errors = {}
-  if (!values.email.trim()) errors.email = i18n.t('common.enterYourEmailAddress')
-  else if (!EMAIL_PATTERN.test(values.email)) errors.email = i18n.t('common.thatDoesNotLookLikeA')
-  if (!values.password) errors.password = i18n.t('login.enterYourPassword')
-  else if (values.password.length < 8) errors.password = i18n.t('login.passwordMustBeAtLeast8')
-  return errors
-}
+import { loginSchema, type LoginValues } from '../schemas/login.schema'
 
 export default function Login() {
   const { t } = useTranslation()
@@ -27,41 +15,22 @@ export default function Login() {
   const location = useLocation()
   const from = (location.state as { from?: string } | null)?.from ?? '/dashboard'
 
-  const [values, setValues] = useState<Values>({ email: '', password: '' })
-  const [errors, setErrors] = useState<Errors>({})
-  const [touched, setTouched] = useState<Partial<Record<keyof Values, boolean>>>({})
-  const [formError, setFormError] = useState<string | null>(null)
-  const [submitting, setSubmitting] = useState(false)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+    mode: 'onTouched',
+  })
 
-  const setField = (name: keyof Values) => (event: ChangeEvent<HTMLInputElement>) => {
-    const next = { ...values, [name]: event.target.value }
-    setValues(next)
-    if (touched[name]) setErrors(validate(next))
-  }
-
-  const blur = (name: keyof Values) => () => {
-    setTouched((t) => ({ ...t, [name]: true }))
-    setErrors(validate(values))
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-    const found = validate(values)
-    setErrors(found)
-    setTouched({ email: true, password: true })
-    setFormError(null)
-    if (Object.keys(found).length > 0) return
-
-    setSubmitting(true)
+  const onValid = async (values: LoginValues) => {
     try {
       await login(values)
       navigate(from, { replace: true })
     } catch (err) {
-      const fields = fieldErrorsOf(err)
-      setErrors(fields)
-      if (Object.keys(fields).length === 0) setFormError(errorMessage(err))
-    } finally {
-      setSubmitting(false)
+      toast.error(errorMessage(err))
     }
   }
 
@@ -75,18 +44,16 @@ export default function Login() {
           <p className="font-body-md text-body-md text-on-surface-variant">{t('login.logInToTrackYourProgress')}</p>
         </div>
 
-        <form onSubmit={handleSubmit} noValidate className="space-y-lg">
+        <form onSubmit={handleSubmit(onValid)} noValidate className="space-y-lg">
           <TextField
             label={t('common.emailAddress')}
-            name="email"
+            id="email"
             type="email"
             icon="mail"
             placeholder="you@example.com"
             autoComplete="email"
-            value={values.email}
-            onChange={setField('email')}
-            onBlur={blur('email')}
-            error={touched.email ? errors.email : undefined}
+            error={errors.email?.message}
+            {...register('email')}
           />
 
           <div>
@@ -99,31 +66,22 @@ export default function Login() {
               </Link>
             </div>
             <TextField
-              name="password"
               id="password"
               type="password"
               icon="lock"
               placeholder="••••••••"
               autoComplete="current-password"
-              value={values.password}
-              onChange={setField('password')}
-              onBlur={blur('password')}
-              error={touched.password ? errors.password : undefined}
+              error={errors.password?.message}
+              {...register('password')}
             />
           </div>
 
-          {formError ? (
-            <p role="alert" className="font-label-sm text-label-sm text-error text-center">
-              {formError}
-            </p>
-          ) : null}
-
           <button
             type="submit"
-            disabled={submitting}
+            disabled={isSubmitting}
             className="w-full flex justify-center items-center gap-sm py-sm px-md rounded-lg shadow-sm font-label-bold text-label-bold text-on-primary bg-primary-container hover:bg-primary transition-colors duration-200 active:scale-[0.98] disabled:opacity-60"
           >
-            {submitting ? t('login.loggingIn') : t('common.logIn')}
+            {isSubmitting ? t('login.loggingIn') : t('common.logIn')}
           </button>
         </form>
 
@@ -133,7 +91,6 @@ export default function Login() {
             {t('login.signUp')}
           </Link>
         </p>
-
       </div>
     </div>
   )

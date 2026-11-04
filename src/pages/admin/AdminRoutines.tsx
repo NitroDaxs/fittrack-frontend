@@ -1,8 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { tLabel } from '../../i18n/index'
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { adminService } from '../../services/admin'
 import type { Routine, RoutineForm } from '../../types/routines'
+import { adminRoutineSchema, type AdminRoutineInput, type AdminRoutineValues } from '../../schemas/admin-routine.schema'
 import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter } from '../../components/admin/AdminPage'
 import DataTable, { RowActions, TableFooter, type Column } from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
@@ -14,14 +17,12 @@ import RoutineDayBuilder from '../../components/admin/RoutineDayBuilder'
 import { useCrud } from '../../hooks/useCrud'
 import { useTaxonomies } from '../../hooks/useTaxonomies'
 
-type FormErrors = Partial<Record<keyof RoutineForm, string>>
-
-const blankRoutine: RoutineForm = {
+const blankRoutine: AdminRoutineInput = {
   title: '',
   description: '',
   goal: 'Strength',
   level: 'Beginner',
-  daysPerWeek: 3,
+  daysPerWeek: '3',
   isPublic: true,
   imageUrl: '',
   days: [],
@@ -46,8 +47,12 @@ export default function AdminRoutines() {
     extraQuery: { goal },
   })
 
-  const [form, setForm] = useState<RoutineForm>(blankRoutine)
-  const [errors, setErrors] = useState<FormErrors>({})
+  const { register, control, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<AdminRoutineInput, unknown, AdminRoutineValues>({
+    resolver: zodResolver(adminRoutineSchema),
+    mode: 'onTouched',
+    defaultValues: blankRoutine,
+  })
+  const daysPerWeek = watch('daysPerWeek')
 
   // The table row carries only metadata, so the programme is fetched separately
   // when an existing routine is opened. New routines start with no days.
@@ -55,21 +60,20 @@ export default function AdminRoutines() {
     if (!crud.editing) return
 
     const row = crud.editingRow
-    setForm(
+    reset(
       row
         ? {
             title: row.title,
             description: row.description,
             goal: row.goal,
             level: row.level,
-            daysPerWeek: row.daysPerWeek,
+            daysPerWeek: String(row.daysPerWeek),
             isPublic: row.isPublic,
-            imageUrl: row.image,
+            imageUrl: row.image ?? '',
             days: [],
           }
         : blankRoutine,
     )
-    setErrors({})
 
     if (!row) return undefined
 
@@ -77,7 +81,7 @@ export default function AdminRoutines() {
     adminService.routines
       .programme(row.id)
       .then((days) => {
-        if (!cancelled) setForm((f) => ({ ...f, days }))
+        if (!cancelled) setValue('days', days)
       })
       .catch(() => {
         // Leave days empty -- saving without touching them won't wipe the
@@ -87,26 +91,9 @@ export default function AdminRoutines() {
     return () => {
       cancelled = true
     }
-  }, [crud.editing, crud.editingRow])
+  }, [crud.editing, crud.editingRow, reset, setValue])
 
-  const setField = (name: keyof RoutineForm) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm((f) => ({ ...f, [name]: event.target.value }))
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    const found: FormErrors = {}
-    if (!form.title.trim()) found.title = t('common.titleIsRequired')
-    if (!form.description.trim()) found.description = t('admin.routines.describeTheProgrammeInASentence')
-    if (Number(form.daysPerWeek) < 1 || Number(form.daysPerWeek) > 7) found.daysPerWeek = t('admin.routines.between1And7')
-    // A day with no exercises would publish as an empty block on the routine page.
-    const emptyDay = form.days.findIndex((day) => day.exercises.length === 0)
-    if (emptyDay !== -1) {
-      found.days = t('admin.routines.hasNoExercises', { name: form.days[emptyDay].name || t('common.day', { n: emptyDay + 1 }) })
-    }
-    setErrors(found)
-    if (Object.keys(found).length > 0) return
-
-    crud.save(form)
-  }
+  const submit = handleSubmit((values) => crud.save(values))
 
   const columns: Column<Routine>[] = [
     {
@@ -215,31 +202,24 @@ export default function AdminRoutines() {
         footer={<ModalFooter onCancel={() => crud.setEditing(null)} saving={crud.saving} />}
       >
         <form id="crud-form" onSubmit={submit} noValidate className="space-y-md">
-          <TextField label={t('common.title')} name="title" value={form.title} onChange={setField('title')} error={errors.title ?? crud.fieldErrors.title} />
-          <TextAreaField
-            label={t('common.description')}
-            name="description"
-            value={form.description}
-            onChange={setField('description')}
-            error={errors.description}
-          />
+          <TextField label={t('common.title')} id="title" error={errors.title?.message} {...register('title')} />
+          <TextAreaField label={t('common.description')} id="description" error={errors.description?.message} {...register('description')} />
           <TextField
             label={t('admin.routines.imageUrl')}
-            name="imageUrl"
+            id="imageUrl"
             type="url"
-            value={form.imageUrl}
-            onChange={setField('imageUrl')}
-            error={crud.fieldErrors.image_url}
+            error={errors.imageUrl?.message}
             placeholder="https://images.unsplash.com/photo-..."
+            {...register('imageUrl')}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-            <SelectField label={t('common.goal')} name="goal" value={form.goal} onChange={setField('goal')}>
+            <SelectField label={t('common.goal')} id="goal" error={errors.goal?.message} {...register('goal')}>
               {(taxonomies?.goals ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
                   {tLabel(option.label)}</option>
               ))}
             </SelectField>
-            <SelectField label={t('admin.routines.level')} name="level" value={form.level} onChange={setField('level')}>
+            <SelectField label={t('admin.routines.level')} id="level" error={errors.level?.message} {...register('level')}>
               {(taxonomies?.levels ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
                   {tLabel(option.label)}</option>
@@ -247,24 +227,25 @@ export default function AdminRoutines() {
             </SelectField>
             <TextField
               label={t('admin.routines.daysPerWeek')}
-              name="daysPerWeek"
+              id="daysPerWeek"
               type="number"
               min="1"
               max="7"
-              value={form.daysPerWeek}
-              onChange={setField('daysPerWeek')}
-              error={errors.daysPerWeek ?? crud.fieldErrors.days_per_week}
+              error={errors.daysPerWeek?.message}
+              {...register('daysPerWeek')}
             />
           </div>
 
-          {errors.days ?? crud.fieldErrors.days ? (
-            <p className="font-label-sm text-label-sm text-error">{errors.days ?? crud.fieldErrors.days}</p>
+          {errors.days?.message ? (
+            <p className="font-label-sm text-label-sm text-error">{errors.days.message}</p>
           ) : null}
 
-          <RoutineDayBuilder
-            days={form.days}
-            daysPerWeek={form.daysPerWeek}
-            onChange={(days) => setForm((f) => ({ ...f, days }))}
+          <Controller
+            control={control}
+            name="days"
+            render={({ field }) => (
+              <RoutineDayBuilder days={field.value} daysPerWeek={daysPerWeek} onChange={field.onChange} />
+            )}
           />
         </form>
       </Modal>

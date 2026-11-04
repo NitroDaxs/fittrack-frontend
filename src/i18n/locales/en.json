@@ -4,7 +4,6 @@
       "hasNoExercises": "\"{{name}}\" has no exercises.",
       "addNewRoutine": "Add new routine",
       "allGoals": "All Goals",
-      "between1And7": "Between 1 and 7.",
       "createEditAndOrganizeWorkoutTemplates": "Create, edit, and organize workout templates for users.",
       "daysPerWeek": "Days per week",
       "describeTheProgrammeInASentence": "Describe the programme in a sentence.",
@@ -265,10 +264,8 @@
     "searchRoutines": "Search routines...",
     "searching": "Searching…",
     "sets": "Sets",
-    "somethingWentWrongPleaseTryAgain": "Something went wrong. Please try again.",
     "status": "Status",
     "tdeeCalculator": "TDEE Calculator",
-    "thatDoesNotLookLikeA": "That does not look like a valid email address.",
     "title": "Title",
     "titleIsRequired": "Title is required.",
     "units": "Units",
@@ -343,11 +340,8 @@
     "passwordChanged": "Your password has been changed.",
     "errors": {
       "nameRequired": "Enter your name.",
-      "emailInvalid": "Enter a valid email address.",
-      "emailTaken": "This email address is already in use.",
       "currentPasswordRequired": "Enter your current password.",
-      "currentPasswordWrong": "The current password is incorrect.",
-      "passwordRules": "Use at least 8 characters, including a number.",
+      "passwordRules": "Use at least 8 characters, including a number and an uppercase letter.",
       "passwordSame": "Choose a password different from your current one.",
       "passwordMismatch": "The passwords do not match.",
       "imageType": "Choose a JPEG, PNG or WebP image.",
@@ -412,11 +406,10 @@
     "fair": "Fair",
     "fullName": "Full Name",
     "good": "Good",
-    "mustBeAtLeast8Characters": "Must be at least 8 characters and include a number.",
+    "mustBeAtLeast8Characters": "Must be at least 8 characters and include a number and an uppercase letter.",
     "passwordStrength": "Password strength: {{value}}",
     "startYourHighPerformanceJourneyToday": "Start your high-performance journey today.",
     "strong": "Strong",
-    "thatNameLooksTooShort": "That name looks too short.",
     "tooShort": "Too short",
     "weak": "Weak"
   },
@@ -504,7 +497,7 @@
     "thisLinkDoesnTWork": "This link doesn't work",
     "updatePassword": "Update password",
     "updating": "Updating…",
-    "useAtLeast8CharactersIncluding": "Use at least 8 characters, including a number.",
+    "useAtLeast8CharactersIncluding": "Use at least 8 characters, including a number and an uppercase letter.",
     "youCanNowLogInWith": "You can now log in with your new password."
   },
   "routinesCatalog": {
@@ -588,7 +581,6 @@
     "forgotPassword": "Forgot password?",
     "logInToTrackYourProgress": "Log in to track your progress.",
     "loggingIn": "Logging in…",
-    "passwordMustBeAtLeast8": "Password must be at least 8 characters.",
     "signUp": "Sign up"
   },
   "workoutHistory": {
@@ -665,5 +657,21 @@
     "newChat": "New chat",
     "thinking": "The assistant is thinking"
   },
-  "labels": {}
+  "labels": {},
+  "validation": {
+    "required": "This field is required.",
+    "number": "Enter a number.",
+    "passwordUppercase": "Include at least one uppercase letter.",
+    "heightRequired": "Enter your height.",
+    "hipRequired": "Enter your hip measurement.",
+    "waistLargerThanNeck": "Waist must be larger than neck.",
+    "splitRequired": "Choose a split.",
+    "activityRequired": "Choose your activity level.",
+    "imageUrl": "Enter a valid http or https address.",
+    "dayExercisesInvalid": "{{name}}: sets must be 1–20, reps at most 20 characters and rest 0–900 seconds.",
+    "dayNameTooLong": "{{name}}: the day name can be at most {{max}} characters.",
+    "maxLength": "Use at most {{max}} characters.",
+    "between": "Enter a number from {{min}} to {{max}}.",
+    "wholeBetween": "Enter a whole number from {{min}} to {{max}}."
+  }
 }

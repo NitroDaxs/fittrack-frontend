@@ -4,7 +4,6 @@
       "hasNoExercises": "„{{name}}“ няма упражнения.",
       "addNewRoutine": "Добави програма",
       "allGoals": "Всички цели",
-      "between1And7": "Между 1 и 7.",
       "createEditAndOrganizeWorkoutTemplates": "Създавайте, редактирайте и подреждайте тренировъчни шаблони за потребителите.",
       "daysPerWeek": "Дни в седмицата",
       "describeTheProgrammeInASentence": "Опишете програмата с едно изречение.",
@@ -265,10 +264,8 @@
     "searchRoutines": "Търсене на програми...",
     "searching": "Търсене…",
     "sets": "Серии",
-    "somethingWentWrongPleaseTryAgain": "Нещо се обърка. Моля, опитайте отново.",
     "status": "Статус",
     "tdeeCalculator": "Калкулатор за TDEE",
-    "thatDoesNotLookLikeA": "Това не изглежда като валиден имейл адрес.",
     "title": "Заглавие",
     "titleIsRequired": "Заглавието е задължително.",
     "units": "Мерни единици",
@@ -343,11 +340,8 @@
     "passwordChanged": "Паролата ви е сменена.",
     "errors": {
       "nameRequired": "Въведете името си.",
-      "emailInvalid": "Въведете валиден имейл адрес.",
-      "emailTaken": "Този имейл адрес вече се използва.",
       "currentPasswordRequired": "Въведете текущата си парола.",
-      "currentPasswordWrong": "Текущата парола е грешна.",
-      "passwordRules": "Използвайте поне 8 символа, включително цифра.",
+      "passwordRules": "Използвайте поне 8 символа, включително цифра и главна буква.",
       "passwordSame": "Изберете парола, различна от текущата.",
       "passwordMismatch": "Паролите не съвпадат.",
       "imageType": "Изберете изображение във формат JPEG, PNG или WebP.",
@@ -412,11 +406,10 @@
     "fair": "Задоволителна",
     "fullName": "Пълно име",
     "good": "Добра",
-    "mustBeAtLeast8Characters": "Трябва да е поне 8 символа и да съдържа цифра.",
+    "mustBeAtLeast8Characters": "Трябва да е поне 8 символа и да съдържа цифра и главна буква.",
     "passwordStrength": "Сила на паролата: {{value}}",
     "startYourHighPerformanceJourneyToday": "Започнете пътя си към по-добри резултати още днес.",
     "strong": "Силна",
-    "thatNameLooksTooShort": "Името изглежда твърде кратко.",
     "tooShort": "Твърде кратка",
     "weak": "Слаба"
   },
@@ -504,7 +497,7 @@
     "thisLinkDoesnTWork": "Тази връзка не работи",
     "updatePassword": "Смени паролата",
     "updating": "Обновяване…",
-    "useAtLeast8CharactersIncluding": "Използвайте поне 8 символа, включително цифра.",
+    "useAtLeast8CharactersIncluding": "Използвайте поне 8 символа, включително цифра и главна буква.",
     "youCanNowLogInWith": "Вече можете да влезете с новата си парола."
   },
   "routinesCatalog": {
@@ -588,7 +581,6 @@
     "forgotPassword": "Забравена парола?",
     "logInToTrackYourProgress": "Влезте, за да следите напредъка си.",
     "loggingIn": "Влизане…",
-    "passwordMustBeAtLeast8": "Паролата трябва да е поне 8 символа.",
     "signUp": "Регистрация"
   },
   "workoutHistory": {
@@ -728,5 +720,21 @@
     "Admin": "Администратор",
     "Active": "Активен",
     "Suspended": "Спрян"
+  },
+  "validation": {
+    "required": "Това поле е задължително.",
+    "number": "Въведете число.",
+    "passwordUppercase": "Включете поне една главна буква.",
+    "heightRequired": "Въведете ръста си.",
+    "hipRequired": "Въведете обиколката на ханша.",
+    "waistLargerThanNeck": "Талията трябва да е по-голяма от врата.",
+    "splitRequired": "Изберете разпределение.",
+    "activityRequired": "Изберете ниво на активност.",
+    "imageUrl": "Въведете валиден http или https адрес.",
+    "dayExercisesInvalid": "{{name}}: сериите трябва да са 1–20, повторенията до 20 символа, а почивката 0–900 секунди.",
+    "dayNameTooLong": "{{name}}: името на деня може да е най-много {{max}} символа.",
+    "maxLength": "Използвайте най-много {{max}} символа.",
+    "between": "Въведете число от {{min}} до {{max}}.",
+    "wholeBetween": "Въведете цяло число от {{min}} до {{max}}."
   }
 }

@@ -2,7 +2,6 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import i18n from '../i18n'
-import { fieldErrorsOf } from '../services/http'
 import type { Page } from '../types/shared'
 import type { AdminQuery } from '../types/admin'
 import { useDebounced } from './useDebounced'
@@ -81,7 +80,6 @@ export function useCrud<TRow extends { id: number }, TForm>(
   })
 
   const editingRow = editing && editing !== 'new' ? editing : null
-  const fieldErrors = fieldErrorsOf(saveMutation.error)
   const { reset: resetSave } = saveMutation
 
   const openEditor = useCallback(
@@ -112,7 +110,6 @@ export function useCrud<TRow extends { id: number }, TForm>(
     setDeleting,
     saving: saveMutation.isPending,
     save: (form: TForm) => saveMutation.mutate({ row: editingRow, form }),
-    fieldErrors,
     confirmDelete: () => {
       if (deleting) deleteMutation.mutate(deleting)
     },

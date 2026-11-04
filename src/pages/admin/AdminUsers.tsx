@@ -1,10 +1,13 @@
 import { useTranslation } from 'react-i18next'
 import i18n, { tLabel } from '../../i18n/index'
 import { toast } from 'sonner'
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { errorMessage } from '../../services/http'
 import { adminService } from '../../services/admin'
 import type { AdminUser, UserForm } from '../../types/admin'
+import { adminUserSchema, type AdminUserValues } from '../../schemas/admin-user.schema'
 import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter } from '../../components/admin/AdminPage'
 import DataTable, { RowActions, TableFooter, type Column } from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
@@ -14,9 +17,7 @@ import { ErrorState, Spinner } from '../../components/ui/States'
 import Icon from '../../components/ui/Icon'
 import { useCrud } from '../../hooks/useCrud'
 
-type FormErrors = Partial<Record<keyof UserForm, string>>
-
-const blankUser: UserForm = { name: '', email: '', role: 'Member', status: 'Active' }
+const blankUser: AdminUserValues = { name: '', email: '', role: 'Member', status: 'Active' }
 
 const statusTone: Record<string, string> = {
   Active: 'bg-primary-fixed text-on-primary-fixed-variant',
@@ -35,27 +36,23 @@ export default function AdminUsers() {
 
   const crud = useCrud<AdminUser, UserForm>(adminService.users, { resource: 'users', defaultSort: { key: 'name', dir: 'asc' }, extraQuery: { role, status } })
 
-  const [form, setForm] = useState<UserForm>(blankUser)
-  const [errors, setErrors] = useState<FormErrors>({})
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<AdminUserValues>({
+    resolver: zodResolver(adminUserSchema),
+    mode: 'onTouched',
+    defaultValues: blankUser,
+  })
 
   useEffect(() => {
     if (!crud.editing) return
     const row = crud.editingRow
-    setForm(row ? { name: row.name, email: row.email, role: row.role, status: row.status } : blankUser)
-    setErrors({})
-  }, [crud.editing, crud.editingRow])
+    reset(
+      row
+        ? { name: row.name, email: row.email, role: row.role as AdminUserValues['role'], status: row.status as AdminUserValues['status'] }
+        : blankUser,
+    )
+  }, [crud.editing, crud.editingRow, reset])
 
-  const setField = (name: keyof UserForm) => (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm((f) => ({ ...f, [name]: event.target.value }))
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    const found: FormErrors = {}
-    if (!form.name.trim()) found.name = t('common.nameIsRequired')
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) found.email = t('admin.users.enterAValidEmailAddress')
-    setErrors(found)
-    if (Object.keys(found).length > 0) return
-    crud.save(form)
-  }
+  const submit = handleSubmit((values) => crud.save(values))
 
   // Dedicated endpoint rather than a full update: it flips the flag server-side
   // and refuses to let an admin deactivate their own account.
@@ -207,21 +204,14 @@ export default function AdminUsers() {
         size="sm"
       >
         <form id="crud-form" onSubmit={submit} noValidate className="space-y-md">
-          <TextField label={t('common.name')} name="name" value={form.name} onChange={setField('name')} error={errors.name ?? crud.fieldErrors.name} />
-          <TextField
-            label={t('common.email')}
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={setField('email')}
-            error={errors.email ?? crud.fieldErrors.email}
-          />
+          <TextField label={t('common.name')} id="name" error={errors.name?.message} {...register('name')} />
+          <TextField label={t('common.email')} id="email" type="email" error={errors.email?.message} {...register('email')} />
           <div className="grid grid-cols-2 gap-md">
-            <SelectField label={t('admin.users.role')} name="role" value={form.role} onChange={setField('role')}>
+            <SelectField label={t('admin.users.role')} id="role" {...register('role')}>
               <option value="Member">{t('common.member')}</option>
               <option value="Admin">{t('common.admin')}</option>
             </SelectField>
-            <SelectField label={t('common.status')} name="status" value={form.status} onChange={setField('status')}>
+            <SelectField label={t('common.status')} id="status" {...register('status')}>
               <option value="Active">{t('admin.users.active')}</option>
               <option value="Suspended">{t('admin.users.suspended')}</option>
             </SelectField>
