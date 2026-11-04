@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index'
-import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { CalculateButton, CalculatorHeader, FieldError, FormError, NumberInput, toNumber } from '../components/calculators/shared'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CalculateButton, CalculatorHeader, FieldError, NumberInput } from '../components/calculators/shared'
+import { macroSchema } from '../schemas/calculators.schema'
 import { useMacros } from '../hooks/useCalculators'
 import type { MacroResult, MacroSplit } from '../types/calculators'
-import { fieldErrorsOf } from '../services/http'
 
 const splits: { value: MacroSplit; label: string }[] = [
   { value: 'balanced', label: 'calculators.macro.balanced' },
@@ -22,17 +23,15 @@ const macroStyle: Record<MacroResult['targets'][number]['macro'], { label: strin
 
 export default function MacroCalculator() {
   const { t } = useTranslation()
-  const [calories, setCalories] = useState('')
-  const [split, setSplit] = useState<MacroSplit | null>(null)
   const calculation = useMacros()
+  const { register, control, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(macroSchema),
+    mode: 'onTouched',
+    defaultValues: { calories: '' },
+  })
 
-  const errors = fieldErrorsOf(calculation.error)
   const result = calculation.data
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    calculation.mutate({ calories: toNumber(calories), split })
-  }
+  const submit = handleSubmit((values) => calculation.mutate(values))
 
   return (
     <div className="max-w-[800px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
@@ -41,7 +40,7 @@ export default function MacroCalculator() {
       <form onSubmit={submit} noValidate className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant mb-xl space-y-md">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
           <div>
-            <NumberInput id="calories" label={t('calculators.macro.dailyCalories')} value={calories} onChange={setCalories} error={errors.calories} />
+            <NumberInput id="calories" label={t('calculators.macro.dailyCalories')} error={errors.calories?.message} {...register('calories')} />
             <p className="font-label-sm text-label-sm text-secondary mt-sm">
               {t('calculators.macro.notSureUseThe')}{' '}
               <Link to="/calculators/tdee" className="text-primary hover:text-primary-container">
@@ -52,15 +51,20 @@ export default function MacroCalculator() {
           </div>
           <div>
             <span className="font-label-bold text-label-bold text-on-surface-variant mb-xs block">{t('calculators.macro.split')}</span>
-            <div className="grid grid-cols-2 gap-sm">
-              {splits.map((option) => (
+            <Controller
+              control={control}
+              name="split"
+              render={({ field }) => (
+                <div className="grid grid-cols-2 gap-sm">
+              {splits.map((option, index) => (
                 <button
                   key={option.value}
+                  ref={index === 0 ? field.ref : undefined}
                   type="button"
-                  aria-pressed={split === option.value}
-                  onClick={() => setSplit(option.value)}
+                  aria-pressed={field.value === option.value}
+                  onClick={() => field.onChange(option.value)}
                   className={`px-sm py-sm rounded-lg border font-label-sm text-label-sm transition-colors ${
-                    split === option.value
+                    field.value === option.value
                       ? 'border-primary bg-primary-container/10 text-primary'
                       : 'border-surface-variant bg-surface text-secondary hover:border-primary/50'
                   }`}
@@ -68,12 +72,13 @@ export default function MacroCalculator() {
                   {t(option.label)}
                 </button>
               ))}
-            </div>
-            <FieldError message={errors.split} />
+                </div>
+              )}
+            />
+            <FieldError message={errors.split?.message} />
           </div>
         </div>
         <CalculateButton pending={calculation.isPending} />
-        <FormError error={calculation.error} />
       </form>
 
       {result ? (

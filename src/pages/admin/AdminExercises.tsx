@@ -1,9 +1,12 @@
 import { useTranslation } from 'react-i18next'
 import { tLabel } from '../../i18n/index'
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { adminService } from '../../services/admin'
 import { toExerciseForm } from '../../services/exercises'
 import type { Exercise, ExerciseForm } from '../../types/exercises'
+import { adminExerciseSchema, type AdminExerciseValues } from '../../schemas/admin-exercise.schema'
 import { AdminHeader, AdminSelect, AdminToolbar, DeleteDialog, ModalFooter } from '../../components/admin/AdminPage'
 import DataTable, { RowActions, TableFooter, type Column } from '../../components/ui/DataTable'
 import Modal from '../../components/ui/Modal'
@@ -16,9 +19,7 @@ import { useTaxonomies } from '../../hooks/useTaxonomies'
 
 const difficultyStars: Record<string, number> = { Beginner: 1, Intermediate: 2, Advanced: 3 }
 
-type FormErrors = Partial<Record<keyof ExerciseForm, string>>
-
-const blankExercise: ExerciseForm = {
+const blankExercise: AdminExerciseValues = {
   name: '',
   description: '',
   instructions: '',
@@ -37,37 +38,22 @@ export default function AdminExercises() {
   const taxonomies = useTaxonomies()
 
   const crud = useCrud<Exercise, ExerciseForm>(adminService.exercises, { resource: 'exercises', defaultSort: { key: 'name', dir: 'asc' }, extraQuery: { category } })
-  const [form, setForm] = useState<ExerciseForm>(blankExercise)
-  const [errors, setErrors] = useState<FormErrors>({})
+  const { register, control, handleSubmit, reset, formState: { errors } } = useForm<AdminExerciseValues>({
+    resolver: zodResolver(adminExerciseSchema),
+    mode: 'onTouched',
+    defaultValues: blankExercise,
+  })
 
   useEffect(() => {
     if (!crud.editing) return
-    setForm(crud.editingRow ? toExerciseForm(crud.editingRow) : blankExercise)
-    setErrors({})
-  }, [crud.editing, crud.editingRow])
-
-  const setField = (name: keyof ExerciseForm) => (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => setForm((f) => ({ ...f, [name]: event.target.value }))
+    reset(crud.editingRow ? toExerciseForm(crud.editingRow) : blankExercise)
+  }, [crud.editing, crud.editingRow, reset])
 
   // One toggler for both chip rows -- they behave identically.
-  const toggleIn = (key: 'muscleGroups' | 'equipmentList') => (value: string) =>
-    setForm((f) => ({
-      ...f,
-      [key]: f[key].includes(value) ? f[key].filter((item) => item !== value) : [...f[key], value],
-    }))
+  const toggle = (list: string[], value: string) =>
+    list.includes(value) ? list.filter((item) => item !== value) : [...list, value]
 
-  const toggleMuscle = toggleIn('muscleGroups')
-  const toggleEquipment = toggleIn('equipmentList')
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    const found: FormErrors = {}
-    if (!form.name.trim()) found.name = t('common.nameIsRequired')
-    if (!form.description.trim()) found.description = t('admin.exercises.giveItAOneLineDescription')
-    if (form.muscleGroups.length === 0) found.muscleGroups = t('admin.exercises.pickAtLeastOneMuscleGroup')
-    setErrors(found)
-    if (Object.keys(found).length > 0) return
-    crud.save(form)
-  }
+  const submit = handleSubmit((values) => crud.save(values))
 
   const columns: Column<Exercise>[] = [
     {
@@ -183,26 +169,25 @@ export default function AdminExercises() {
         footer={<ModalFooter onCancel={() => crud.setEditing(null)} saving={crud.saving} />}
       >
         <form id="crud-form" onSubmit={submit} noValidate className="space-y-md">
-          <TextField label={t('common.name')} name="name" value={form.name} onChange={setField('name')} error={errors.name ?? crud.fieldErrors.name} />
-          <TextAreaField
-            label={t('common.description')}
-            name="description"
-            value={form.description}
-            onChange={setField('description')}
-            error={errors.description ?? crud.fieldErrors.description}
-          />
+          <TextField label={t('common.name')} id="name" error={errors.name?.message} {...register('name')} />
+          <TextAreaField label={t('common.description')} id="description" error={errors.description?.message} {...register('description')} />
 
           <div>
             <span className="block font-label-bold text-label-bold text-on-surface mb-xs">{t('admin.exercises.muscleGroups2')}</span>
+            <Controller
+              control={control}
+              name="muscleGroups"
+              render={({ field }) => (
             <div className="flex flex-wrap gap-sm">
-              {(taxonomies?.muscleGroups ?? []).map((group) => {
-                const active = form.muscleGroups.includes(group.label)
+              {(taxonomies?.muscleGroups ?? []).map((group, index) => {
+                const active = field.value.includes(group.label)
                 return (
                   <button
                     key={group.value}
+                    ref={index === 0 ? field.ref : undefined}
                     type="button"
                     aria-pressed={active}
-                    onClick={() => toggleMuscle(group.label)}
+                    onClick={() => field.onChange(toggle(field.value, group.label))}
                     className={`px-sm py-xs rounded-full border font-label-sm text-label-sm transition-colors ${
                       active
                         ? 'border-primary bg-primary-container/10 text-primary'
@@ -213,22 +198,28 @@ export default function AdminExercises() {
                 )
               })}
             </div>
+              )}
+            />
             {errors.muscleGroups ? (
-              <p className="font-label-sm text-label-sm text-error mt-xs">{errors.muscleGroups}</p>
+              <p className="font-label-sm text-label-sm text-error mt-xs">{errors.muscleGroups.message}</p>
             ) : null}
           </div>
 
           <div>
             <span className="block font-label-bold text-label-bold text-on-surface mb-xs">{t('common.equipment')}</span>
+            <Controller
+              control={control}
+              name="equipmentList"
+              render={({ field }) => (
             <div className="flex flex-wrap gap-sm">
               {(taxonomies?.equipment ?? []).map((option) => {
-                const active = form.equipmentList.includes(option.label)
+                const active = field.value.includes(option.label)
                 return (
                   <button
                     key={option.value}
                     type="button"
                     aria-pressed={active}
-                    onClick={() => toggleEquipment(option.label)}
+                    onClick={() => field.onChange(toggle(field.value, option.label))}
                     className={`px-sm py-xs rounded-full border font-label-sm text-label-sm transition-colors ${
                       active
                         ? 'border-primary bg-primary-container/10 text-primary'
@@ -239,16 +230,18 @@ export default function AdminExercises() {
                 )
               })}
             </div>
+              )}
+            />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
-            <SelectField label={t('common.difficulty')} name="difficulty" value={form.difficulty} onChange={setField('difficulty')}>
+            <SelectField label={t('common.difficulty')} id="difficulty" error={errors.difficulty?.message} {...register('difficulty')}>
               {(taxonomies?.difficulties ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
                   {tLabel(option.label)}</option>
               ))}
             </SelectField>
-            <SelectField label={t('common.category')} name="category" value={form.category} onChange={setField('category')}>
+            <SelectField label={t('common.category')} id="category" error={errors.category?.message} {...register('category')}>
               {(taxonomies?.categories ?? []).map((option) => (
                 <option key={option.value} value={option.label}>
                   {tLabel(option.label)}</option>
@@ -258,17 +251,15 @@ export default function AdminExercises() {
 
           <TextField
             label={t('admin.exercises.primaryMuscles')}
-            name="primaryMuscles"
-            value={form.primaryMuscles}
-            onChange={setField('primaryMuscles')}
+            id="primaryMuscles"
+            {...register('primaryMuscles')}
             placeholder={t('admin.exercises.chestTricepsMustBeAmongThe')}
           />
 
           <TextAreaField
             label={t('admin.exercises.instructionsOneStepPerLine')}
-            name="instructions"
-            value={form.instructions}
-            onChange={setField('instructions')}
+            id="instructions"
+            {...register('instructions')}
             rows={5}
             placeholder={t('admin.exercises.instructionsPlaceholder')}
           />
@@ -276,20 +267,18 @@ export default function AdminExercises() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
             <TextField
               label={t('admin.exercises.videoUrl')}
-              name="videoUrl"
+              id="videoUrl"
               type="url"
-              value={form.videoUrl}
-              onChange={setField('videoUrl')}
-              error={crud.fieldErrors.video_url}
+              error={errors.videoUrl?.message}
+              {...register('videoUrl')}
               placeholder="https://www.youtube.com/watch?v=..."
             />
             <TextField
               label={t('admin.exercises.thumbnailUrl')}
-              name="thumbnailUrl"
+              id="thumbnailUrl"
               type="url"
-              value={form.thumbnailUrl}
-              onChange={setField('thumbnailUrl')}
-              error={crud.fieldErrors.thumbnail_url}
+              error={errors.thumbnailUrl?.message}
+              {...register('thumbnailUrl')}
               placeholder="https://i.ytimg.com/vi/<id>/hqdefault.jpg"
             />
           </div>

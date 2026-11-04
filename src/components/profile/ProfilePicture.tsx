@@ -2,7 +2,6 @@ import { useRef, type ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useRemoveAvatar, useUploadAvatar } from '../../hooks/useMe'
-import { fieldErrorsOf } from '../../services/http'
 import Avatar from '../ui/Avatar'
 import Icon from '../ui/Icon'
 
@@ -30,13 +29,8 @@ export default function ProfilePicture({ url }: { url: string | null }) {
       return
     }
 
-    upload.mutate(file, {
-      onSuccess: () => toast.success(t('profileSettings.pictureSaved')),
-      onError: (error) => {
-        // The API checks the contents, so a renamed file can get this far.
-        if (fieldErrorsOf(error).file) toast.error(t('profileSettings.errors.imageType'))
-      },
-    })
+    // The API checks the contents too; a renamed file it rejects is toasted globally.
+    upload.mutate(file, { onSuccess: () => toast.success(t('profileSettings.pictureSaved')) })
   }
 
   return (

@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index'
 import type { IconName } from '../components/ui/Icon'
-import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { errorMessage } from '../services/http'
+import { useMemo } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { measurementSchema, type MeasurementInput, type MeasurementValues } from '../schemas/measurement.schema'
 import MeasurementChart from '../components/charts/MeasurementChart'
 import { ErrorState, Spinner } from '../components/ui/States'
 import Icon from '../components/ui/Icon'
@@ -22,7 +24,7 @@ const fields: { name: FieldName; label: string; kind: 'weight' | 'percent' | 'le
   { name: 'arms', label: 'bodyMeasurements.arms', kind: 'length', step: '0.1', icon: 'ruler' },
 ]
 
-const emptyForm: Record<FieldName, string> = { weight: '', bodyFat: '', waist: '', chest: '', arms: '' }
+const emptyForm: MeasurementInput = { weight: '', bodyFat: '', waist: '', chest: '', arms: '' }
 
 function Delta({ current, previous, suffix = '' }: { current: number | null; previous: number | null; suffix?: string }) {
   if (previous == null || current == null) {
@@ -47,40 +49,35 @@ function Delta({ current, previous, suffix = '' }: { current: number | null; pre
 export default function BodyMeasurements() {
   const { t } = useTranslation()
   const { unit, setUnit, weightLabel, lengthLabel, showWeight, showLength, toStoredWeight, toStoredLength } = useUnits()
-  const [form, setForm] = useState(emptyForm)
-  const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({})
   const { data: measurements, isPending: loading, error, refetch } = useMeasurements()
-
   const logMeasurement = useLogMeasurement()
 
-  const setField = (name: FieldName) => (event: ChangeEvent<HTMLInputElement>) => {
-    setForm((f) => ({ ...f, [name]: event.target.value }))
-  }
+  // The weight ceiling depends on the unit the numbers are typed in.
+  const schema = useMemo(() => measurementSchema(unit), [unit])
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<MeasurementInput, unknown, MeasurementValues>({
+    resolver: zodResolver(schema),
+    mode: 'onTouched',
+    defaultValues: emptyForm,
+  })
 
-  const handleSubmit = (event: FormEvent) => {
-    event.preventDefault()
-    const found: Partial<Record<FieldName, string>> = {}
-    if (!form.weight) found.weight = t('bodyMeasurements.weightIsRequired')
-    else if (Number(form.weight) <= 0) found.weight = t('bodyMeasurements.enterAPositiveNumber')
-    if (form.bodyFat && (Number(form.bodyFat) < 0 || Number(form.bodyFat) > 70))
-      found.bodyFat = t('bodyMeasurements.bodyFatShouldBeBetween0')
-    setErrors(found)
-    if (Object.keys(found).length > 0) return
-
-    // The API always stores lbs/inches -- convert on the way out so a metric
-    // user's "84 kg" isn't written to the database as 84 lbs.
-    logMeasurement.mutate({
-      weight: toStoredWeight(form.weight),
-      bodyFat: form.bodyFat ? Number(form.bodyFat) : null,
-      waist: toStoredLength(form.waist),
-      chest: toStoredLength(form.chest),
-      arms: toStoredLength(form.arms),
-    }, {
-      onSuccess: () => {
-        setForm(emptyForm)
+  // The API always stores lbs/inches -- convert on the way out so a metric
+  // user's "84 kg" isn't written to the database as 84 lbs.
+  const onValid = (values: MeasurementValues) =>
+    logMeasurement.mutate(
+      {
+        weight: toStoredWeight(values.weight),
+        bodyFat: values.bodyFat,
+        waist: toStoredLength(values.waist),
+        chest: toStoredLength(values.chest),
+        arms: toStoredLength(values.arms),
       },
-    })
-  }
+      { onSuccess: () => reset(emptyForm) },
+    )
 
   if (loading) return <Spinner label={t('bodyMeasurements.loadingMeasurements')} />
   if (error) return <ErrorState error={error} onRetry={refetch} />
@@ -102,7 +99,7 @@ export default function BodyMeasurements() {
         {/* Log form */}
         <section className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant">
           <h2 className="font-headline-md text-headline-md text-on-surface mb-md">{t('bodyMeasurements.logMeasurements')}</h2>
-          <form onSubmit={handleSubmit} noValidate className="space-y-md">
+          <form onSubmit={handleSubmit(onValid)} noValidate className="space-y-md">
             {fields.map((field) => (
               <div key={field.name}>
                 <label
@@ -116,19 +113,20 @@ export default function BodyMeasurements() {
                 </label>
                 <input
                   id={field.name}
-                  name={field.name}
                   type="number"
                   step={field.step}
                   min="0"
-                  value={form[field.name]}
-                  onChange={setField(field.name)}
+                  inputMode="decimal"
+                  aria-invalid={errors[field.name] ? 'true' : undefined}
+                  aria-describedby={errors[field.name] ? `${field.name}-error` : undefined}
+                  {...register(field.name)}
                   placeholder="—"
                   className={`w-full bg-surface-container-low rounded-lg py-sm px-md ring-1 ring-inset outline-none transition-all font-body-md text-on-surface focus:ring-2 focus:bg-surface-container-lowest ${
                     errors[field.name] ? 'ring-error focus:ring-error' : 'ring-surface-variant focus:ring-primary'
                   }`}
                 />
                 {errors[field.name] ? (
-                  <p className="font-label-sm text-label-sm text-error mt-xs">{errors[field.name]}</p>
+                  <p id={`${field.name}-error`} className="font-label-sm text-label-sm text-error mt-xs">{errors[field.name]?.message}</p>
                 ) : null}
               </div>
             ))}
@@ -140,14 +138,6 @@ export default function BodyMeasurements() {
             >
               {logMeasurement.isPending ? t('common.saving') : t('bodyMeasurements.saveEntry')}
             </button>
-
-            {logMeasurement.isError ? (
-              <p role="alert" className="font-label-sm text-label-sm text-error text-center">
-                {errorMessage(logMeasurement.error)}
-              </p>
-            ) : null}
-
-            
           </form>
         </section>
 

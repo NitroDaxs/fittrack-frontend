@@ -1,25 +1,22 @@
 import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index'
-import { useState, type FormEvent } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   CalculateButton,
   CalculatorHeader,
-  emptyHeight,
   FieldError,
-  FormError,
-  heightRequest,
   HeightInput,
   inputClass,
   NumberInput,
   SexToggle,
-  toNumber,
   useCalculatorUnit,
 } from '../components/calculators/shared'
+import { emptyHeight, tdeeSchema, type TdeeInput, type TdeeValues } from '../schemas/calculators.schema'
 import Icon from '../components/ui/Icon'
 import UnitToggle from '../components/ui/UnitToggle'
 import { useTdee } from '../hooks/useCalculators'
-import type { ActivityLevel, Sex } from '../types/calculators'
-import { fieldErrorsOf } from '../services/http'
+import type { ActivityLevel } from '../types/calculators'
 
 const activityLevels: { value: ActivityLevel; label: string }[] = [
   { value: 'sedentary', label: 'calculators.tdee.sedentaryOfficeJobLittleToNo' },
@@ -31,32 +28,22 @@ const activityLevels: { value: ActivityLevel; label: string }[] = [
 
 export default function TdeeCalculator() {
   const { t } = useTranslation()
-  const [sex, setSex] = useState<Sex>('male')
-  const [age, setAge] = useState('')
-  const [weight, setWeight] = useState('')
-  const [height, setHeight] = useState(emptyHeight)
-  const [activity, setActivity] = useState<ActivityLevel | ''>('')
   const calculation = useTdee()
-  const { unit, setUnit, weightLabel } = useCalculatorUnit(() => {
-    setWeight('')
-    setHeight(emptyHeight)
+  // Weight and height are typed in the unit, so they are cleared; sex, age and activity are kept.
+  const { unit, setUnit, weightLabel } = useCalculatorUnit((next) => {
+    setValue('units', next)
+    for (const name of ['weight', 'height_feet', 'height_inches', 'height_cm'] as const) resetField(name, { defaultValue: '' })
     calculation.reset()
   })
+  const { register, control, handleSubmit, setValue, resetField, formState: { errors } } = useForm<TdeeInput, unknown, TdeeValues>({
+    resolver: zodResolver(tdeeSchema),
+    mode: 'onTouched',
+    // `activity` starts on the "choose" option, which the schema rejects until one is picked.
+    defaultValues: { units: unit, sex: 'male', age: '', weight: '', ...emptyHeight },
+  })
 
-  const errors = fieldErrorsOf(calculation.error)
   const result = calculation.data
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    calculation.mutate({
-      units: unit,
-      sex,
-      age: toNumber(age),
-      weight: toNumber(weight),
-      activity: activity || null,
-      ...heightRequest(height),
-    })
-  }
+  const submit = handleSubmit((values) => calculation.mutate(values))
 
   return (
     <div className="max-w-[900px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
@@ -76,12 +63,17 @@ export default function TdeeCalculator() {
           </div>
 
           <div className="space-y-md">
-            <SexToggle value={sex} onChange={setSex} />
+            <Controller control={control} name="sex" render={({ field }) => <SexToggle value={field.value} onChange={field.onChange} />} />
             <div className="grid grid-cols-2 gap-md">
-              <NumberInput id="age" label={t('calculators.tdee.age')} value={age} onChange={setAge} error={errors.age} />
-              <NumberInput id="weight" label={t('common.weight', { unit: weightLabel })} value={weight} onChange={setWeight} error={errors.weight} />
+              <NumberInput id="age" label={t('calculators.tdee.age')} error={errors.age?.message} {...register('age')} />
+              <NumberInput id="weight" label={t('common.weight', { unit: weightLabel })} error={errors.weight?.message} {...register('weight')} />
             </div>
-            <HeightInput value={height} onChange={setHeight} errors={errors} />
+            <HeightInput
+              feet={register('height_feet')}
+              inches={register('height_inches')}
+              cm={register('height_cm')}
+              errors={{ height_feet: errors.height_feet?.message, height_inches: errors.height_inches?.message, height_cm: errors.height_cm?.message }}
+            />
             <div>
               <label htmlFor="activity" className="font-label-bold text-label-bold text-on-surface-variant mb-xs block">
                 {t('calculators.tdee.activityLevel')}
@@ -89,8 +81,9 @@ export default function TdeeCalculator() {
               <div className="relative">
                 <select
                   id="activity"
-                  value={activity}
-                  onChange={(event) => setActivity(event.target.value as ActivityLevel | '')}
+                  defaultValue=""
+                  aria-invalid={errors.activity ? 'true' : undefined}
+                  {...register('activity')}
                   className={`${inputClass} appearance-none pr-xl ${errors.activity ? 'ring-error focus:ring-error' : 'ring-surface-variant focus:ring-primary'}`}
                 >
                   <option value="">{t('calculators.tdee.chooseYourActivityLevel')}</option>
@@ -102,10 +95,9 @@ export default function TdeeCalculator() {
                 </select>
                 <Icon name="chevron-down" size={20} className="absolute right-sm top-1/2 -translate-y-1/2 text-secondary pointer-events-none" />
               </div>
-              <FieldError message={errors.activity} />
+              <FieldError message={errors.activity?.message} />
             </div>
             <CalculateButton pending={calculation.isPending} />
-            <FormError error={calculation.error} />
           </div>
         </form>
 

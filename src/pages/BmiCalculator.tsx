@@ -1,20 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { useState, type FormEvent } from 'react'
-import {
-  CalculateButton,
-  CalculatorHeader,
-  emptyHeight,
-  FormError,
-  heightRequest,
-  HeightInput,
-  NumberInput,
-  toNumber,
-  useCalculatorUnit,
-} from '../components/calculators/shared'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CalculateButton, CalculatorHeader, HeightInput, NumberInput, useCalculatorUnit } from '../components/calculators/shared'
+import { bmiSchema, emptyHeight, type BmiInput } from '../schemas/calculators.schema'
+import type { Units } from '../types/shared'
 import UnitToggle from '../components/ui/UnitToggle'
 import { useBmi } from '../hooks/useCalculators'
 import type { BmiCategory } from '../types/calculators'
-import { fieldErrorsOf } from '../services/http'
 
 const categories: Record<BmiCategory, { label: string; tone: string }> = {
   underweight: { label: 'calculators.bmi.underweight', tone: 'text-secondary' },
@@ -23,24 +15,23 @@ const categories: Record<BmiCategory, { label: string; tone: string }> = {
   obese: { label: 'calculators.bmi.obese', tone: 'text-error' },
 }
 
+const blank = (units: Units): BmiInput => ({ units, weight: '', ...emptyHeight })
+
 export default function BmiCalculator() {
   const { t } = useTranslation()
-  const [height, setHeight] = useState(emptyHeight)
-  const [weight, setWeight] = useState('')
   const calculation = useBmi()
-  const { unit, setUnit, weightLabel } = useCalculatorUnit(() => {
-    setHeight(emptyHeight)
-    setWeight('')
+  const { unit, setUnit, weightLabel } = useCalculatorUnit((next) => {
+    reset(blank(next))
     calculation.reset()
   })
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    resolver: zodResolver(bmiSchema),
+    mode: 'onTouched',
+    defaultValues: blank(unit),
+  })
 
-  const errors = fieldErrorsOf(calculation.error)
   const result = calculation.data
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault()
-    calculation.mutate({ units: unit, weight: toNumber(weight), ...heightRequest(height) })
-  }
+  const submit = handleSubmit((values) => calculation.mutate(values))
 
   return (
     <div className="max-w-[800px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
@@ -52,11 +43,15 @@ export default function BmiCalculator() {
 
       <form onSubmit={submit} noValidate className="bg-surface-container-lowest rounded-xl p-lg elev-card border border-surface-variant mb-xl space-y-md">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-lg">
-          <HeightInput value={height} onChange={setHeight} errors={errors} />
-          <NumberInput id="weight" label={t('common.weight', { unit: weightLabel })} value={weight} onChange={setWeight} error={errors.weight} />
+          <HeightInput
+            feet={register('height_feet')}
+            inches={register('height_inches')}
+            cm={register('height_cm')}
+            errors={{ height_feet: errors.height_feet?.message, height_inches: errors.height_inches?.message, height_cm: errors.height_cm?.message }}
+          />
+          <NumberInput id="weight" label={t('common.weight', { unit: weightLabel })} error={errors.weight?.message} {...register('weight')} />
         </div>
         <CalculateButton pending={calculation.isPending} />
-        <FormError error={calculation.error} />
       </form>
 
       {result ? (

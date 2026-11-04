@@ -1,4 +1,5 @@
 import type { PageQuery } from './shared'
+import type { AdminArticleValues } from '../schemas/admin-article.schema'
 
 export type ArticleCategoryValue = 'nutrition' | 'training_theory' | 'recovery' | 'mindset'
 
@@ -57,13 +58,8 @@ export interface Article {
   related: Article[]
 }
 
-export interface ArticleForm {
-  title: string
-  body: string
-  category: string
-  status: string
-  imageUrl: string
-}
+/** The admin form's values, inferred from `adminArticleSchema` so there is one source. */
+export type ArticleForm = AdminArticleValues
 
 export interface ArticleQuery extends PageQuery {
   search?: string

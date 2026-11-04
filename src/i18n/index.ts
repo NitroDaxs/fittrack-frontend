@@ -1,6 +1,7 @@
 import i18n from 'i18next'
 import LanguageDetector from 'i18next-browser-languagedetector'
 import { initReactI18next } from 'react-i18next'
+import * as z from 'zod'
 import bg from './locales/bg.json'
 import en from './locales/en.json'
 
@@ -25,11 +26,15 @@ void i18n
     },
   })
 
-const syncDocumentLanguage = (language: string) => {
+// The page and Zod's built-in validation messages follow the app language.
+const zodLocales = { en: z.locales.en, bg: z.locales.bg } as const
+
+const syncLanguage = (language: string) => {
   document.documentElement.lang = language
+  z.config((zodLocales[language as keyof typeof zodLocales] ?? zodLocales.en)())
 }
-syncDocumentLanguage(i18n.resolvedLanguage ?? 'en')
-i18n.on('languageChanged', syncDocumentLanguage)
+syncLanguage(i18n.resolvedLanguage ?? 'en')
+i18n.on('languageChanged', syncLanguage)
 
 /**
  * Translates a fixed value the API sends in English, such as a muscle group or
