@@ -8,8 +8,7 @@ import i18n from '../i18n'
  * the value, and are looked up when a value is validated (not when the schema is
  * created), so they follow the language the user has picked.
  *
- * The frontend defines these rules and the API enforces the same ones; the
- * mapping is in src/docs/validation-rules.md.
+ * The frontend defines these rules and the API enforces the same ones.
  */
 
 /** A custom message, translated at validation time. */
