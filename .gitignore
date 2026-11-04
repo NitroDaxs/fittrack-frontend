@@ -10,3 +10,6 @@ dist
 .DS_Store
 Thumbs.db
 .vercel
+
+# Test coverage reports
+coverage
