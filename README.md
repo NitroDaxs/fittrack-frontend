@@ -324,6 +324,9 @@ API calls are mocked, so no backend is needed.
   each test a fresh query client and a `MemoryRouter`.
 - `src/test/fixtures.ts` has sample API data.
 
+GitHub Actions (`.github/workflows/ci.yml`) runs `npm run typecheck` and
+`npm run test:run` on every push to `main` and on every pull request.
+
 ## Deployment
 
 `vercel.json` sends all paths to `index.html`, so deep links work on Vercel. On any
@@ -338,8 +341,6 @@ Deploy API changes before frontend changes that depend on them.
 
 ## Known limitations
 
-- There's no CI workflow, so run `npm run typecheck` and `npm run test:run` before
-  pushing.
 - There are no end-to-end tests against a running API.
 - The main JavaScript bundle is over 500 kB, because routes aren't code-split.
 - Progress-photo upload and social sign-in aren't implemented.
