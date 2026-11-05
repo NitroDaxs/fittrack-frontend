@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useCallback, useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { useWorkoutDraft } from '../context/WorkoutContext'
+import { useWorkoutStore } from '../store/workout.store'
 import { ApiError } from '../services/http'
 import Icon from '../components/ui/Icon'
 import Img from '../components/ui/Img'
@@ -67,7 +67,12 @@ function Stepper({ label, value, step, onAdjust, onSet }: StepperProps) {
 export default function ActiveWorkout() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { session, adjustCurrent, setCurrentValue, completeSet, goToExercise, endSession } = useWorkoutDraft()
+  const session = useWorkoutStore((state) => state.session)
+  const adjustCurrent = useWorkoutStore((state) => state.adjustCurrent)
+  const setCurrentValue = useWorkoutStore((state) => state.setCurrentValue)
+  const completeSet = useWorkoutStore((state) => state.completeSet)
+  const goToExercise = useWorkoutStore((state) => state.goToExercise)
+  const endSession = useWorkoutStore((state) => state.endSession)
 
   const [restRemaining, setRestRemaining] = useState(0)
   const [restRunning, setRestRunning] = useState(false)

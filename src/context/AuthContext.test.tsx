@@ -4,8 +4,9 @@ import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { toast } from 'sonner'
 import i18n from '../i18n'
-import { userDto } from '../test/fixtures'
+import { exercise, userDto } from '../test/fixtures'
 import { createTestQueryClient, silenceRenderErrors } from '../test/utils'
+import { useWorkoutStore } from '../store/workout.store'
 import { AuthProvider, useAuth } from './AuthContext'
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
@@ -136,6 +137,22 @@ describe('login / register / logout', () => {
     expect(getToken()).toBeNull()
     expect(localStorage.getItem(SESSION_KEY)).toBeNull()
     expect(queryClient.getQueryData(['private'])).toBeUndefined()
+  })
+
+  it('logout clears the workout draft and session', async () => {
+    storeSession()
+    const workout = useWorkoutStore.getState()
+    workout.addExercise(exercise({ id: 1, name: 'Squat' }))
+    workout.startSession()
+    expect(useWorkoutStore.getState().session).not.toBeNull()
+    const { result } = setup()
+
+    await act(async () => {
+      await result.current.logout()
+    })
+    expect(useWorkoutStore.getState().session).toBeNull()
+    expect(useWorkoutStore.getState().draft.items).toEqual([])
+    expect(JSON.parse(localStorage.getItem('fittrack.workout')!).state.session).toBeNull()
   })
 })
 

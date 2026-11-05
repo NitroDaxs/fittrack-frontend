@@ -5,7 +5,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ErrorState, Spinner } from '../components/ui/States'
 import Icon from '../components/ui/Icon'
 import Img from '../components/ui/Img'
-import { useWorkoutDraft } from '../context/WorkoutContext'
+import { useWorkoutStore } from '../store/workout.store'
 import type { RoutineDay } from '../types/routines'
 import { useFavorite } from '../hooks/useFavorite'
 import { useRoutine } from '../hooks/useRoutines'
@@ -15,7 +15,7 @@ export default function RoutineDetail() {
   const { slug = '' } = useParams()
   const navigate = useNavigate()
   const [activeDay, setActiveDay] = useState(0)
-  const { loadRoutineDay } = useWorkoutDraft()
+  const loadRoutineDay = useWorkoutStore((state) => state.loadRoutineDay)
 
   const { data: routine, isPending: loading, error, refetch } = useRoutine(slug)
   const { isSaved, toggle: toggleSaved, pending: saving, canSave } = useFavorite('routine', routine?.id)

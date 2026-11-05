@@ -7,6 +7,7 @@ import type { AuthResponse, LoginRequest, RegisterRequest, UserDto } from '../ty
 import type { UserRole } from '../types/shared'
 import { getToken, setToken, setUnauthorizedHandler } from '../services/http'
 import { authService } from '../services/auth'
+import { useWorkoutStore } from '../store/workout.store'
 
 interface Session {
   user: UserDto
@@ -104,6 +105,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(null)
       // Otherwise the next person to log in on this browser would see this user's data.
       queryClient.clear()
+      // The same goes for a workout in progress on this device.
+      useWorkoutStore.getState().reset()
     }
   }, [setSession, queryClient])
 

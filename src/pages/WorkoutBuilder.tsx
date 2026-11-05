@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { tLabel } from '../i18n/index'
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useWorkoutDraft } from '../context/WorkoutContext'
+import { useWorkoutStore } from '../store/workout.store'
 import Icon from '../components/ui/Icon'
 import Img from '../components/ui/Img'
 import { EmptyState } from '../components/ui/States'
@@ -39,8 +39,14 @@ function NumberField({ label, value, onChange, width = 'w-16', accent = false }:
 export default function WorkoutBuilder() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { draft, setDraftName, addExercise, removeItem, updateItem, moveItem, resetDraft, startSession } =
-    useWorkoutDraft()
+  const draft = useWorkoutStore((state) => state.draft)
+  const setDraftName = useWorkoutStore((state) => state.setDraftName)
+  const addExercise = useWorkoutStore((state) => state.addExercise)
+  const removeItem = useWorkoutStore((state) => state.removeItem)
+  const updateItem = useWorkoutStore((state) => state.updateItem)
+  const moveItem = useWorkoutStore((state) => state.moveItem)
+  const resetDraft = useWorkoutStore((state) => state.resetDraft)
+  const startSession = useWorkoutStore((state) => state.startSession)
 
   const [search, setSearch] = useState('')
   const [pickerOpen, setPickerOpen] = useState(false)

@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest'
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeAll, beforeEach } from 'vitest'
 import i18n from '../i18n'
+import { useWorkoutStore } from '../store/workout.store'
 
 // Every test runs in English so assertions can use i18n.t() or literal copy alike.
 beforeAll(async () => {
@@ -9,6 +10,8 @@ beforeAll(async () => {
 })
 
 beforeEach(() => {
+  // The workout store lives for the whole test file, so start every test from a clean one.
+  useWorkoutStore.getState().reset()
   window.localStorage.clear()
 })
 
