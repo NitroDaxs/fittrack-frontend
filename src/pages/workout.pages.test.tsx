@@ -226,6 +226,27 @@ describe('ActiveWorkout', () => {
     expect(screen.getByLabelText(t('workoutBuilder.workoutName'))).toBeInTheDocument()
   })
 
+  it('keeps the builder exercises after quitting', async () => {
+    renderApp('/builder')
+    await userEvent.click(screen.getByLabelText(t('workoutBuilder.searchLibraryToAddExercise')))
+    await userEvent.click(await screen.findByRole('button', { name: /Squat/ }))
+    await userEvent.click(screen.getByRole('button', { name: t('workoutBuilder.startWorkout') }))
+    await userEvent.click(screen.getByRole('button', { name: t('activeWorkout.quitWorkout') }))
+    expect(screen.getByRole('heading', { name: 'Squat', level: 3 })).toBeInTheDocument()
+  })
+
+  it('empties the builder once the workout is saved', async () => {
+    renderApp('/builder')
+    await userEvent.click(screen.getByLabelText(t('workoutBuilder.searchLibraryToAddExercise')))
+    await userEvent.click(await screen.findByRole('button', { name: /Squat/ }))
+    await userEvent.click(screen.getByRole('button', { name: t('workoutBuilder.startWorkout') }))
+    await finishAllSets()
+    await userEvent.click(screen.getByRole('button', { name: t('activeWorkout.saveToHistory') }))
+    expect(await screen.findByText('landed on /history')).toBeInTheDocument()
+    expect(useWorkoutStore.getState().session).toBeNull()
+    expect(useWorkoutStore.getState().draft).toEqual({ name: t('workoutBuilder.newWorkout'), items: [] })
+  })
+
   const finishAllSets = async () => {
     for (let i = 0; i < 3; i++) await userEvent.click(screen.getByRole('button', { name: t('activeWorkout.completeSet') }))
   }

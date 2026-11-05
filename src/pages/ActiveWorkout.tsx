@@ -73,6 +73,7 @@ export default function ActiveWorkout() {
   const completeSet = useWorkoutStore((state) => state.completeSet)
   const goToExercise = useWorkoutStore((state) => state.goToExercise)
   const endSession = useWorkoutStore((state) => state.endSession)
+  const resetDraft = useWorkoutStore((state) => state.resetDraft)
 
   const [restRemaining, setRestRemaining] = useState(0)
   const [restRunning, setRestRunning] = useState(false)
@@ -125,7 +126,10 @@ export default function ActiveWorkout() {
       entries: session.exercises.map((exercise) => ({ exerciseId: exercise.exerciseId, sets: exercise.logged })),
     }, {
       onSuccess: () => {
+        // The workout is in history now, so the builder starts fresh. Quitting keeps
+        // the draft instead, so the same workout can be started again.
         endSession()
+        resetDraft()
         navigate('/history')
       },
     })
