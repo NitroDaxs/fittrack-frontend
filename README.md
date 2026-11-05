@@ -2,7 +2,7 @@
 
 FitTrack is a fitness tracking web app with an exercise library, training routines,
 a workout builder and live logger, progress charts, body measurements, fitness
-calculators and an admin console.
+calculators, an assistant chat and an admin console.
 
 This repository is the React single-page app. Its data and business logic come from
 the [FitTrack API](https://github.com/NitroDaxs/fittrack-be-cs), built with ASP.NET
@@ -15,6 +15,8 @@ Core.
 - [Getting started](#getting-started)
 - [Project structure](#project-structure)
 - [How data flows](#how-data-flows)
+- [Client state](#client-state)
+- [Forms and validation](#forms-and-validation)
 - [Routes](#routes)
 - [Authentication and roles](#authentication-and-roles)
 - [Calculators](#calculators)
@@ -22,6 +24,7 @@ Core.
 - [Languages](#languages)
 - [Notifications](#notifications)
 - [Styling and components](#styling-and-components)
+- [Testing](#testing)
 - [Deployment](#deployment)
 - [Known limitations](#known-limitations)
 
@@ -31,6 +34,8 @@ Core.
 | --- | --- |
 | UI | React 18, strict TypeScript |
 | Server data | TanStack Query 5, Axios |
+| Client state | Zustand 5 |
+| Forms | React Hook Form, Zod 4 |
 | Routing | React Router 6 |
 | Build | Vite 8 |
 | Styling | Tailwind CSS 3 |
@@ -38,6 +43,7 @@ Core.
 | Icons | Lucide |
 | Languages | i18next, react-i18next |
 | Notifications | Sonner |
+| Tests | Vitest 5, Testing Library, jsdom |
 | Hosting config | Vercel |
 
 ## Features
@@ -46,10 +52,13 @@ Core.
 
 - Exercise library with search, multi-select filters and a clickable body map, plus detail pages
   with video and step-by-step instructions
+- Search and filters on the library, routines and articles listings are kept in the URL,
+  so a filtered view survives a reload and can be shared
 - Routines catalog with day-by-day programmes
 - Articles on nutrition, recovery and mindset
 - Calculators for one-rep max, TDEE, BMI, macros and body fat
-- Workout builder and live workout logger
+- Workout builder and live workout logger with a rest timer; the workout in progress
+  survives a page reload
 - Sign up, log in and reset a forgotten password
 
 **Members**
@@ -57,6 +66,8 @@ Core.
 - Dashboard with strength progression, body-weight trend and a consistency heatmap
 - Workout history and body measurements
 - Saved exercises and routines
+- Assistant chat that replies in the current language and links matching exercises,
+  routines and articles
 - Profile settings: picture, name, email, password, and metric or imperial units
 
 **Admins**
@@ -93,6 +104,9 @@ the API's seed creates:
 | `npm run typecheck` | Check types without building |
 | `npm run build` | Type-check, then build for production into `dist/` |
 | `npm run preview` | Serve the production build locally |
+| `npm test` | Run the tests in watch mode |
+| `npm run test:run` | Run the tests once |
+| `npm run test:run -- --coverage` | Run the tests once with a V8 coverage report |
 
 ### Environment variables
 
@@ -110,17 +124,24 @@ If the browser reports a CORS error, add your frontend's address to the API's
 
 ```
 src/
-  router/       Page routes and the RequireRole guard
+  router/       Page routes and the RequireRole and RequireGuest guards
   layouts/      Public and admin page shells, navigation, footer
   pages/        One file per screen; admin screens are in pages/admin
-  components/   UI primitives, charts, admin tables, calculator form parts
-  hooks/        TanStack Query hooks; what pages use to read and write data
-  services/     API calls, per domain
+  components/   UI primitives, charts, chat, library filters, profile forms,
+                the admin routine builder, calculator form parts
+  hooks/        TanStack Query hooks, plus small shared hooks (URL params, debounce)
+  services/     API calls and mappers, per domain
   types/        TypeScript types, per domain
-  context/      Auth, units and active-workout state
+  schemas/      Zod schemas for every form
+  store/        Zustand stores: workout session, unit preference, chat history
+  context/      Auth session
+  i18n/         i18next setup and the English and Bulgarian translations
   data/         Calculator list for the hub page
   utils/        Unit conversion for displaying stored values
+  test/         Test setup, render helpers and fixtures
 ```
+
+Tests sit next to the code they cover, as `*.test.ts` or `*.test.tsx`.
 
 ## How data flows
 
@@ -164,6 +185,41 @@ handled by the server.
 Admin tables can use `hooks/useCrud.ts`, which handles paging, search, sorting, the
 add and edit modal, and delete confirmation.
 
+### Listing filters
+
+The library, routines and articles pages keep their search, filters and page number in
+the URL, through `hooks/useQueryParams.ts`. Lists are comma-separated (`?goals=a,b`),
+empty values are left out, and a change replaces the current history entry instead of
+adding one for every keystroke.
+
+## Client state
+
+Data that belongs to the browser rather than the server lives in Zustand stores in
+`src/store/`:
+
+| Store | Holds | Kept in |
+| --- | --- | --- |
+| `workout.store.ts` | The builder's draft, the live session and its rest timer | `localStorage` |
+| `unit.store.ts` | Metric or imperial | `localStorage` |
+| `chat.store.ts` | The assistant chat history and whose it is | `sessionStorage` |
+
+The stores are versioned. When the saved shape of the workout changes, raise
+`STORAGE_VERSION` and add a step to `migrate`, so saved workouts still load.
+
+The auth session is the only state kept in React context (`context/AuthContext.tsx`),
+because it ties the token, the profile query and the stores together.
+
+## Forms and validation
+
+Every form uses React Hook Form with a Zod schema from `src/schemas/`, connected through
+`zodResolver`. `schemas/shared.ts` has the building blocks: required text, email,
+http(s) URLs, the new-password rule (8 or more characters, with a number and an
+uppercase letter), and helpers that turn input text into numbers within a range.
+
+Messages are i18n keys, looked up at validation time so they follow the current
+language. The API enforces the same rules. Anything it still rejects, such as an email
+that's already taken, is shown as a toast or a field error.
+
 ## Routes
 
 Defined in `src/router/index.tsx`.
@@ -186,8 +242,9 @@ Defined in `src/router/index.tsx`.
 ## Authentication and roles
 
 Logging in returns a JWT, which is kept in `localStorage` and sent with every request.
-A 401 on a signed-in request ends the session, and logging out clears the query
-cache.
+A 401 on a signed-in request ends the session, with one toast however many requests
+failed. Logging out clears the query cache, the workout in progress and the chat
+history.
 
 `RequireRole` sends guests to `/login` and remembers where they were going, and sends
 signed-in users without the role to `/dashboard`. `RequireGuest` sends signed-in users
@@ -211,9 +268,13 @@ the form. `components/calculators/shared.tsx` holds the shared form parts.
 
 Stored weights and measurements are in pounds and inches, and are converted for
 display, so switching between metric and imperial never changes saved data.
-`UnitContext` holds the current choice, saved to the profile and mirrored in
-`localStorage` so the first paint uses the right units. `utils/units.ts` does the
-display conversion.
+
+- `store/unit.store.ts` holds the current choice. It's kept in `localStorage`, so the
+  first paint uses the right units and guests keep their choice.
+- `hooks/useUnits.ts` has `useUnitFormat()` for labels and conversions, and
+  `useSetUnit()`, which also saves the choice to the profile when signed in.
+- On login the account's setting wins, so the choice follows the user between devices.
+- `utils/units.ts` does the display conversion.
 
 ## Languages
 
@@ -226,7 +287,9 @@ files. `tLabel()` translates fixed values the API sends in English, such as musc
 groups and difficulty levels.
 
 Exercise, routine and article content comes from the database, and API messages come
-from the backend, so both stay in English.
+from the backend, so both stay in English. The assistant chat sends the current language
+and replies in it. Changing the language refetches cached queries, because they include
+dates formatted for the old language.
 
 ## Notifications
 
@@ -243,9 +306,23 @@ except field errors, which the form shows. Hooks show the success toasts, such a
 - **Icons:** `components/ui/Icon.tsx` lists the Lucide icons the app uses. Import and
   list a new one there, then use it as `<Icon name="dumbbell" />`.
 - **Images:** `<Img>` falls back to a tinted icon tile if a URL stops resolving.
+- **Profile pictures:** `ProfilePicture` uploads JPEG, PNG or WebP images of up to 2 MB
+  to the API.
 - **Charts:** `MeasurementChart` uses a `ComposedChart` rather than an `AreaChart`,
   because `AreaChart` silently discards `Line` children. The consistency heatmap is
   built by hand from divs.
+
+## Testing
+
+The tests use Vitest in jsdom with Testing Library. They cover schemas, services and
+mappers, hooks, stores, route guards, translations, UI components and the main pages.
+API calls are mocked, so no backend is needed.
+
+- `src/test/setup.ts` runs every test in English and resets the stores and browser
+  storage before each one.
+- `src/test/utils.tsx` has `renderWithProviders()` and `createWrapper()`, which give
+  each test a fresh query client and a `MemoryRouter`.
+- `src/test/fixtures.ts` has sample API data.
 
 ## Deployment
 
@@ -261,7 +338,8 @@ Deploy API changes before frontend changes that depend on them.
 
 ## Known limitations
 
-- There are no automated frontend tests. `npm run typecheck` and `npm run build` are
-  the only automated checks.
+- There's no CI workflow, so run `npm run typecheck` and `npm run test:run` before
+  pushing.
+- There are no end-to-end tests against a running API.
 - The main JavaScript bundle is over 500 kB, because routes aren't code-split.
 - Progress-photo upload and social sign-in aren't implemented.
