@@ -1,17 +1,20 @@
 import { useTranslation } from 'react-i18next'
-import { useState } from 'react'
 import { ArticleCard } from '../components/cards'
 import SearchInput from '../components/ui/SearchInput'
 import FilterChips from '../components/ui/FilterChips'
 import { EmptyState, ErrorState, SkeletonCard } from '../components/ui/States'
 import { useArticles } from '../hooks/useArticles'
 import { useDebounced } from '../hooks/useDebounced'
+import { useQueryParams } from '../hooks/useQueryParams'
 import { useTaxonomies } from '../hooks/useTaxonomies'
 
 export default function ArticlesListing() {
   const { t } = useTranslation()
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState<string | null>(null)
+  const { getString, getNullable, update } = useQueryParams()
+  const search = getString('q')
+  const category = getNullable('category')
+  const setSearch = (q: string) => update({ q })
+  const setCategory = (value: string | null) => update({ category: value })
 
   const debouncedSearch = useDebounced(search)
   const taxonomies = useTaxonomies()

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import ActiveFilters from '../components/library/ActiveFilters'
-import ExerciseFilters, { NO_FILTERS, type ExerciseFilterValues } from '../components/library/ExerciseFilters'
-import { useState } from 'react'
+import ExerciseFilters, { type ExerciseFilterValues } from '../components/library/ExerciseFilters'
+import { useMemo, useState } from 'react'
 import { ExerciseCard } from '../components/cards'
 import Modal from '../components/ui/Modal'
 import SearchInput from '../components/ui/SearchInput'
@@ -10,16 +10,31 @@ import Icon from '../components/ui/Icon'
 import { Pagination } from '../components/ui/Pagination'
 import { useDebounced } from '../hooks/useDebounced'
 import { useExercises } from '../hooks/useExercises'
+import { useQueryParams } from '../hooks/useQueryParams'
 import { useTaxonomies } from '../hooks/useTaxonomies'
 
 const PER_PAGE = 16
 
 export default function ExerciseLibrary() {
   const { t } = useTranslation()
-  const [search, setSearch] = useState('')
-  const [filters, setFilters] = useState<ExerciseFilterValues>(NO_FILTERS)
+  const { getString, getNullable, getList, getNumber, update } = useQueryParams()
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [page, setPage] = useState(1)
+
+  const search = getString('q')
+  const muscleGroups = getList('muscles').join(',')
+  const equipment = getList('equipment').join(',')
+  const difficulty = getNullable('difficulty')
+  const filters = useMemo<ExerciseFilterValues>(
+    () => ({
+      muscleGroups: muscleGroups ? muscleGroups.split(',') : [],
+      equipment: equipment ? equipment.split(',') : [],
+      difficulty,
+    }),
+    [muscleGroups, equipment, difficulty],
+  )
+  const page = Math.max(1, Math.floor(getNumber('page') ?? 1))
+  // Page 1 is the default, so it stays out of the URL.
+  const setPage = (next: number) => update({ page: next > 1 ? next : null })
 
   const debouncedSearch = useDebounced(search)
 
@@ -36,19 +51,14 @@ export default function ExerciseLibrary() {
     difficulties: taxonomies?.difficulties ?? [],
   }
 
-  // Any filter change invalidates the current page number.
-  const withPageReset = <T,>(setter: (value: T) => void) => (value: T) => {
-    setter(value)
-    setPage(1)
-  }
+  // Any filter change invalidates the current page number, so each update
+  // drops `page` in the same URL write.
+  const setSearch = (q: string) => update({ q, page: null })
 
-  const applyFilters = withPageReset(setFilters)
+  const applyFilters = (next: ExerciseFilterValues) =>
+    update({ muscles: next.muscleGroups, equipment: next.equipment, difficulty: next.difficulty, page: null })
 
-  const clearAll = () => {
-    setSearch('')
-    setFilters(NO_FILTERS)
-    setPage(1)
-  }
+  const clearAll = () => update({ q: null, muscles: null, equipment: null, difficulty: null, page: null })
 
   return (
     <div className="px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto w-full py-xl">
@@ -61,7 +71,7 @@ export default function ExerciseLibrary() {
         </p>
         <SearchInput
           value={search}
-          onChange={withPageReset(setSearch)}
+          onChange={setSearch}
           placeholder={t('common.searchExercises')}
           className="max-w-xl"
         />
