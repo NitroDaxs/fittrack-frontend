@@ -3,7 +3,8 @@ import { tLabel } from '../i18n/index'
 import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useUnits } from '../context/UnitContext'
+import { useSetUnit } from '../hooks/useUnits'
+import { useUnitStore } from '../store/unit.store'
 import { ErrorState, Spinner } from '../components/ui/States'
 import ChangePasswordForm from '../components/profile/ChangePasswordForm'
 import EditProfileForm from '../components/profile/EditProfileForm'
@@ -14,7 +15,8 @@ import { useProfile, useSaved } from '../hooks/useMe'
 export default function ProfileSettings() {
   const { t } = useTranslation()
   const { logout } = useAuth()
-  const { unit, setUnit } = useUnits()
+  const unit = useUnitStore((state) => state.unit)
+  const setUnit = useSetUnit()
   const navigate = useNavigate()
 
   const { data: profile, isPending: loading, error, refetch } = useProfile()

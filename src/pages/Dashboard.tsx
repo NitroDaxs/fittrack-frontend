@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import i18n from '../i18n/index'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useUnits } from '../context/UnitContext'
+import { useUnitFormat } from '../hooks/useUnits'
 import StrengthChart from '../components/charts/StrengthChart'
 import MeasurementChart from '../components/charts/MeasurementChart'
 import ConsistencyHeatmap from '../components/charts/ConsistencyHeatmap'
@@ -17,7 +17,7 @@ const change = (from: number | null, to: number | null): number =>
 export default function Dashboard() {
   const { t } = useTranslation()
   const { user } = useAuth()
-  const { weightLabel, showWeight } = useUnits()
+  const { weightLabel, showWeight } = useUnitFormat()
   const navigate = useNavigate()
 
   const { data, isPending: loading, error, refetch } = useDashboard()

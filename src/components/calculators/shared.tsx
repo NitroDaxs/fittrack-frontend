@@ -4,7 +4,8 @@ import type { UseFormRegisterReturn } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import type { Sex } from '../../types/calculators'
 import type { Units } from '../../types/shared'
-import { useUnits } from '../../context/UnitContext'
+import { useSetUnit } from '../../hooks/useUnits'
+import { useUnitStore } from '../../store/unit.store'
 import Icon from '../ui/Icon'
 
 export const inputClass =
@@ -74,7 +75,7 @@ interface HeightInputProps {
 /** Height as ft + in or cm, following the app-wide unit. */
 export function HeightInput({ feet, inches, cm, errors }: HeightInputProps) {
   const { t } = useTranslation()
-  const { unit } = useUnits()
+  const unit = useUnitStore((state) => state.unit)
   return (
     <div>
       <span className="font-label-bold text-label-bold text-on-surface-variant mb-xs block">{t('calculators.shared.height')}</span>
@@ -156,7 +157,8 @@ export function CalculatorHeader({ title, description, action }: { title: string
  * mean nothing in the other, so switching clears the form through `onReset`.
  */
 export function useCalculatorUnit(onReset: (unit: Units) => void) {
-  const { unit, setUnit } = useUnits()
+  const unit = useUnitStore((state) => state.unit)
+  const setUnit = useSetUnit()
   const lastUnit = useRef<Units>(unit)
   const resetRef = useRef(onReset)
   resetRef.current = onReset

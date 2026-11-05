@@ -1,8 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { UnitProvider } from '../context/UnitContext'
 import i18n from '../i18n'
+import { useUnitStore } from '../store/unit.store'
 import { renderWithProviders } from '../test/utils'
 import type { Measurement } from '../types/me'
 import BodyMeasurements from './BodyMeasurements'
@@ -44,7 +44,7 @@ const history = [
   entry({ id: 1, date: '2024-05-01', weight: 180, bodyFat: 16, chest: 40, waist: 32 }),
 ]
 
-const renderPage = () => renderWithProviders(<UnitProvider><BodyMeasurements /></UnitProvider>)
+const renderPage = () => renderWithProviders(<BodyMeasurements />)
 
 beforeEach(() => {
   vi.mocked(meService.measurements).mockReset().mockResolvedValue(history)
@@ -103,7 +103,7 @@ describe('BodyMeasurements', () => {
   })
 
   it('converts metric input to the stored imperial units', async () => {
-    localStorage.setItem('units', 'metric')
+    useUnitStore.setState({ unit: 'metric' })
     renderPage()
     await screen.findByRole('list')
     // History is shown converted too.

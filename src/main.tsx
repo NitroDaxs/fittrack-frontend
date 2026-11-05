@@ -7,7 +7,6 @@ import './i18n'
 import App from './router/index'
 import { AuthProvider } from './context/AuthContext'
 import { queryClient } from './services/queryClient'
-import { UnitProvider } from './context/UnitContext'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
@@ -15,10 +14,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <UnitProvider>
-            <App />
-            <Toaster position="top-right" richColors closeButton />
-          </UnitProvider>
+          <App />
+          <Toaster position="top-right" richColors closeButton />
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

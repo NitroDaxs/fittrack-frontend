@@ -1,7 +1,7 @@
 import i18n from '../../i18n/index'
 import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { tokens } from './StrengthChart'
-import { useUnits } from '../../context/UnitContext'
+import { useUnitFormat } from '../../hooks/useUnits'
 import type { WeightPoint } from '../../types/me'
 
 // ComposedChart rather than AreaChart: AreaChart only accepts Area children, so
@@ -36,7 +36,7 @@ function MeasurementTooltip({ active, payload, label, weightLabel }: Measurement
 }
 
 export default function MeasurementChart({ data, showBodyFat = false }: { data: WeightPoint[]; showBodyFat?: boolean }) {
-  const { weightLabel } = useUnits()
+  const { weightLabel } = useUnitFormat()
   const axisTick = { fontSize: 12, fontFamily: 'Inter' }
 
   return (

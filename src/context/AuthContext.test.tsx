@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import i18n from '../i18n'
 import { exercise, userDto } from '../test/fixtures'
 import { createTestQueryClient, silenceRenderErrors } from '../test/utils'
+import { useUnitStore } from '../store/unit.store'
 import { useWorkoutStore } from '../store/workout.store'
 import { AuthProvider, useAuth } from './AuthContext'
 
@@ -177,6 +178,22 @@ describe('keeping the session in step', () => {
     await waitFor(() => expect(result.current.isAdmin).toBe(true))
     expect(result.current.user?.name).toBe('Promoted')
     expect(JSON.parse(localStorage.getItem(SESSION_KEY)!).role).toBe('admin')
+  })
+
+  it("adopts the account's unit preference once the profile loads", async () => {
+    useUnitStore.getState().setUnit('imperial')
+    storeSession()
+    vi.mocked(meService.profile).mockResolvedValue(toProfile(userDto({ units: 'metric' })))
+    setup()
+    await waitFor(() => expect(useUnitStore.getState().unit).toBe('metric'))
+  })
+
+  it('leaves a guest unit preference alone', async () => {
+    useUnitStore.getState().setUnit('metric')
+    setup()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(meService.profile).not.toHaveBeenCalled()
+    expect(useUnitStore.getState().unit).toBe('metric')
   })
 
   it('ignores a profile for a different user', async () => {

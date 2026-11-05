@@ -7,6 +7,7 @@ import type { AuthResponse, LoginRequest, RegisterRequest, UserDto } from '../ty
 import type { UserRole } from '../types/shared'
 import { getToken, setToken, setUnauthorizedHandler } from '../services/http'
 import { authService } from '../services/auth'
+import { useUnitStore } from '../store/unit.store'
 import { useWorkoutStore } from '../store/workout.store'
 
 interface Session {
@@ -82,6 +83,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (profile.role === user.role && profile.name === user.name && profile.email === user.email) return
     setSession({ user: { ...user, role: profile.role, name: profile.name, email: profile.email }, role: profile.role })
   }, [profile, session, setSession])
+
+  // The same goes for the unit preference: a guest who picked metric and then logs
+  // into an imperial account gets the account's answer. If /me fails (offline, say)
+  // this device's saved choice stays in charge.
+  const accountUnits = profile?.units
+  useEffect(() => {
+    if (accountUnits) useUnitStore.getState().setUnit(accountUnits)
+  }, [accountUnits])
 
   const start = useCallback(
     ({ user, access_token }: AuthResponse) => {
