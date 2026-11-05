@@ -1,19 +1,24 @@
 import { useTranslation } from 'react-i18next'
 import { tLabel } from '../i18n/index'
-import { useState } from 'react'
 import { RoutineCard } from '../components/cards'
 import SearchInput from '../components/ui/SearchInput'
 import { EmptyState, ErrorState, SkeletonCard } from '../components/ui/States'
 import { useDebounced } from '../hooks/useDebounced'
+import { useQueryParams } from '../hooks/useQueryParams'
 import { useRoutines } from '../hooks/useRoutines'
 import { useTaxonomies } from '../hooks/useTaxonomies'
 
 export default function RoutinesCatalog() {
   const { t } = useTranslation()
-  const [search, setSearch] = useState('')
-  const [goals, setGoals] = useState<string[]>([])
-  const [levels, setLevels] = useState<string[]>([])
-  const [daysPerWeek, setDaysPerWeek] = useState<number | null>(null)
+  const { getString, getList, getNumber, update } = useQueryParams()
+  const search = getString('q')
+  const goals = getList('goals')
+  const levels = getList('levels')
+  const daysPerWeek = getNumber('days')
+  const setSearch = (q: string) => update({ q })
+  const setGoals = (next: string[]) => update({ goals: next })
+  const setLevels = (next: string[]) => update({ levels: next })
+  const setDaysPerWeek = (days: number | null) => update({ days })
 
   const debouncedSearch = useDebounced(search)
   const taxonomies = useTaxonomies()
@@ -24,12 +29,7 @@ export default function RoutinesCatalog() {
   const toggle = (list: string[], setList: (next: string[]) => void) => (value: string) =>
     setList(list.includes(value) ? list.filter((v) => v !== value) : [...list, value])
 
-  const clearAll = () => {
-    setSearch('')
-    setGoals([])
-    setLevels([])
-    setDaysPerWeek(null)
-  }
+  const clearAll = () => update({ q: null, goals: null, levels: null, days: null })
 
   const hasFilters = goals.length > 0 || levels.length > 0 || daysPerWeek !== null || search !== ''
 
