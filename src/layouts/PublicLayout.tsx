@@ -8,7 +8,7 @@ import { useAuth } from '../context/AuthContext'
 
 export default function PublicLayout() {
   const { pathname } = useLocation()
-  const { isAuthenticated } = useAuth()
+  const { user } = useAuth()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -22,7 +22,8 @@ export default function PublicLayout() {
       </main>
       <Footer />
       <BottomNav />
-      {isAuthenticated ? <ChatBubble /> : null}
+      {/* Keyed by user so a different account never inherits this one's panel state. */}
+      {user ? <ChatBubble key={user.id} userId={user.id} /> : null}
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import Icon from '../ui/Icon'
 import Img from '../ui/Img'
 import { chatService } from '../../services/chat'
+import { selectMessagesFor, useChatStore } from '../../store/chat.store'
 import { errorMessage } from '../../services/http'
 import type { ChatCards, ChatMessage } from '../../types/chat'
 import { CHAT_MESSAGE_MAX, chatMessageSchema, type ChatMessageValues } from '../../schemas/chat.schema'
@@ -13,13 +14,23 @@ import { CHAT_MESSAGE_MAX, chatMessageSchema, type ChatMessageValues } from '../
 // The API accepts up to 40 turns; it only reads the last few, so send fewer.
 const HISTORY_TURNS = 12
 
-let nextId = 1
+const message = (role: ChatMessage['role'], content: string, cards?: ChatMessage['cards']): ChatMessage => ({
+  id: crypto.randomUUID(),
+  role,
+  content,
+  ...(cards ? { cards } : {}),
+})
 
-/** Floating assistant button and chat panel, shown to logged-in users. */
-export default function ChatBubble() {
+/** Floating assistant button and chat panel, shown to logged-in users. `userId` is whose chat to show. */
+export default function ChatBubble({ userId }: { userId: number }) {
   const { t, i18n } = useTranslation()
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState<ChatMessage[]>([])
+  // The history lives in the chat store (sessionStorage); only this user's is ever shown.
+  const messages = useChatStore(selectMessagesFor(userId))
+  const ask = useChatStore((state) => state.ask)
+  const reply = useChatStore((state) => state.reply)
+  const dropLast = useChatStore((state) => state.dropLast)
+  const clearChat = useChatStore((state) => state.clear)
   const { register, handleSubmit, setValue, setFocus } = useForm<ChatMessageValues>({
     resolver: zodResolver(chatMessageSchema),
     defaultValues: { message: '' },
@@ -46,29 +57,26 @@ export default function ChatBubble() {
   }, [open])
 
   async function send(text: string) {
-    const message = text.trim()
-    if (!message || pending) return
+    const question = text.trim()
+    if (!question || pending) return
 
     const history = messages.slice(-HISTORY_TURNS).map(({ role, content }) => ({ role, content }))
-    setMessages((current) => [...current, { id: nextId++, role: 'user', content: message }])
+    ask(userId, message('user', question))
     setValue('message', '')
     setError(null)
     setPending(true)
 
     try {
       const answer = await chatService.ask({
-        message,
+        message: question,
         history,
         language: i18n.resolvedLanguage === 'bg' ? 'bg' : 'en',
       })
-      setMessages((current) => [
-        ...current,
-        { id: nextId++, role: 'assistant', content: answer.reply, cards: answer.cards },
-      ])
+      reply(userId, message('assistant', answer.reply, answer.cards))
     } catch (caught) {
       // Take the failed message back out so "try again" doesn't send it twice.
-      setMessages((current) => current.slice(0, -1))
-      setError({ text: message, message: errorMessage(caught) })
+      dropLast(userId)
+      setError({ text: question, message: errorMessage(caught) })
     } finally {
       setPending(false)
     }
@@ -85,7 +93,7 @@ export default function ChatBubble() {
   }
 
   function reset() {
-    setMessages([])
+    clearChat()
     setError(null)
     setValue('message', '')
   }

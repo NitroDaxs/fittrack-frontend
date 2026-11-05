@@ -9,7 +9,7 @@ import MeasurementChart from '../components/charts/MeasurementChart'
 import { ErrorState, Spinner } from '../components/ui/States'
 import Icon from '../components/ui/Icon'
 import UnitToggle from '../components/ui/UnitToggle'
-import { useUnits } from '../context/UnitContext'
+import { useSetUnit, useUnitFormat } from '../hooks/useUnits'
 import { useLogMeasurement, useMeasurements } from '../hooks/useMe'
 
 // `kind` drives both the label suffix and which converter runs on submit;
@@ -48,7 +48,8 @@ function Delta({ current, previous, suffix = '' }: { current: number | null; pre
 
 export default function BodyMeasurements() {
   const { t } = useTranslation()
-  const { unit, setUnit, weightLabel, lengthLabel, showWeight, showLength, toStoredWeight, toStoredLength } = useUnits()
+  const { unit, weightLabel, lengthLabel, showWeight, showLength, toStoredWeight, toStoredLength } = useUnitFormat()
+  const setUnit = useSetUnit()
   const { data: measurements, isPending: loading, error, refetch } = useMeasurements()
   const logMeasurement = useLogMeasurement()
 

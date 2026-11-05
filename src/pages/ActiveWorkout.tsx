@@ -1,13 +1,25 @@
 import { useTranslation } from 'react-i18next'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { useWorkoutDraft } from '../context/WorkoutContext'
+import { REST_SECONDS, isRestRunning, restSecondsLeft, useWorkoutStore } from '../store/workout.store'
 import { ApiError } from '../services/http'
 import Icon from '../components/ui/Icon'
 import Img from '../components/ui/Img'
 import { useLogWorkout } from '../hooks/useMe'
 
-const REST_SECONDS = 90
+/**
+ * Re-renders a few times a second while `active`, so anything read from Date.now()
+ * during render stays current. Faster than once a second so the display never lags
+ * a whole second behind, for example after a reload mid-countdown.
+ */
+function useTicker(active: boolean) {
+  const [, setTick] = useState(0)
+  useEffect(() => {
+    if (!active) return undefined
+    const interval = setInterval(() => setTick((tick) => tick + 1), 250)
+    return () => clearInterval(interval)
+  }, [active])
+}
 
 interface StepperProps {
   label: string
@@ -67,31 +79,24 @@ function Stepper({ label, value, step, onAdjust, onSet }: StepperProps) {
 export default function ActiveWorkout() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { session, adjustCurrent, setCurrentValue, completeSet, goToExercise, endSession } = useWorkoutDraft()
+  const session = useWorkoutStore((state) => state.session)
+  const adjustCurrent = useWorkoutStore((state) => state.adjustCurrent)
+  const setCurrentValue = useWorkoutStore((state) => state.setCurrentValue)
+  const completeSet = useWorkoutStore((state) => state.completeSet)
+  const goToExercise = useWorkoutStore((state) => state.goToExercise)
+  const endSession = useWorkoutStore((state) => state.endSession)
+  const resetDraft = useWorkoutStore((state) => state.resetDraft)
 
-  const [restRemaining, setRestRemaining] = useState(0)
-  const [restRunning, setRestRunning] = useState(false)
+  const startRest = useWorkoutStore((state) => state.startRest)
+  const pauseRest = useWorkoutStore((state) => state.pauseRest)
+  const skipRest = useWorkoutStore((state) => state.skipRest)
   const logWorkout = useLogWorkout()
 
-  // Rest countdown. Ticks only while running, and clears itself at zero.
-  useEffect(() => {
-    if (!restRunning) return undefined
-    const interval = setInterval(() => {
-      setRestRemaining((remaining) => {
-        if (remaining <= 1) {
-          setRestRunning(false)
-          return 0
-        }
-        return remaining - 1
-      })
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [restRunning])
-
-  const startRest = useCallback((seconds = REST_SECONDS) => {
-    setRestRemaining(seconds)
-    setRestRunning(true)
-  }, [])
+  // The timer lives in the store as timestamps; this only redraws it while it runs.
+  const now = Date.now()
+  const restRunning = session ? isRestRunning(session.rest, now) : false
+  const restRemaining = session ? restSecondsLeft(session.rest, now) : 0
+  useTicker(restRunning)
 
   if (!session) return <Navigate to="/builder" replace />
 
@@ -102,15 +107,8 @@ export default function ActiveWorkout() {
   const progress = totalSets ? Math.round((doneSets / totalSets) * 100) : 0
   const previousSet = current.logged[current.logged.length - 1]
 
-  const handleComplete = () => {
-    const outcome = completeSet()
-    if (outcome.type === 'finished') {
-      setRestRunning(false)
-      setRestRemaining(0)
-    } else {
-      startRest()
-    }
-  }
+  // completeSet starts the rest timer itself, or stops it after the last set.
+  const handleComplete = () => void completeSet()
 
   // On failure the session stays, so the workout isn't lost and the button can retry.
   const finishWorkout = () =>
@@ -120,7 +118,10 @@ export default function ActiveWorkout() {
       entries: session.exercises.map((exercise) => ({ exerciseId: exercise.exerciseId, sets: exercise.logged })),
     }, {
       onSuccess: () => {
+        // The workout is in history now, so the builder starts fresh. Quitting keeps
+        // the draft instead, so the same workout can be started again.
         endSession()
+        resetDraft()
         navigate('/history')
       },
     })
@@ -315,17 +316,14 @@ export default function ActiveWorkout() {
             <>
               <button
                 type="button"
-                onClick={() => setRestRunning(false)}
+                onClick={pauseRest}
                 className="font-label-bold text-label-bold text-secondary hover:text-on-surface px-sm py-xs rounded-full transition-colors"
               >
                 {t('activeWorkout.pause')}
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setRestRunning(false)
-                  setRestRemaining(0)
-                }}
+                onClick={skipRest}
                 className="font-label-bold text-label-bold text-primary hover:text-primary-container px-sm py-xs rounded-full transition-colors"
               >
                 {t('activeWorkout.skip')}
@@ -334,7 +332,7 @@ export default function ActiveWorkout() {
           ) : (
             <button
               type="button"
-              onClick={() => startRest(restRemaining || REST_SECONDS)}
+              onClick={() => startRest(session.rest.pausedMs ? session.rest.pausedMs / 1000 : REST_SECONDS)}
               className="font-label-bold text-label-bold text-primary hover:text-primary-container px-sm py-xs rounded-full transition-colors"
             >
               {restRemaining ? t('activeWorkout.resume') : t('activeWorkout.startRest')}

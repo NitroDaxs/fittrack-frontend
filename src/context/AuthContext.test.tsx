@@ -4,8 +4,11 @@ import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { toast } from 'sonner'
 import i18n from '../i18n'
-import { userDto } from '../test/fixtures'
+import { exercise, userDto } from '../test/fixtures'
 import { createTestQueryClient, silenceRenderErrors } from '../test/utils'
+import { useChatStore } from '../store/chat.store'
+import { useUnitStore } from '../store/unit.store'
+import { useWorkoutStore } from '../store/workout.store'
 import { AuthProvider, useAuth } from './AuthContext'
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
@@ -137,6 +140,54 @@ describe('login / register / logout', () => {
     expect(localStorage.getItem(SESSION_KEY)).toBeNull()
     expect(queryClient.getQueryData(['private'])).toBeUndefined()
   })
+
+  it('logout clears the workout draft and session', async () => {
+    storeSession()
+    const workout = useWorkoutStore.getState()
+    workout.addExercise(exercise({ id: 1, name: 'Squat' }))
+    workout.startSession()
+    expect(useWorkoutStore.getState().session).not.toBeNull()
+    const { result } = setup()
+
+    await act(async () => {
+      await result.current.logout()
+    })
+    expect(useWorkoutStore.getState().session).toBeNull()
+    expect(useWorkoutStore.getState().draft.items).toEqual([])
+    expect(JSON.parse(localStorage.getItem('fittrack.workout')!).state.session).toBeNull()
+  })
+})
+
+describe('chat history', () => {
+  const chatOf = (userId: number) => {
+    useChatStore.getState().ask(userId, { id: 'm1', role: 'user', content: 'Hi' })
+  }
+
+  it('logout clears it', async () => {
+    storeSession(userDto({ id: 1 }))
+    chatOf(1)
+    const { result } = setup()
+    await act(async () => {
+      await result.current.logout()
+    })
+    expect(useChatStore.getState()).toMatchObject({ userId: null, messages: [] })
+  })
+
+  it('is deleted when a different user is signed in', () => {
+    storeSession(userDto({ id: 2 }))
+    chatOf(1)
+    setup()
+    expect(useChatStore.getState().messages).toEqual([])
+  })
+
+  it("is kept for its owner, and while nobody is signed in", () => {
+    chatOf(1)
+    setup()
+    expect(useChatStore.getState().messages).toHaveLength(1)
+    storeSession(userDto({ id: 1 }))
+    setup()
+    expect(useChatStore.getState().messages).toHaveLength(1)
+  })
 })
 
 describe('expired sessions', () => {
@@ -160,6 +211,22 @@ describe('keeping the session in step', () => {
     await waitFor(() => expect(result.current.isAdmin).toBe(true))
     expect(result.current.user?.name).toBe('Promoted')
     expect(JSON.parse(localStorage.getItem(SESSION_KEY)!).role).toBe('admin')
+  })
+
+  it("adopts the account's unit preference once the profile loads", async () => {
+    useUnitStore.getState().setUnit('imperial')
+    storeSession()
+    vi.mocked(meService.profile).mockResolvedValue(toProfile(userDto({ units: 'metric' })))
+    setup()
+    await waitFor(() => expect(useUnitStore.getState().unit).toBe('metric'))
+  })
+
+  it('leaves a guest unit preference alone', async () => {
+    useUnitStore.getState().setUnit('metric')
+    setup()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(meService.profile).not.toHaveBeenCalled()
+    expect(useUnitStore.getState().unit).toBe('metric')
   })
 
   it('ignores a profile for a different user', async () => {

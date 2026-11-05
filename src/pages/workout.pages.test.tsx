@@ -1,10 +1,10 @@
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { useEffect, useState, type ReactNode } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { WorkoutProvider, useWorkoutDraft, type Draft } from '../context/WorkoutContext'
 import i18n from '../i18n'
+import { useWorkoutStore } from '../store/workout.store'
+import type { Draft } from '../types/workout'
 import { ApiError } from '../services/http'
 import { exercise } from '../test/fixtures'
 import { renderWithProviders } from '../test/utils'
@@ -37,23 +37,11 @@ const routes = (
   </Routes>
 )
 
-/** Starts a session before rendering the app, for tests that begin in the logger. */
-function WithSession({ draft, children }: { draft: Draft; children: ReactNode }) {
-  const { startSession } = useWorkoutDraft()
-  const [ready, setReady] = useState(false)
-  useEffect(() => {
-    startSession(draft)
-    setReady(true)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  return ready ? children : null
+/** Renders the routes, first starting a session for tests that begin in the logger. */
+const renderApp = (route: string, draft?: Draft) => {
+  if (draft) useWorkoutStore.getState().startSession(draft)
+  return renderWithProviders(routes, { route })
 }
-
-const renderApp = (route: string, draft?: Draft) =>
-  renderWithProviders(
-    <WorkoutProvider>{draft ? <WithSession draft={draft}>{routes}</WithSession> : routes}</WorkoutProvider>,
-    { route },
-  )
 
 const item = (e: typeof squat, sets: number, reps: number, weight: number) => ({
   uid: `u${e.id}`,
@@ -225,6 +213,19 @@ describe('ActiveWorkout', () => {
     expect(screen.getByRole('button', { name: t('activeWorkout.startRest') })).toBeInTheDocument()
   })
 
+  it('keeps the rest timer running while the logger is closed', () => {
+    vi.useFakeTimers()
+    const { unmount } = startLogger()
+    fireEvent.click(screen.getByRole('button', { name: t('activeWorkout.completeSet') }))
+    unmount()
+
+    // Away from the logger for 20 seconds, then back.
+    act(() => vi.advanceTimersByTime(20_000))
+    renderApp('/workout/active')
+    expect(screen.getByText(/^\d\d:\d\d$/)).toHaveTextContent('01:10')
+    expect(screen.getByRole('button', { name: t('activeWorkout.pause') })).toBeInTheDocument()
+  })
+
   it('jumps to another exercise from the list', async () => {
     startLogger()
     await userEvent.click(screen.getByRole('button', { name: /Bench Press/ }))
@@ -236,6 +237,27 @@ describe('ActiveWorkout', () => {
     startLogger()
     await userEvent.click(screen.getByRole('button', { name: t('activeWorkout.quitWorkout') }))
     expect(screen.getByLabelText(t('workoutBuilder.workoutName'))).toBeInTheDocument()
+  })
+
+  it('keeps the builder exercises after quitting', async () => {
+    renderApp('/builder')
+    await userEvent.click(screen.getByLabelText(t('workoutBuilder.searchLibraryToAddExercise')))
+    await userEvent.click(await screen.findByRole('button', { name: /Squat/ }))
+    await userEvent.click(screen.getByRole('button', { name: t('workoutBuilder.startWorkout') }))
+    await userEvent.click(screen.getByRole('button', { name: t('activeWorkout.quitWorkout') }))
+    expect(screen.getByRole('heading', { name: 'Squat', level: 3 })).toBeInTheDocument()
+  })
+
+  it('empties the builder once the workout is saved', async () => {
+    renderApp('/builder')
+    await userEvent.click(screen.getByLabelText(t('workoutBuilder.searchLibraryToAddExercise')))
+    await userEvent.click(await screen.findByRole('button', { name: /Squat/ }))
+    await userEvent.click(screen.getByRole('button', { name: t('workoutBuilder.startWorkout') }))
+    await finishAllSets()
+    await userEvent.click(screen.getByRole('button', { name: t('activeWorkout.saveToHistory') }))
+    expect(await screen.findByText('landed on /history')).toBeInTheDocument()
+    expect(useWorkoutStore.getState().session).toBeNull()
+    expect(useWorkoutStore.getState().draft).toEqual({ name: t('workoutBuilder.newWorkout'), items: [] })
   })
 
   const finishAllSets = async () => {

@@ -5,7 +5,7 @@ import { ErrorState, Spinner } from '../components/ui/States'
 import Icon from '../components/ui/Icon'
 import VideoEmbed from '../components/ui/VideoEmbed'
 import { useAuth } from '../context/AuthContext'
-import { useWorkoutDraft } from '../context/WorkoutContext'
+import { useWorkoutStore } from '../store/workout.store'
 import { useExercise, useExercises } from '../hooks/useExercises'
 import { useFavorite } from '../hooks/useFavorite'
 
@@ -14,7 +14,7 @@ export default function ExerciseDetail() {
   const { slug = '' } = useParams()
   const navigate = useNavigate()
   const { isMember } = useAuth()
-  const { addExercise } = useWorkoutDraft()
+  const addExercise = useWorkoutStore((state) => state.addExercise)
 
   const { data: exercise, isPending: loading, error, refetch } = useExercise(slug)
   const primaryMuscle = exercise?.muscleGroups[0]

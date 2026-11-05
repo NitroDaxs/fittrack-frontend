@@ -2,7 +2,6 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { UnitProvider } from '../context/UnitContext'
 import { calculators } from '../data/calculators'
 import i18n from '../i18n'
 import { renderWithProviders } from '../test/utils'
@@ -22,7 +21,7 @@ vi.mock('../services/calculators', () => ({
 const { calculatorService } = await import('../services/calculators')
 const t = (key: string, params?: Record<string, unknown>) => i18n.t(key, params)
 
-const renderCalculator = (ui: ReactNode) => renderWithProviders(<UnitProvider>{ui}</UnitProvider>)
+const renderCalculator = (ui: ReactNode) => renderWithProviders(ui)
 const calculate = () => userEvent.click(screen.getByRole('button', { name: t('calculators.shared.calculate') }))
 const sentBody = (fn: (...args: never[]) => unknown) => vi.mocked(fn).mock.calls[0][0]
 

@@ -1,5 +1,5 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { useUnits } from '../../context/UnitContext'
+import { useUnitFormat } from '../../hooks/useUnits'
 import type { StrengthPoint } from '../../types/me'
 
 export const tokens = {
@@ -33,7 +33,7 @@ function ChartTooltip({ active, payload, label, unit = 'lbs' }: ChartTooltipProp
 export default function StrengthChart({ data }: { data: StrengthPoint[] }) {
   // Lifted weights arrive in lbs from the API; convert here so every caller
   // doesn't have to remember to.
-  const { weightLabel, showWeight } = useUnits()
+  const { weightLabel, showWeight } = useUnitFormat()
   const series = data.map((point) => ({ ...point, value: showWeight(point.value) }))
 
   return (
