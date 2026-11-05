@@ -29,7 +29,7 @@ afterEach(async () => {
 
 describe('ChatBubble', () => {
   it('opens and closes the panel', async () => {
-    renderWithProviders(<ChatBubble />)
+    renderWithProviders(<ChatBubble userId={1} />)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     await open()
     expect(screen.getByRole('dialog', { name: t('chat.title') })).toBeInTheDocument()
@@ -44,7 +44,7 @@ describe('ChatBubble', () => {
   })
 
   it('sends with Enter, keeps Shift+Enter for new lines, and shows the reply', async () => {
-    renderWithProviders(<ChatBubble />)
+    renderWithProviders(<ChatBubble userId={1} />)
     await open()
     await userEvent.type(input(), 'Hi{Shift>}{Enter}{/Shift}there')
     expect(input()).toHaveValue('Hi\nthere')
@@ -57,7 +57,7 @@ describe('ChatBubble', () => {
   })
 
   it('ignores blank messages', async () => {
-    renderWithProviders(<ChatBubble />)
+    renderWithProviders(<ChatBubble userId={1} />)
     await open()
     await userEvent.type(input(), '   {Enter}')
     await userEvent.click(screen.getByRole('button', { name: t('chat.send') }))
@@ -65,7 +65,7 @@ describe('ChatBubble', () => {
   })
 
   it('sends a suggestion and includes earlier turns as history', async () => {
-    renderWithProviders(<ChatBubble />)
+    renderWithProviders(<ChatBubble userId={1} />)
     await open()
     await userEvent.click(screen.getByRole('button', { name: t('chat.suggestion1') }))
     await screen.findByText('Hello!')
@@ -81,7 +81,7 @@ describe('ChatBubble', () => {
 
   it('asks in Bulgarian when the app is in Bulgarian', async () => {
     await i18n.changeLanguage('bg')
-    renderWithProviders(<ChatBubble />)
+    renderWithProviders(<ChatBubble userId={1} />)
     await userEvent.click(screen.getByRole('button', { name: i18n.t('chat.open') }))
     await userEvent.type(screen.getByRole('textbox'), 'Здрасти{Enter}')
     await waitFor(() => expect(chatService.ask).toHaveBeenCalledWith(expect.objectContaining({ language: 'bg' })))
@@ -89,7 +89,7 @@ describe('ChatBubble', () => {
 
   it('renders bold text and lists in replies', async () => {
     vi.mocked(chatService.ask).mockResolvedValue(answer('## Plan\n**Day 1** focus\n- Squat\n- Bench\n1. Warm up\n2) Lift'))
-    renderWithProviders(<ChatBubble />)
+    renderWithProviders(<ChatBubble userId={1} />)
     await open()
     await userEvent.type(input(), 'plan{Enter}')
     expect(await screen.findByText('Day 1')).toContainHTML('<strong>Day 1</strong>')
@@ -102,7 +102,7 @@ describe('ChatBubble', () => {
 
   it('links to suggested content and closes when one is followed', async () => {
     vi.mocked(chatService.ask).mockResolvedValue(answer('Try this', { exercises: [exercise({ slug: 'bench-press', name: 'Bench Press' })] }))
-    renderWithProviders(<ChatBubble />)
+    renderWithProviders(<ChatBubble userId={1} />)
     await open()
     await userEvent.type(input(), 'chest{Enter}')
     const link = await screen.findByRole('link', { name: /Bench Press/ })
@@ -113,7 +113,7 @@ describe('ChatBubble', () => {
 
   it('shows a failure, removes the failed message and retries it', async () => {
     vi.mocked(chatService.ask).mockRejectedValueOnce(new Error('Assistant unavailable'))
-    renderWithProviders(<ChatBubble />)
+    renderWithProviders(<ChatBubble userId={1} />)
     await open()
     await userEvent.type(input(), 'Hello?{Enter}')
 
@@ -127,8 +127,39 @@ describe('ChatBubble', () => {
     expect(vi.mocked(chatService.ask).mock.calls[1][0].message).toBe('Hello?')
   })
 
+  it('keeps the conversation when the bubble is mounted again, as after a refresh', async () => {
+    const { unmount } = renderWithProviders(<ChatBubble userId={1} />)
+    await open()
+    await userEvent.type(input(), 'Hi{Enter}')
+    await screen.findByText('Hello!')
+    unmount()
+
+    renderWithProviders(<ChatBubble userId={1} />)
+    await open()
+    expect(screen.getByText('Hi')).toBeInTheDocument()
+    expect(screen.getByText('Hello!')).toBeInTheDocument()
+  })
+
+  it("never shows one user another user's chat", async () => {
+    const { unmount } = renderWithProviders(<ChatBubble userId={1} />)
+    await open()
+    await userEvent.type(input(), 'My secret{Enter}')
+    await screen.findByText('Hello!')
+    unmount()
+
+    renderWithProviders(<ChatBubble userId={2} />)
+    await open()
+    expect(screen.queryByText('My secret')).not.toBeInTheDocument()
+    expect(screen.getByText(t('chat.intro'))).toBeInTheDocument()
+
+    // Nor is it sent as their history.
+    await userEvent.type(input(), 'Hi{Enter}')
+    await screen.findByText('Hello!')
+    expect(vi.mocked(chatService.ask).mock.calls[1][0].history).toEqual([])
+  })
+
   it('starts a new chat', async () => {
-    renderWithProviders(<ChatBubble />)
+    renderWithProviders(<ChatBubble userId={1} />)
     await open()
     expect(screen.queryByRole('button', { name: t('chat.newChat') })).not.toBeInTheDocument()
     await userEvent.type(input(), 'Hi{Enter}')

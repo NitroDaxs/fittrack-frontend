@@ -31,7 +31,8 @@ export interface ChatCards {
 }
 
 export interface ChatMessage {
-  id: number
+  // A UUID: a counter would restart after a refresh and clash with the saved messages.
+  id: string
   role: ChatRole
   content: string
   cards?: ChatCards

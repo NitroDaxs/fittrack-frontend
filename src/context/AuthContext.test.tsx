@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import i18n from '../i18n'
 import { exercise, userDto } from '../test/fixtures'
 import { createTestQueryClient, silenceRenderErrors } from '../test/utils'
+import { useChatStore } from '../store/chat.store'
 import { useUnitStore } from '../store/unit.store'
 import { useWorkoutStore } from '../store/workout.store'
 import { AuthProvider, useAuth } from './AuthContext'
@@ -154,6 +155,38 @@ describe('login / register / logout', () => {
     expect(useWorkoutStore.getState().session).toBeNull()
     expect(useWorkoutStore.getState().draft.items).toEqual([])
     expect(JSON.parse(localStorage.getItem('fittrack.workout')!).state.session).toBeNull()
+  })
+})
+
+describe('chat history', () => {
+  const chatOf = (userId: number) => {
+    useChatStore.getState().ask(userId, { id: 'm1', role: 'user', content: 'Hi' })
+  }
+
+  it('logout clears it', async () => {
+    storeSession(userDto({ id: 1 }))
+    chatOf(1)
+    const { result } = setup()
+    await act(async () => {
+      await result.current.logout()
+    })
+    expect(useChatStore.getState()).toMatchObject({ userId: null, messages: [] })
+  })
+
+  it('is deleted when a different user is signed in', () => {
+    storeSession(userDto({ id: 2 }))
+    chatOf(1)
+    setup()
+    expect(useChatStore.getState().messages).toEqual([])
+  })
+
+  it("is kept for its owner, and while nobody is signed in", () => {
+    chatOf(1)
+    setup()
+    expect(useChatStore.getState().messages).toHaveLength(1)
+    storeSession(userDto({ id: 1 }))
+    setup()
+    expect(useChatStore.getState().messages).toHaveLength(1)
   })
 })
 
