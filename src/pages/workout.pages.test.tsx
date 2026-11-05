@@ -213,6 +213,19 @@ describe('ActiveWorkout', () => {
     expect(screen.getByRole('button', { name: t('activeWorkout.startRest') })).toBeInTheDocument()
   })
 
+  it('keeps the rest timer running while the logger is closed', () => {
+    vi.useFakeTimers()
+    const { unmount } = startLogger()
+    fireEvent.click(screen.getByRole('button', { name: t('activeWorkout.completeSet') }))
+    unmount()
+
+    // Away from the logger for 20 seconds, then back.
+    act(() => vi.advanceTimersByTime(20_000))
+    renderApp('/workout/active')
+    expect(screen.getByText(/^\d\d:\d\d$/)).toHaveTextContent('01:10')
+    expect(screen.getByRole('button', { name: t('activeWorkout.pause') })).toBeInTheDocument()
+  })
+
   it('jumps to another exercise from the list', async () => {
     startLogger()
     await userEvent.click(screen.getByRole('button', { name: /Bench Press/ }))

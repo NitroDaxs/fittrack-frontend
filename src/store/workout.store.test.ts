@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import i18n from '../i18n'
 import { exercise } from '../test/fixtures'
 import type { Routine, RoutineDay } from '../types/routines'
-import { WORKOUT_STORAGE_KEY, useWorkoutStore } from './workout.store'
+import { REST_SECONDS, WORKOUT_STORAGE_KEY, isRestRunning, restSecondsLeft, useWorkoutStore } from './workout.store'
 
 // The store is reset before every test in src/test/setup.ts.
 const store = () => useWorkoutStore.getState()
@@ -202,11 +202,93 @@ describe('session', () => {
   })
 })
 
+describe('rest timer', () => {
+  const left = () => restSecondsLeft(store().session!.rest, Date.now())
+  const running = () => isRestRunning(store().session!.rest, Date.now())
+  const start = () => {
+    store().addExercise(squat, { sets: 2 })
+    store().addExercise(bench, { sets: 1 })
+    store().startSession()
+  }
+
+  it('is idle when the session starts', () => {
+    start()
+    expect(store().session!.rest).toEqual({ endsAt: null, pausedMs: 0 })
+    expect(left()).toBe(0)
+    expect(running()).toBe(false)
+  })
+
+  it('starts after each set and stops after the last one', () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(0)
+    start()
+    store().completeSet()
+    expect(running()).toBe(true)
+    expect(left()).toBe(REST_SECONDS)
+
+    now.mockReturnValue(20_000)
+    store().completeSet() // last set of the squat: still rests before the bench
+    expect(left()).toBe(REST_SECONDS)
+
+    store().completeSet() // the very last set
+    expect(running()).toBe(false)
+    expect(left()).toBe(0)
+  })
+
+  it('counts down from the clock and runs out by itself', () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(0)
+    start()
+    store().completeSet()
+    now.mockReturnValue(30_500)
+    expect(left()).toBe(60)
+    now.mockReturnValue(REST_SECONDS * 1000)
+    expect(left()).toBe(0)
+    expect(running()).toBe(false)
+  })
+
+  it('pauses with the time left, and resumes from it', () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(0)
+    start()
+    store().completeSet()
+    now.mockReturnValue(10_000)
+    store().pauseRest()
+    expect(store().session!.rest).toEqual({ endsAt: null, pausedMs: 80_000 })
+
+    now.mockReturnValue(100_000) // paused time does not count
+    expect(left()).toBe(80)
+    store().startRest(store().session!.rest.pausedMs / 1000)
+    now.mockReturnValue(105_000)
+    expect(left()).toBe(75)
+  })
+
+  it('pausing a timer that has run out leaves it idle', () => {
+    const now = vi.spyOn(Date, 'now').mockReturnValue(0)
+    start()
+    store().completeSet()
+    now.mockReturnValue(200_000)
+    store().pauseRest()
+    expect(store().session!.rest).toEqual({ endsAt: null, pausedMs: 0 })
+  })
+
+  it('skips', () => {
+    start()
+    store().completeSet()
+    store().skipRest()
+    expect(store().session!.rest).toEqual({ endsAt: null, pausedMs: 0 })
+  })
+
+  it('does nothing without a session', () => {
+    store().startRest()
+    store().pauseRest()
+    store().skipRest()
+    expect(store().session).toBeNull()
+  })
+})
+
 describe('persistence', () => {
-  it('stores only the draft and the session, at version 1', () => {
+  it('stores only the draft and the session, at version 2', () => {
     startWithSquat()
     const stored = JSON.parse(localStorage.getItem(WORKOUT_STORAGE_KEY)!)
-    expect(stored.version).toBe(1)
+    expect(stored.version).toBe(2)
     expect(Object.keys(stored.state).sort()).toEqual(['draft', 'session'])
   })
 
@@ -226,6 +308,36 @@ describe('persistence', () => {
     expect(reloaded.getState().completeSet()).toEqual({ type: 'next-set' })
     expect(reloaded.getState().session!.exercises[0].logged).toHaveLength(2)
   })
+
+  it('the rest timer keeps counting through a rehydration', async () => {
+    vi.spyOn(Date, 'now').mockReturnValue(10_000)
+    startWithSquat()
+    store().completeSet()
+
+    vi.resetModules()
+    const reloaded = await import('./workout.store')
+    // 30 seconds later, as if the page had been closed in between.
+    vi.mocked(Date.now).mockReturnValue(40_000)
+    expect(reloaded.restSecondsLeft(reloaded.useWorkoutStore.getState().session!.rest, Date.now())).toBe(60)
+  })
+
+  it('migrates a version 1 session by giving it an idle rest timer', async () => {
+    const { rest: _rest, ...v1Session } = sessionFixture()
+    localStorage.setItem(WORKOUT_STORAGE_KEY, JSON.stringify({ state: { draft: { name: 'Old', items: [] }, session: v1Session }, version: 1 }))
+
+    vi.resetModules()
+    const { useWorkoutStore: reloaded } = await import('./workout.store')
+    expect(reloaded.getState().session).toEqual({ ...v1Session, rest: { endsAt: null, pausedMs: 0 } })
+    expect(reloaded.getState().draft.name).toBe('Old')
+  })
+
+  function sessionFixture() {
+    startWithSquat()
+    const session = store().session!
+    store().reset()
+    localStorage.clear()
+    return session
+  }
 
   function startWithSquat() {
     store().addExercise(squat, { sets: 3, reps: 5, weight: 100 })

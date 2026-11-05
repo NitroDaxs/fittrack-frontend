@@ -2,7 +2,7 @@
 import {create} from 'zustand'
 import {persist} from 'zustand/middleware'
 import i18n from '../i18n'
-import type {AdjustableField, Draft, DraftItem, SetOutcome, WorkoutSession} from '../types/workout'
+import type {AdjustableField, Draft, DraftItem, RestTimer, SetOutcome, WorkoutSession} from '../types/workout'
 import type {Exercise} from '../types/exercises'
 import type {Routine, RoutineDay} from '../types/routines'
 
@@ -28,11 +28,26 @@ interface WorkoutActions {
     setCurrentValue: (field: AdjustableField, value: number | string) => void
     goToExercise: (index: number) => void
     endSession: () => void
+    startRest: (seconds?: number) => void
+    pauseRest: () => void
+    skipRest: () => void
     reset: () => void // for logout
 }
 
 export const WORKOUT_STORAGE_KEY = 'fittrack.workout'
-const STORAGE_VERSION = 1
+// 2: sessions gained the rest timer.
+const STORAGE_VERSION = 2
+
+export const REST_SECONDS = 90
+const idleRest: RestTimer = {endsAt: null, pausedMs: 0}
+const runningRest = (ms: number): RestTimer => ({endsAt: Date.now() + ms, pausedMs: 0})
+
+/** Whole seconds left on the rest timer at `now`: 0 when idle or run out. */
+export const restSecondsLeft = (rest: RestTimer, now: number): number =>
+    Math.max(0, Math.ceil((rest.endsAt === null ? rest.pausedMs : rest.endsAt - now) / 1000))
+
+/** True while the timer is counting down. */
+export const isRestRunning = (rest: RestTimer, now: number): boolean => rest.endsAt !== null && rest.endsAt > now
 
 // The starting values, in one place, so reset() can return to them.
 const initialState: WorkoutState = {draft: {name: i18n.t('workoutBuilder.newWorkout'), items: []}, session: null}
@@ -120,13 +135,14 @@ export const useWorkoutStore = create<WorkoutState & WorkoutActions>()(
                             reps: Number(item.reps) || 0,
                             logged: [],
                         })),
+                        rest: idleRest,
                     },
                 })
                 return true
             },
             /**
-             * Records the current set and advances. Returns a descriptor of what happened
-             * so the logger can decide whether to start the rest timer or show the summary.
+             * Records the current set and advances, starting the rest timer unless that was
+             * the last set. Returns a descriptor of what happened for the logger.
              */
             completeSet: () => {
                 const session = get().session
@@ -138,16 +154,17 @@ export const useWorkoutStore = create<WorkoutState & WorkoutActions>()(
                         : exercise
                 )
                 const current = exercises[session.exerciseIndex]
+                const rest = runningRest(REST_SECONDS * 1000)
 
                 if (current.logged.length < current.targetSets) {
-                    set({session: {...session, exercises, setIndex: session.setIndex + 1}})
+                    set({session: {...session, exercises, setIndex: session.setIndex + 1, rest}})
                     return {type: 'next-set'}
                 }
                 if (session.exerciseIndex < exercises.length - 1) {
-                    set({session: {...session, exercises, exerciseIndex: session.exerciseIndex + 1, setIndex: 0}})
+                    set({session: {...session, exercises, exerciseIndex: session.exerciseIndex + 1, setIndex: 0, rest}})
                     return {type: 'next-exercise'}
                 }
-                set({session: {...session, exercises, finished: true}})
+                set({session: {...session, exercises, finished: true, rest: idleRest}})
                 return {type: 'finished'}
             },
             adjustCurrent: (field, delta) =>
@@ -179,6 +196,22 @@ export const useWorkoutStore = create<WorkoutState & WorkoutActions>()(
                     return {session: {...session, exerciseIndex: index, setIndex: session.exercises[index]?.logged.length ?? 0}}
                 }),
             endSession: () => set({session: null}),
+
+            // --- rest timer -------------------------------------------------------
+            /** Starts (or resumes) the countdown with `seconds` left. */
+            startRest: (seconds = REST_SECONDS) =>
+                set((state) => (state.session ? {session: {...state.session, rest: runningRest(seconds * 1000)}} : state)),
+            /** Stops the countdown, keeping the time left so it can be resumed. */
+            pauseRest: () =>
+                set((state) => {
+                    const session = state.session
+                    if (!session || session.rest.endsAt === null) return state
+                    const left = session.rest.endsAt - Date.now()
+                    return {session: {...session, rest: left > 0 ? {endsAt: null, pausedMs: left} : idleRest}}
+                }),
+            skipRest: () =>
+                set((state) => (state.session ? {session: {...state.session, rest: idleRest}} : state)),
+
             reset: () => set(initialState),
         }),
         {
@@ -186,9 +219,14 @@ export const useWorkoutStore = create<WorkoutState & WorkoutActions>()(
             version: STORAGE_VERSION,
             // Only the data is stored; the actions come from the code on every load.
             partialize: (state) => ({draft: state.draft, session: state.session}),
-            // Called when the stored version is older than STORAGE_VERSION. Nothing to
-            // convert yet: add a step here whenever the shape of draft or session changes.
-            migrate: (persistedState, _version) => persistedState as WorkoutState,
+            // Called when the stored version is older than STORAGE_VERSION. Add a step
+            // here whenever the shape of draft or session changes.
+            migrate: (persistedState, version) => {
+                const state = persistedState as WorkoutState
+                // 1 -> 2: a session saved before the rest timer existed starts with it idle.
+                if (version < 2 && state.session) state.session = {...state.session, rest: idleRest}
+                return state
+            },
         },
     ),
 )

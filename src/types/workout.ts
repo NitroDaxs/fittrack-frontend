@@ -27,6 +27,18 @@ export interface SessionExercise extends DraftItem {
     logged: LoggedSet[]
 }
 
+/**
+ * The rest countdown between sets. Stored as times rather than a ticking number,
+ * so it keeps counting while the logger is closed and across reloads.
+ * Running: endsAt is set. Paused: endsAt is null and pausedMs is the time left.
+ * Idle: endsAt is null and pausedMs is 0. A running timer whose endsAt has passed
+ * has simply run out.
+ */
+export interface RestTimer {
+    endsAt: number | null
+    pausedMs: number
+}
+
 export interface WorkoutSession {
     name: string
     startedAt: number
@@ -34,6 +46,7 @@ export interface WorkoutSession {
     setIndex: number
     finished: boolean
     exercises: SessionExercise[]
+    rest: RestTimer
 }
 
 export type AdjustableField = 'weight' | 'reps'
